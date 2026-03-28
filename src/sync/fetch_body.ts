@@ -19,6 +19,9 @@ export async function fetchBody(
 	const message = getMessage(db, folder.id, uid);
 	if (!message) throw new Error(`Message not found: ${folderPath} uid ${uid}`);
 
+	if (session.selectedFolder !== folderPath) {
+		await session.selectFolder(folderPath);
+	}
 	const results = await session.fetchMessages(String(uid), ['BODY.PEEK[]']);
 	const result = results[0];
 	if (!result) return;

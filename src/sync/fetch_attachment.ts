@@ -24,6 +24,9 @@ export async function fetchAttachment(
 	const att = attachments.find((a) => a.partPath === partPath);
 	if (!att) throw new Error(`Attachment part ${partPath} not found`);
 
+	if (session.selectedFolder !== folderPath) {
+		await session.selectFolder(folderPath);
+	}
 	const results = await session.fetchMessages(String(uid), [`BODY.PEEK[${partPath}]`]);
 	const result = results[0];
 	if (!result) throw new Error('No FETCH response');

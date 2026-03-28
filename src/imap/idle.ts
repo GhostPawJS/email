@@ -35,12 +35,22 @@ export async function* idle(
 
 	dispatcher.onUnsolicited(handler);
 
+	let idlePromise: Promise<unknown> | null = null;
+
 	const enterIdle = async () => {
-		await dispatcher.execute('IDLE');
+		idlePromise = dispatcher.execute('IDLE');
+		await idlePromise;
+		idlePromise = null;
+	};
+
+	const exitIdle = () => {
+		// RFC 2177: send DONE\r\n to terminate IDLE before issuing new commands.
+		dispatcher.sendRaw('DONE\r\n');
 	};
 
 	signal?.addEventListener('abort', () => {
 		done = true;
+		exitIdle();
 		notify?.();
 	});
 
@@ -67,13 +77,25 @@ export async function* idle(
 			if (signal?.aborted) {
 				done = true;
 			} else if (events.length === 0) {
-				// timeout renewal — restart IDLE
+				// Timeout renewal — send DONE, wait for IDLE to terminate, then re-enter.
 				clearTimeout(timer);
-				timer = renewTimer();
+				exitIdle();
+				await (idlePromise ?? Promise.resolve());
+				if (!done) {
+					void enterIdle();
+					timer = renewTimer();
+				}
 			}
 		}
 	} finally {
 		clearTimeout(timer);
 		dispatcher.onUnsolicited(() => {});
+		// Drain the pending IDLE command. In production the server always responds after
+		// receiving DONE; add a 5-second safety timeout for degenerate cases (e.g. tests
+		// with stub transports that never deliver the tagged OK).
+		await Promise.race([
+			idlePromise ?? Promise.resolve(),
+			new Promise<void>((res) => setTimeout(res, 5000)),
+		]).catch(() => {});
 	}
 }

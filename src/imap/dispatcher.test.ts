@@ -143,4 +143,57 @@ describe('ImapDispatcher', () => {
 		d.receive(Buffer.from('T0001 OK Done\r\n'));
 		await p;
 	});
+
+	it('handles FETCH response with literal split across two TCP chunks', async () => {
+		const { socket } = makeMockSocket();
+		const tokenizer = new ImapTokenizer();
+		const d = new ImapDispatcher(socket, tokenizer, createTagGenerator('T'));
+
+		const p = d.execute('UID FETCH', ['1', '(BODY[])']);
+
+		// Chunk 1: FETCH header + literal specifier, but body is in next chunk
+		d.receive(Buffer.from('* 1 FETCH (UID 42 BODY[] {13}\r\nHello, World!'));
+		// Chunk 2: closing paren + CRLF + tagged OK
+		d.receive(Buffer.from(')\r\nT0001 OK Fetch done\r\n'));
+
+		const result = await p;
+		assert.equal(result.tagged.status, 'OK');
+		assert.equal(result.untagged.length, 1);
+		assert.equal(result.untagged[0]?.type, 'FETCH');
+	});
+
+	it('handles response split mid-line across multiple receive() calls', async () => {
+		const { socket } = makeMockSocket();
+		const tokenizer = new ImapTokenizer();
+		const d = new ImapDispatcher(socket, tokenizer, createTagGenerator('T'));
+
+		const p = d.execute('NOOP');
+
+		// Split "T0001 OK Done\r\n" across three chunks
+		d.receive(Buffer.from('T0001'));
+		d.receive(Buffer.from(' OK Do'));
+		d.receive(Buffer.from('ne\r\n'));
+
+		const result = await p;
+		assert.equal(result.tagged.status, 'OK');
+	});
+
+	it('sendRaw writes directly to the socket', () => {
+		const { socket, written } = makeMockSocket();
+		const tokenizer = new ImapTokenizer();
+		const d = new ImapDispatcher(socket, tokenizer, createTagGenerator('T'));
+
+		d.sendRaw('DONE\r\n');
+		assert.equal(written[0], 'DONE\r\n');
+	});
+
+	it('sendRaw is a no-op after destroy', () => {
+		const { socket, written } = makeMockSocket();
+		const tokenizer = new ImapTokenizer();
+		const d = new ImapDispatcher(socket, tokenizer, createTagGenerator('T'));
+
+		d.destroy();
+		d.sendRaw('DONE\r\n');
+		assert.equal(written.length, 0);
+	});
 });

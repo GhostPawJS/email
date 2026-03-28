@@ -27,41 +27,56 @@ function makeSession(fetchResults: FetchResult[]): Partial<ImapSession> {
 }
 
 describe('initialSync', () => {
+	const makeFetchResult = (uid: number, subject: string): FetchResult => ({
+		uid,
+		flags: ['\\Seen'],
+		internalDate: new Date().toISOString(),
+		size: 100,
+		envelope: {
+			date: new Date().toISOString(),
+			subject,
+			from: [],
+			sender: [],
+			replyTo: [],
+			to: [],
+			cc: [],
+			bcc: [],
+			inReplyTo: null,
+			messageId: `<msg${uid}@test>`,
+		},
+		bodyStructure: null,
+		modSeq: null,
+		bodySections: new Map(),
+	});
+
 	it('inserts messages and updates folder meta', async () => {
 		const db = new DatabaseSync(':memory:') as EmailDb;
 		initSchema(db);
 		const a = upsertAccount(db, { host: 'h', port: 993, username: 'u' });
 		const f = upsertFolder(db, { accountId: a.id, path: 'INBOX' });
 
-		const results: FetchResult[] = [
-			{
-				uid: 1,
-				flags: ['\\Seen'],
-				internalDate: new Date().toISOString(),
-				size: 100,
-				envelope: {
-					date: new Date().toISOString(),
-					subject: 'Hello',
-					from: [],
-					sender: [],
-					replyTo: [],
-					to: [],
-					cc: [],
-					bcc: [],
-					inReplyTo: null,
-					messageId: '<msg1@test>',
-				},
-				bodyStructure: null,
-				modSeq: null,
-				bodySections: new Map(),
-			},
-		];
-
+		const results = [makeFetchResult(1, 'Hello')];
 		const session = makeSession(results) as unknown as ImapSession;
 		const result = await initialSync(session, db, f.id, 'INBOX');
 
 		assert.equal(listMessages(db, f.id).length, 1);
 		assert.equal(result.newMessages, 1);
+		db.close();
+	});
+
+	it('running initialSync twice does not crash (idempotent via batch insert)', async () => {
+		const db = new DatabaseSync(':memory:') as EmailDb;
+		initSchema(db);
+		const a = upsertAccount(db, { host: 'h', port: 993, username: 'u' });
+		const f = upsertFolder(db, { accountId: a.id, path: 'INBOX' });
+
+		const results = [makeFetchResult(1, 'Hello'), makeFetchResult(2, 'World')];
+		const session = makeSession(results) as unknown as ImapSession;
+
+		await initialSync(session, db, f.id, 'INBOX');
+		await initialSync(session, db, f.id, 'INBOX');
+
+		assert.equal(listMessages(db, f.id).length, 2);
 		db.close();
 	});
 });

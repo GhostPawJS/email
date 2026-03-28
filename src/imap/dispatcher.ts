@@ -1,7 +1,7 @@
 import type { Writable } from 'node:stream';
 import { EmailConnectionError, EmailProtocolError } from '../errors.ts';
 import type { TaggedResponse, UntaggedResponse } from '../types/imap_response.ts';
-import { buildCommand, encodeArg } from './command_builder.ts';
+import { buildCommand, encodeArgs, type RawArg } from './command_builder.ts';
 import { parseResponse } from './response_parser.ts';
 import type { ImapTokenizer } from './tokenizer.ts';
 
@@ -21,6 +21,8 @@ export class ImapDispatcher {
 	/** Fired when the server sends a `+ ` continuation response. */
 	#continuationHandler: ((text: string) => void) | null = null;
 	#destroyed = false;
+	/** Accumulates tokens for the current incomplete response line. */
+	#pendingLine: ReturnType<ImapTokenizer['readAll']> = [];
 
 	constructor(socket: Writable, tokenizer: ImapTokenizer, tagGen: () => string) {
 		this.#socket = socket;
@@ -36,59 +38,60 @@ export class ImapDispatcher {
 
 	#drain(): void {
 		const tok = this.#tokenizer.readAll();
-		// Split on CRLF boundaries into response lines
-		const lines: (typeof tok)[] = [];
-		let cur: typeof tok = [];
 		for (const t of tok) {
 			if (t.type === 'crlf') {
-				if (cur.length) lines.push(cur);
-				cur = [];
+				if (this.#pendingLine.length) {
+					this.#processLine(this.#pendingLine);
+					this.#pendingLine = [];
+				}
 			} else {
-				cur.push(t);
+				this.#pendingLine.push(t);
 			}
 		}
-		if (cur.length) lines.push(cur);
+		// Do NOT flush #pendingLine here — incomplete lines (those without a terminating
+		// CRLF) are held until more data arrives. This correctly handles IMAP FETCH
+		// responses where a large literal body spans multiple TCP chunks.
+	}
 
-		for (const line of lines) {
-			const resp = parseResponse(line);
-			if (resp.kind === 'tagged') {
-				const pending = this.#pending.get(resp.tag);
-				if (pending) {
-					this.#pending.delete(resp.tag);
-					if (resp.status === 'OK') {
-						pending.resolve({ tagged: resp, untagged: pending.untagged });
-					} else {
-						pending.reject(
-							new EmailProtocolError(`IMAP ${resp.status}: ${resp.text}`, {
-								rawResponse: resp.text,
-								tag: resp.tag,
-							}),
-						);
-					}
+	#processLine(line: ReturnType<ImapTokenizer['readAll']>): void {
+		const resp = parseResponse(line);
+		if (resp.kind === 'tagged') {
+			const pending = this.#pending.get(resp.tag);
+			if (pending) {
+				this.#pending.delete(resp.tag);
+				if (resp.status === 'OK') {
+					pending.resolve({ tagged: resp, untagged: pending.untagged });
+				} else {
+					pending.reject(
+						new EmailProtocolError(`IMAP ${resp.status}: ${resp.text}`, {
+							rawResponse: resp.text,
+							tag: resp.tag,
+						}),
+					);
 				}
-			} else if (resp.kind === 'continuation') {
-				// Server is requesting literal data — fire the registered handler.
-				const handler = this.#continuationHandler;
-				this.#continuationHandler = null;
-				if (handler) handler(resp.text);
-			} else if (resp.kind === 'untagged') {
-				// Route to current pending command(s), or to unsolicited handler
-				let routed = false;
-				for (const pending of this.#pending.values()) {
-					pending.untagged.push(resp);
-					routed = true;
-					break; // route to the oldest pending command
-				}
-				if (!routed && this.#unsolicitedHandler) {
-					this.#unsolicitedHandler(resp);
-				}
+			}
+		} else if (resp.kind === 'continuation') {
+			// Server is requesting literal data — fire the registered handler.
+			const handler = this.#continuationHandler;
+			this.#continuationHandler = null;
+			if (handler) handler(resp.text);
+		} else if (resp.kind === 'untagged') {
+			// Route to current pending command(s), or to unsolicited handler
+			let routed = false;
+			for (const pending of this.#pending.values()) {
+				pending.untagged.push(resp);
+				routed = true;
+				break; // route to the oldest pending command
+			}
+			if (!routed && this.#unsolicitedHandler) {
+				this.#unsolicitedHandler(resp);
 			}
 		}
 	}
 
 	execute(
 		name: string,
-		args?: string[],
+		args?: (string | RawArg)[],
 	): Promise<{ tagged: TaggedResponse; untagged: UntaggedResponse[] }> {
 		if (this.#destroyed) {
 			return Promise.reject(new EmailConnectionError('Dispatcher destroyed'));
@@ -122,7 +125,7 @@ export class ImapDispatcher {
 	 */
 	executeWithLiteral(
 		name: string,
-		args: string[],
+		args: (string | RawArg)[],
 		literal: Buffer,
 	): Promise<{ tagged: TaggedResponse; untagged: UntaggedResponse[] }> {
 		if (this.#destroyed) {
@@ -130,7 +133,7 @@ export class ImapDispatcher {
 		}
 		const tag = this.#tagGen();
 		// Encode regular arguments, then append the literal specifier un-quoted.
-		const encodedArgs = args.map(encodeArg).join(' ');
+		const encodedArgs = encodeArgs(args);
 		const cmd = `${tag} ${name}${encodedArgs ? ` ${encodedArgs}` : ''} {${literal.length}}\r\n`;
 
 		return new Promise((resolve, reject) => {
@@ -163,6 +166,13 @@ export class ImapDispatcher {
 
 	onUnsolicited(handler: (resp: UntaggedResponse) => void): void {
 		this.#unsolicitedHandler = handler;
+	}
+
+	/** Write raw bytes directly to the socket (used for IDLE DONE). */
+	sendRaw(data: string): void {
+		if (!this.#destroyed) {
+			this.#socket.write(data);
+		}
 	}
 
 	destroy(): void {

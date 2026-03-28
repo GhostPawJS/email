@@ -1,87 +1,79 @@
 import type { Address } from '../types/address.ts';
-import type { ImapToken, ParsedEnvelope } from '../types/imap_response.ts';
+import type { ParsedEnvelope } from '../types/imap_response.ts';
 import { decodeEncodedWords } from './decode_encoded_words.ts';
 
-function tokStr(t: ImapToken | undefined): string | null {
-	if (!t) return null;
-	if (t.type === 'nil') return null;
-	if (t.type === 'quoted' || t.type === 'atom') return String(t.value ?? '');
-	if (t.type === 'number') return String(t.value ?? '');
+/**
+ * Works with the output of collectItems() in response_parser.ts, where:
+ *   - IMAP NIL  → null
+ *   - quoted / atom / number  → string | number
+ *   - parenthesised groups    → nested unknown[]
+ */
+type Item = unknown;
+
+function s(v: Item): string | null {
+	if (v === null || v === undefined) return null;
+	if (typeof v === 'string') return v || null; // treat empty string as null
+	if (typeof v === 'number') return String(v);
+	if (Buffer.isBuffer(v)) return v.toString('utf8') || null;
 	return null;
 }
 
-function parseAddressList(tokens: ImapToken[], i: { v: number }): Address[] {
+/**
+ * Parse an address list.
+ * After collectItems: an address list is a nested array of address arrays,
+ * each address being [personalName, sourceRoute, mailboxName, hostName].
+ */
+function parseAddressList(items: Item): Address[] {
+	if (!Array.isArray(items)) return [];
 	const out: Address[] = [];
-	const t = tokens[i.v];
-	if (!t || t.type === 'nil') {
-		i.v += 1;
-		return out;
-	}
-	if (t.type !== 'lparen') {
-		i.v += 1;
-		return out;
-	}
-	i.v += 1;
-	while (i.v < tokens.length) {
-		const cur = tokens[i.v];
-		if (cur?.type === 'rparen') {
-			i.v += 1;
-			break;
-		}
-		if (cur?.type === 'lparen') {
-			i.v += 1;
-			const name = tokStr(tokens[i.v]);
-			i.v += 1;
-			i.v += 1;
-			const mailbox = tokStr(tokens[i.v]);
-			i.v += 1;
-			const host = tokStr(tokens[i.v]);
-			i.v += 1;
-			if (tokens[i.v]?.type === 'rparen') i.v += 1;
-			const addr = mailbox && host ? `${mailbox}@${host}` : '';
-			if (addr) {
-				if (name) {
-					out.push({ name: decodeEncodedWords(name), address: addr });
-				} else {
-					out.push({ address: addr });
-				}
-			}
-		} else {
-			i.v += 1;
-		}
+	for (const entry of items as Item[]) {
+		if (!Array.isArray(entry)) continue;
+		const addrArr = entry as Item[];
+		const nameRaw = s(addrArr[0]);
+		// addrArr[1] is the source-route — RFC 2822 deprecated, ignored
+		const mailbox = s(addrArr[2]);
+		const host = s(addrArr[3]);
+		if (!mailbox || !host) continue;
+		const address = `${mailbox}@${host}`;
+		const name = nameRaw ? decodeEncodedWords(nameRaw) : undefined;
+		out.push(name ? { name, address } : { address });
 	}
 	return out;
 }
 
-export function decodeEnvelope(tokens: ImapToken[]): ParsedEnvelope {
-	const i = { v: 0 };
-	if (tokens[i.v]?.type === 'lparen') i.v += 1;
-	const date = tokStr(tokens[i.v]);
-	i.v += 1;
-	const subjectRaw = tokStr(tokens[i.v]);
-	i.v += 1;
-	const subject = subjectRaw ? decodeEncodedWords(subjectRaw) : null;
-	const from = parseAddressList(tokens, i);
-	const sender = parseAddressList(tokens, i);
-	const replyTo = parseAddressList(tokens, i);
-	const to = parseAddressList(tokens, i);
-	const cc = parseAddressList(tokens, i);
-	const bcc = parseAddressList(tokens, i);
-	const irtRaw = tokStr(tokens[i.v]);
-	i.v += 1;
-	const midRaw = tokStr(tokens[i.v]);
-	i.v += 1;
-	if (tokens[i.v]?.type === 'rparen') i.v += 1;
+/**
+ * Decode an IMAP ENVELOPE response into a ParsedEnvelope.
+ *
+ * ENVELOPE data layout (RFC 3501 §7.4.2):
+ *   [date, subject, from, sender, reply-to, to, cc, bcc, in-reply-to, message-id]
+ */
+export function decodeEnvelope(data: unknown[]): ParsedEnvelope {
+	const [
+		dateRaw,
+		subjectRaw,
+		fromRaw,
+		senderRaw,
+		replyToRaw,
+		toRaw,
+		ccRaw,
+		bccRaw,
+		irtRaw,
+		midRaw,
+	] = data;
+
+	const dateStr = s(dateRaw);
+	const subjectStr = s(subjectRaw);
+
 	return {
-		date,
-		subject,
-		from,
-		sender,
-		replyTo,
-		to,
-		cc,
-		bcc,
-		inReplyTo: irtRaw,
-		messageId: midRaw,
+		date: dateStr,
+		subject: subjectStr ? decodeEncodedWords(subjectStr) : null,
+		from: parseAddressList(fromRaw),
+		sender: parseAddressList(senderRaw),
+		replyTo: parseAddressList(replyToRaw),
+		to: parseAddressList(toRaw),
+		cc: parseAddressList(ccRaw),
+		bcc: parseAddressList(bccRaw),
+		inReplyTo: s(irtRaw),
+		messageId: s(midRaw),
 	};
 }

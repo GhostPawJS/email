@@ -10,7 +10,8 @@ export function createTables(db: EmailDb): void {
 			port INTEGER NOT NULL,
 			username TEXT NOT NULL,
 			label TEXT,
-			created_at TEXT NOT NULL DEFAULT (datetime('now'))
+			created_at TEXT NOT NULL DEFAULT (datetime('now')),
+			UNIQUE(host, port, username)
 		);
 
 		CREATE TABLE IF NOT EXISTS folders (

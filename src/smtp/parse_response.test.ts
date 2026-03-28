@@ -16,6 +16,30 @@ describe('parseSmtpResponse', () => {
 		assert.equal(r.isMultiline, true);
 	});
 
+	it('preserves line structure with newline separators for EHLO', () => {
+		const r = parseSmtpResponse([
+			'250-smtp.web.de',
+			'250-AUTH PLAIN LOGIN CRAM-MD5',
+			'250-STARTTLS',
+			'250-SIZE 69920427',
+			'250 OK',
+		]);
+		assert.equal(r.code, 250);
+		const lines = r.message.split('\n');
+		assert.ok(
+			lines.some((l) => l === 'AUTH PLAIN LOGIN CRAM-MD5'),
+			'AUTH line must be intact',
+		);
+		assert.ok(
+			lines.some((l) => l === 'STARTTLS'),
+			'STARTTLS line must appear',
+		);
+		assert.ok(
+			lines.some((l) => l === 'SIZE 69920427'),
+			'SIZE line must appear',
+		);
+	});
+
 	it('parses enhanced status code', () => {
 		const r = parseSmtpResponse(['250 2.1.0 OK']);
 		assert.equal(r.enhanced, '2.1.0');

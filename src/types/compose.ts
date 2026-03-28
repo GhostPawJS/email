@@ -9,7 +9,7 @@ export type ComposeAttachment = {
 };
 
 export type ComposeInput = {
-	from: Address;
+	from?: Address;
 	to: Address[];
 	cc?: Address[];
 	bcc?: Address[];

@@ -5,6 +5,7 @@ import type { Folder, FolderStatus } from '../types/folder.ts';
 import type { FetchResult } from '../types/imap_response.ts';
 import { authenticate } from './auth.ts';
 import { negotiateExtensions, parseCapabilities } from './capabilities.ts';
+import { raw } from './command_builder.ts';
 import { enableCompression } from './compress.ts';
 import { ImapConnection } from './connection.ts';
 import { ImapDispatcher } from './dispatcher.ts';
@@ -109,7 +110,7 @@ export class ImapSession {
 
 		// ID — some servers gate features behind client identification (RFC 2971)
 		if (this.#extensions.id) {
-			await dispatcher.execute('ID', ['("name" "ghostpaw-email" "version" "1.0.0")']);
+			await dispatcher.execute('ID', [raw('("name" "ghostpaw-email" "version" "1.0.0")')]);
 		}
 
 		// QRESYNC

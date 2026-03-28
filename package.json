@@ -23,7 +23,7 @@
 	],
 	"sideEffects": false,
 	"scripts": {
-		"build": "tsup",
+		"build": "tsup && node scripts/fix-node-sqlite.mjs",
 		"dev": "tsup --watch",
 		"test": "node --experimental-strip-types --test --test-reporter=dot 'src/**/*.test.ts'",
 		"lint": "biome check",

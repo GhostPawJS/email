@@ -139,11 +139,8 @@ export class SmtpConnection {
 	}
 
 	#parseEhlo(resp: SmtpResponse): void {
-		for (const line of resp.message.split(' ')) {
-			const [key, ...vals] = line.split(' ');
-			if (key) this.#capabilities.set(key.toUpperCase(), vals.join(' '));
-		}
-		const sizeStr = resp.message.match(/SIZE (\d+)/i)?.[1];
+		this.#capabilities = parseEhloCapabilities(resp.message);
+		const sizeStr = this.#capabilities.get('SIZE');
 		if (sizeStr) this.#maxSize = Number(sizeStr);
 	}
 
@@ -164,4 +161,28 @@ export class SmtpConnection {
 			upgraded.once('error', reject);
 		});
 	}
+}
+
+/**
+ * Parse an EHLO response message (lines separated by `\n`) into a
+ * Map of uppercase capability keywords to their parameter strings.
+ *
+ * Example: `"smtp.web.de\nAUTH PLAIN LOGIN CRAM-MD5\nSTARTTLS\nSIZE 69920427"`
+ * → Map { AUTH → "PLAIN LOGIN CRAM-MD5", STARTTLS → "", SIZE → "69920427" }
+ *
+ * The first line (server greeting) is included as a capability with key = its value.
+ */
+export function parseEhloCapabilities(message: string): Map<string, string> {
+	const caps = new Map<string, string>();
+	for (const line of message.split('\n')) {
+		const idx = line.indexOf(' ');
+		if (idx === -1) {
+			if (line) caps.set(line.toUpperCase(), '');
+		} else {
+			const key = line.slice(0, idx).toUpperCase();
+			const val = line.slice(idx + 1);
+			if (key) caps.set(key, val);
+		}
+	}
+	return caps;
 }

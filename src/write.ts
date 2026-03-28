@@ -26,7 +26,17 @@ function identitiesFromConfig(config: EmailConfig): Address[] {
 			: 'mechanism' in auth
 				? (auth.credentials.user ?? auth.credentials.username ?? '')
 				: '';
-	return user ? [{ address: user }] : [];
+	const fromConfig = config.identities?.[0] ?? (user ? { address: user } : null);
+	return fromConfig ? [fromConfig] : [];
+}
+
+/** Fill in `from` from account identity if the caller did not specify it. */
+function withFrom(input: ComposeInput, config: EmailConfig): ComposeInput {
+	if (input.from) return input;
+	const identities = identitiesFromConfig(config);
+	const from = identities[0];
+	if (!from) throw new Error('No sender identity — provide input.from or set config.identities');
+	return { ...input, from };
 }
 
 export function createWriteSurface(
@@ -141,7 +151,7 @@ export function createWriteSurface(
 		},
 		send: async (input: ComposeInput) => {
 			requireSession(); // ensures Mailbox.connect() has been called
-			const composed = composeMessage(input);
+			const composed = composeMessage(withFrom(input, config));
 			return sendComposed(composed);
 		},
 		reply: async (folder: string, uid: number, input: ReplyInput) => {
@@ -169,7 +179,7 @@ export function createWriteSurface(
 				{ ...m, textPlain: body?.textPlain ?? null, textHtml: body?.textHtml ?? null },
 				input,
 			);
-			const composed = composeMessage(composeInput);
+			const composed = composeMessage(withFrom(composeInput, config));
 			return sendComposed(composed);
 		},
 		saveDraft: async (input: ComposeInput) => {
@@ -177,7 +187,7 @@ export function createWriteSurface(
 			const folders = store.listFolders(db, accountId);
 			const draftsFolder = folders.find((f) => f.role === 'drafts');
 			if (!draftsFolder) throw new EmailUnsupportedError('drafts', 'No drafts folder found');
-			const composed = composeMessage(input);
+			const composed = composeMessage(withFrom(input, config));
 			const result = await imap.appendMessage(draftsFolder.path, composed, ['\\Draft']);
 			return { uid: result.uid ?? 0 };
 		},
@@ -189,7 +199,7 @@ export function createWriteSurface(
 			await imap.selectFolder(draftsFolder.path);
 			await imap.storeFlags([uid], '+FLAGS.SILENT', ['\\Deleted']);
 			await imap.uidExpunge([uid]);
-			const composed = composeMessage(input);
+			const composed = composeMessage(withFrom(input, config));
 			const result = await imap.appendMessage(draftsFolder.path, composed, ['\\Draft']);
 			return { uid: result.uid ?? 0 };
 		},

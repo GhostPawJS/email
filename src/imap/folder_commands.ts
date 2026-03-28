@@ -1,6 +1,7 @@
 import type { SelectedFolder } from '../types/capability.ts';
 import type { Folder, FolderStatus } from '../types/folder.ts';
 import type { UntaggedResponse } from '../types/imap_response.ts';
+import { raw } from './command_builder.ts';
 import type { ImapDispatcher } from './dispatcher.ts';
 import { detectFolderRole } from './folder_role.ts';
 
@@ -45,7 +46,10 @@ function parseListResponse(untagged: UntaggedResponse[]): Folder[] {
 }
 
 export async function listFolders(dispatcher: ImapDispatcher): Promise<Folder[]> {
-	const res = await dispatcher.execute('LIST', ['""', '"*"']);
+	// Pass unquoted args — encodeArg handles the quoting.
+	// '' → ""  (empty reference = all namespaces)
+	// '*' → "*" (pattern matching all mailboxes)
+	const res = await dispatcher.execute('LIST', ['', '*']);
 	return parseListResponse(res.untagged);
 }
 
@@ -55,7 +59,10 @@ export async function selectFolder(
 	qresync?: { uidValidity: number; highestModSeq: number; knownUids: string },
 ): Promise<SelectedFolder> {
 	const args = qresync
-		? [path, `(QRESYNC (${qresync.uidValidity} ${qresync.highestModSeq} ${qresync.knownUids}))`]
+		? [
+				path,
+				raw(`(QRESYNC (${qresync.uidValidity} ${qresync.highestModSeq} ${qresync.knownUids}))`),
+			]
 		: [path];
 	const res = await dispatcher.execute('SELECT', args);
 	let exists = 0;
@@ -142,7 +149,7 @@ export async function statusFolder(
 ): Promise<FolderStatus> {
 	const res = await dispatcher.execute('STATUS', [
 		path,
-		'(MESSAGES UNSEEN UIDNEXT UIDVALIDITY HIGHESTMODSEQ)',
+		raw('(MESSAGES UNSEEN UIDNEXT UIDVALIDITY HIGHESTMODSEQ)'),
 	]);
 	let messages = 0;
 	let unseen = 0;

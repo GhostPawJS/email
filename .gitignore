@@ -1,6 +1,7 @@
 node_modules/
 dist/
 /demo/
+/playground/
 *.tsbuildinfo
 .DS_Store
 coverage/

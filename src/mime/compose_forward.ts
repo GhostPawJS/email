@@ -45,7 +45,6 @@ export function composeForward(original: Message & MessageBody, input: ForwardIn
 	}
 
 	const result: ComposeInput = {
-		from: { address: 'forwarder@local' },
 		to: input.to,
 		subject,
 	};

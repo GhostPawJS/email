@@ -12,11 +12,11 @@ export function parseSmtpResponse(lines: string[]): SmtpResponse {
 	// Extract enhanced status code (e.g. 2.1.0)
 	const enhanced = last.match(/^\d{3}[ -](\d\.\d\.\d+)/)?.[1] ?? null;
 
-	// Collect message text (without codes)
+	// Collect message text (without codes), preserve lines with \n separator
 	const message = lines
 		.map((l) => l.slice(4).trim())
 		.filter(Boolean)
-		.join(' ');
+		.join('\n');
 
 	return { code, enhanced, message, isMultiline };
 }

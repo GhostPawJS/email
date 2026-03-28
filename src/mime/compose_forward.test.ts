@@ -95,4 +95,9 @@ describe('composeForward', () => {
 		const c = composeForward(base, { to: [], mode: 'attachment', text: 'Please review.' });
 		assert.equal(c.text, 'Please review.');
 	});
+
+	it('does not set a from field (deferred to withFrom in write surface)', () => {
+		const c = composeForward(base, { to: [{ address: 'x@x.com' }] });
+		assert.equal(c.from, undefined, 'composeForward must not hardcode a from address');
+	});
 });

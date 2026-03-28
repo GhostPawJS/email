@@ -7,11 +7,12 @@ import { encodeHeader } from './encode_header.ts';
 
 export function composeMessage(input: ComposeInput): Buffer {
 	const lines: string[] = [];
-	const domain = input.from.address.split('@')[1] ?? 'local';
+	const from = input.from ?? { address: 'unknown@local' };
+	const domain = from.address.split('@')[1] ?? 'local';
 	lines.push(encodeHeader('Message-ID', generateMessageId(domain)).trim());
 	lines.push(encodeHeader('Date', encodeDate()).trim());
 	lines.push('MIME-Version: 1.0');
-	lines.push(encodeHeader('From', encodeAddress(input.from)).trim());
+	lines.push(encodeHeader('From', encodeAddress(from)).trim());
 	lines.push(encodeHeader('To', encodeAddressList(input.to)).trim());
 	if (input.cc?.length) {
 		lines.push(encodeHeader('Cc', encodeAddressList(input.cc)).trim());

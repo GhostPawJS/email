@@ -24,4 +24,12 @@ describe('encodeAddressList', () => {
 	it('returns empty string for empty list', () => {
 		assert.equal(encodeAddressList([]), '');
 	});
+
+	it('returns empty string for undefined', () => {
+		assert.equal(encodeAddressList(undefined), '');
+	});
+
+	it('returns empty string for null', () => {
+		assert.equal(encodeAddressList(null), '');
+	});
 });

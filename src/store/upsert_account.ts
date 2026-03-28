@@ -33,16 +33,17 @@ export function upsertAccount(db: EmailDb, input: UpsertAccountInput): Account {
 		return mapAccount(row);
 	}
 
-	const result = db
-		.prepare(
-			`
-				INSERT INTO accounts (host, port, username, label)
-				VALUES (?, ?, ?, ?)
-			`,
-		)
-		.run(input.host, input.port, input.username, input.label ?? null);
-	const id = Number(result.lastInsertRowid);
-	const row = db.prepare('SELECT * FROM accounts WHERE id = ?').get(id) as Record<string, unknown>;
+	db.prepare(
+		`
+			INSERT INTO accounts (host, port, username, label)
+			VALUES (?, ?, ?, ?)
+			ON CONFLICT(host, port, username)
+			DO UPDATE SET label = COALESCE(excluded.label, label)
+		`,
+	).run(input.host, input.port, input.username, input.label ?? null);
+	const row = db
+		.prepare('SELECT * FROM accounts WHERE host = ? AND port = ? AND username = ?')
+		.get(input.host, input.port, input.username) as Record<string, unknown>;
 	return mapAccount(row);
 }
 

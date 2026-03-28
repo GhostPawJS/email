@@ -23,15 +23,15 @@ export function upsertFolder(db: EmailDb, input: UpsertFolderInput): Folder {
 				uid_validity, uid_next, highest_mod_seq,
 				message_count, unseen_count, last_synced_at
 			) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-			ON CONFLICT(account_id, path) DO UPDATE SET
-				delimiter = excluded.delimiter,
-				role = excluded.role,
-				uid_validity = excluded.uid_validity,
-				uid_next = excluded.uid_next,
-				highest_mod_seq = excluded.highest_mod_seq,
-				message_count = excluded.message_count,
-				unseen_count = excluded.unseen_count,
-				last_synced_at = excluded.last_synced_at
+		ON CONFLICT(account_id, path) DO UPDATE SET
+			delimiter = excluded.delimiter,
+			role = excluded.role,
+			uid_validity = COALESCE(excluded.uid_validity, uid_validity),
+			uid_next = COALESCE(excluded.uid_next, uid_next),
+			highest_mod_seq = COALESCE(excluded.highest_mod_seq, highest_mod_seq),
+			message_count = COALESCE(excluded.message_count, message_count),
+			unseen_count = COALESCE(excluded.unseen_count, unseen_count),
+			last_synced_at = COALESCE(excluded.last_synced_at, last_synced_at)
 		`,
 	).run(
 		input.accountId,

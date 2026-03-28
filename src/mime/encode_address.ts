@@ -8,6 +8,7 @@ export function encodeAddress(addr: Address): string {
 	return `${encoded} <${addr.address}>`;
 }
 
-export function encodeAddressList(addrs: Address[]): string {
+export function encodeAddressList(addrs: Address[] | undefined | null): string {
+	if (!addrs?.length) return '';
 	return addrs.map(encodeAddress).join(', ');
 }
