@@ -88,15 +88,17 @@ Concept-level manuals under `docs/entities/`:
 
 ## How To Read The Model
 
-Use the surfaces in this order:
+The primary entry point is the `Mailbox` class. A single `connect()` call
+opens the SQLite database, initialises the schema, upserts the account, and
+authenticates the IMAP session:
 
-1. Call `initSchema(db)` once to create the six tables, FTS5 index, and indexes.
-2. Construct a `Mailbox` instance with an `EmailConfig` and a `DatabaseSync` handle.
-3. Use `mailbox.network.connect()` to open the IMAP session.
-4. Use `mailbox.network.sync()` to pull messages into the local cache.
-5. Use `mailbox.read.*` for all local reads.
-6. Use `mailbox.write.*` for flag changes, composition, and folder management.
-7. Use `mailbox.network.watch()` for ongoing IDLE-based push monitoring.
+1. Construct a `Mailbox` with an `EmailConfig` (includes IMAP/SMTP hosts, auth, and optional storage path).
+2. Call `await mailbox.connect()` to initialise everything.
+3. Use `mailbox.network.sync()` to pull messages into the local cache.
+4. Use `mailbox.read.*` for all local reads.
+5. Use `mailbox.write.*` for flag changes, composition, and folder management.
+6. Use `mailbox.network.watch()` for ongoing IDLE-based push monitoring.
+7. Call `await mailbox.disconnect()` to close the session and database.
 
 ## Lifecycle Truth
 
@@ -146,6 +148,7 @@ these rows atomically at the end of each pass.
 - `uidValidity` changes trigger full folder cache invalidation
 - Folder roles are detected from IMAP special-use attributes and XLIST; the detection is best-effort
 - `initSchema(db)` is idempotent: safe to call on an already-initialised database
+- `Mailbox.connect()` calls `initSchema` automatically — manual schema init is not required
 
 ## Temporal And Flag Semantics
 
@@ -171,14 +174,16 @@ common trap of treating a staged draft as a sent message.
 
 ## Public Surface
 
-- `initSchema(db)`: initialize the full schema (idempotent)
-- `Mailbox`: the main porcelain class — accepts `EmailConfig` + `DatabaseSync`
+- `Mailbox`: the main porcelain class — accepts `EmailConfig`, manages its own DB
+- `Mailbox.connect()`: initialise DB + schema + IMAP session (one call)
+- `Mailbox.disconnect()`: close session and database
 - `read.*`: `EmailReadSurface` — local reads, FTS search, stats
 - `write.*`: `EmailWriteSurface` — flag changes, compose, folders, drafts
 - `network.*`: `EmailNetworkSurface` — connect, sync, watch, remote search
 - `tools.emailTools`: 5 LLM-oriented tool definitions (see `LLM.md`)
 - `skills.emailSkills`: 8 workflow skill definitions (see `LLM.md`)
 - `soul.emailSoul`: `Postmaster` thinking foundation (see `LLM.md`)
+- `initSchema(db)`: standalone schema initialiser for advanced use (not needed with `Mailbox`)
 
 ## Code Source Of Truth
 
@@ -191,6 +196,7 @@ common trap of treating a staged draft as a sent message.
 - `src/lib/`: utility codecs (MUTF-7, Base64, QP, ID, html-to-text)
 - `src/read.ts`, `src/write.ts`, `src/network.ts`: surface implementations
 - `src/mailbox.ts`: `Mailbox` porcelain class
+- `src/runtime.ts`: DB initialisation and schema bootstrap
 - `src/tools/`: LLM tool facade
 - `src/skills/`: LLM workflow skill library
 - `src/soul.ts`: `Postmaster` soul
@@ -207,7 +213,7 @@ common trap of treating a staged draft as a sent message.
 
 ## Supplemental Docs
 
-- `HUMAN.md`: human-facing guide for developers using the direct-code API
+- `HUMAN.md`: human-facing guide for developers using the `Mailbox` API
 - `LLM.md`: top-to-bottom overview of the soul, tools, and skills AI surface
 - `PAGES.md`: interactive demo notes
 

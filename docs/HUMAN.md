@@ -15,66 +15,69 @@ a thin IMAP wrapper.
 
 A complete human usage pattern looks like:
 
-- initialise the local schema once
 - construct a `Mailbox` with account config
-- connect and sync to materialise the local cache
+- connect (initialises the local schema, upserts the account, opens the IMAP session)
+- sync to materialise the local cache
 - read from the cache for fast, offline-capable access
 - write flag changes and composed messages back through the protocol
 - watch for new messages via IDLE when staying connected
+- disconnect when done
 
 ## Setup
 
 ```ts
-import { DatabaseSync } from 'node:sqlite';
-import { Mailbox, initSchema } from '@ghostpaw/email';
+import { Mailbox } from '@ghostpaw/email';
 import type { EmailConfig } from '@ghostpaw/email';
 
-const db = new DatabaseSync('mail.db');
-initSchema(db); // idempotent — safe to call on every startup
-
 const config: EmailConfig = {
-  imap: {
-    host: 'imap.example.com',
-    port: 993,
-    tls: true,
-    auth: { type: 'plain', username: 'user@example.com', password: 'secret' },
-  },
-  smtp: {
-    host: 'smtp.example.com',
-    port: 465,
-    tls: true,
-    auth: { type: 'plain', username: 'user@example.com', password: 'secret' },
-  },
+  imap: { host: 'imap.example.com', port: 993, tls: true },
+  smtp: { host: 'smtp.example.com', port: 465, tls: true },
+  auth: { user: 'user@example.com', pass: 'secret' },
+  storage: 'mail.db',
 };
 
-const mailbox = new Mailbox({ db, config });
+const mailbox = new Mailbox(config);
+await mailbox.connect();
 ```
 
-For OAuth2 providers (Gmail, Outlook), use the `xoauth2` or `oauthbearer`
-auth type with a `tokenRefresh` callback:
+`connect()` opens the SQLite database at the `storage` path (or `:memory:` if
+omitted), runs `initSchema`, upserts the account row, and authenticates the
+IMAP session — all in one call.
+
+For OAuth2 providers (Gmail, Outlook), use an access-token auth config with a
+`refreshFn` callback:
 
 ```ts
 const config: EmailConfig = {
-  imap: {
-    host: 'imap.gmail.com',
-    port: 993,
-    tls: true,
-    auth: {
-      type: 'xoauth2',
-      username: 'user@gmail.com',
-      accessToken: currentToken,
-      tokenRefresh: async () => refreshedToken,
-    },
+  imap: { host: 'imap.gmail.com', port: 993, tls: true },
+  smtp: { host: 'smtp.gmail.com', port: 465, tls: true },
+  auth: {
+    user: 'user@gmail.com',
+    accessToken: currentToken,
+    refreshFn: async () => refreshedToken,
   },
-  // ...
+  storage: 'gmail.db',
+};
+```
+
+For SASL mechanisms, use the generic mechanism form:
+
+```ts
+const config: EmailConfig = {
+  imap: { host: 'imap.provider.com', port: 993, tls: true },
+  smtp: { host: 'smtp.provider.com', port: 465, tls: true },
+  auth: {
+    mechanism: 'XOAUTH2',
+    credentials: { user: 'user@provider.com', token: bearerToken },
+  },
 };
 ```
 
 ## Connection Lifecycle
 
 ```ts
-// Connect and authenticate (negotiates capabilities, COMPRESS=DEFLATE, etc.)
-await mailbox.network.connect();
+// Connect: opens DB, initialises schema, upserts account, authenticates IMAP.
+await mailbox.connect();
 
 // Sync all subscribed folders (incremental by default).
 const result = await mailbox.network.sync();
@@ -83,12 +86,13 @@ console.log(`${result.totalNew} new, ${result.totalExpunged} expunged`);
 // Refresh the folder list from the server (detects new folders, role changes).
 const folders = await mailbox.network.refreshFolders();
 
-// Disconnect gracefully.
-await mailbox.network.disconnect();
-
-// Reconnect after a failure (exponential back-off, up to 5 attempts).
-await mailbox.network.reconnect();
+// Disconnect gracefully (closes IMAP session and SQLite database).
+await mailbox.disconnect();
 ```
+
+After disconnecting, a new `Mailbox` instance must be created to reconnect.
+Within an active session, use `mailbox.network.reconnect()` for transient
+failures (exponential back-off, up to 5 attempts).
 
 ## Reading Local State
 
@@ -240,12 +244,15 @@ await mailbox.write.setLabels('INBOX', [42], ['finance']); // replaces all
 const { messageId } = await mailbox.write.send({
   to: [{ address: 'bob@example.com' }],
   subject: 'Project update',
-  textPlain: 'Here is the latest status.',
+  text: 'Here is the latest status.',
   attachments: [
-    { filename: 'status.pdf', mimeType: 'application/pdf', data: pdfBuffer },
+    { filename: 'status.pdf', mimeType: 'application/pdf', content: pdfBuffer },
   ],
 });
 ```
+
+The `from` field is optional. When omitted, the sender address is derived from
+the `identities` array in `EmailConfig`, or from the IMAP auth credentials.
 
 ### Reply (preserves threading headers)
 
@@ -280,12 +287,14 @@ await mailbox.write.forward('INBOX', uid, {
 const { uid: draftUid } = await mailbox.write.saveDraft({
   to: [{ address: 'bob@example.com' }],
   subject: 'Work in progress',
-  textPlain: 'Draft body.',
+  text: 'Draft body.',
 });
 
 // Update the draft.
 const { uid: newUid } = await mailbox.write.updateDraft(draftUid, {
-  textPlain: 'Revised body.',
+  subject: 'Work in progress',
+  to: [{ address: 'bob@example.com' }],
+  text: 'Revised body.',
 });
 
 // Send the draft (SMTP send + append to Sent + expunge from Drafts).
@@ -369,14 +378,14 @@ The engine raises typed errors:
 import { EmailAuthError, EmailConnectionError } from '@ghostpaw/email';
 
 try {
-  await mailbox.network.connect();
+  await mailbox.connect();
 } catch (err) {
   if (err instanceof EmailAuthError) {
     // Credential problem — do not retry.
     console.error('Authentication failed:', err.message);
   } else if (err instanceof EmailConnectionError) {
-    // Network problem — retry once.
-    await mailbox.network.reconnect();
+    // Network problem — create a new Mailbox and try again.
+    console.error('Connection failed:', err.message);
   }
 }
 ```
@@ -386,12 +395,13 @@ try {
 A disciplined human developer drives the mailbox through derived views, not
 through memory or ad-hoc queries:
 
-1. Connect and sync on startup to materialise the local cache.
-2. Use `read.folders()` and `read.messages()` to build views from local state.
-3. Use `read.getMessage()` on demand when body content is needed.
-4. Use `write.*` for intentional mutations — flag changes, sends, organise.
-5. Use `network.watch()` for real-time updates when staying connected.
-6. Use `network.sync()` periodically to pull state changes when IDLE is not in use.
-7. Use `network.reconnect()` on connection loss, then re-sync.
+1. Construct a `Mailbox` with `EmailConfig` and call `connect()` on startup.
+2. Use `network.sync()` to materialise the local cache.
+3. Use `read.folders()` and `read.messages()` to build views from local state.
+4. Use `read.getMessage()` on demand when body content is needed.
+5. Use `write.*` for intentional mutations — flag changes, sends, organise.
+6. Use `network.watch()` for real-time updates when staying connected.
+7. Use `network.sync()` periodically to pull state changes when IDLE is not in use.
+8. Call `disconnect()` to close the session and database when done.
 
 Local reads are always fast. Network operations are always explicit.

@@ -1,10 +1,9 @@
 # Sync
 
-The sync log records the outcome of each completed sync pass.
+The sync log records actions taken during each sync pass.
 
 Sync is the process that closes the gap between the local SQLite cache and the
-remote IMAP server. Every sync pass is recorded as a `sync_log` row regardless
-of whether it found anything new.
+remote IMAP server.
 
 ## Schema
 
@@ -13,15 +12,11 @@ Stored in the `sync_log` table:
 | Column | Type | Notes |
 |---|---|---|
 | `id` | INTEGER | Primary key |
-| `folderId` | INTEGER | Foreign key → `folders.id` |
-| `syncedAt` | TEXT | ISO timestamp when sync completed |
-| `newMessages` | INTEGER | Count of newly inserted message rows |
-| `expungedMessages` | INTEGER | Count of messages removed due to server expunge |
-| `flagChanges` | INTEGER | Count of flag updates applied |
-| `durationMs` | INTEGER | Wall-clock duration of the pass in milliseconds |
-| `strategy` | TEXT | `initial`, `qresync`, or `uid_fallback` |
-| `uidValidityReset` | INTEGER | `1` if cache was invalidated due to UIDVALIDITY change |
-| `error` | TEXT | Error message if the sync pass failed (null on success) |
+| `folder_id` | INTEGER | Foreign key → `folders.id` |
+| `action` | TEXT | What happened (`insert`, `expunge`, `flag_update`, etc.) |
+| `uid` | INTEGER | The message UID this action relates to |
+| `details` | TEXT | Optional JSON details about the action |
+| `synced_at` | TEXT | ISO timestamp when the action was recorded |
 
 ## Sync Strategies
 
@@ -32,13 +27,13 @@ UIDVALIDITY reset). The engine:
 
 1. Issues `UID FETCH 1:* (FLAGS ENVELOPE BODYSTRUCTURE RFC822.SIZE)` in
    configurable batches.
-2. Inserts or updates a `messages` row for each UID.
+2. Inserts message rows via `insertMessagesBatch` (with `INSERT OR IGNORE`
+   semantics for idempotency).
 3. Populates attachment metadata from BODYSTRUCTURE for messages with
    attachments.
-4. Writes attachment metadata rows (without binary data).
-5. Runs thread computation for the folder.
-6. Populates the `messages_fts` FTS5 index.
-7. Records the sync pass in `sync_log`.
+4. Runs thread computation for the folder.
+5. Populates the `messages_fts` FTS5 index.
+6. Records the sync pass in `sync_log`.
 
 ### Incremental Sync (QRESYNC)
 
@@ -48,7 +43,7 @@ Run when the folder has an existing cache and the server advertises QRESYNC
 1. Issues `SELECT INBOX (QRESYNC (uidValidity highestModSeq))`.
 2. Processes VANISHED responses to expunge deleted messages.
 3. Processes FETCH responses to update flags (using `CHANGEDSINCE modSeq`).
-4. Updates `highestModSeq` on the folder row.
+4. Updates `highest_mod_seq` on the folder row.
 5. Records the sync pass.
 
 ### Incremental Sync (UID Fallback)
@@ -62,14 +57,14 @@ Run when QRESYNC is unavailable. The engine:
 
 ## UIDVALIDITY Reset
 
-If the server returns a different `uidValidity` than the locally stored one:
+If the server returns a different `uid_validity` than the locally stored one:
 
 1. All messages for that folder are deleted from `messages`, `bodies`,
    `attachments`, and `sync_log`.
-2. The folder's `uidValidity`, `uidNext`, `highestModSeq`, and `messageCount`
+2. The folder's `uid_validity`, `uid_next`, `highest_mod_seq`, and `message_count`
    are reset to the server-reported values.
 3. An initial sync is performed immediately.
-4. The `sync_log` row records `uidValidityReset: 1`.
+4. The `sync_log` records the reset.
 
 ## Body And Attachment Fetch Strategies
 
@@ -82,17 +77,22 @@ The `sync` call accepts a `bodies` option:
 Attachment binary data is never fetched during sync. It is always fetched on
 demand via `read.getAttachment()`.
 
+The `fetchBody` and `fetchAttachment` functions in the sync engine include an
+optimisation: they skip `session.selectFolder()` if the target folder is
+already selected, avoiding redundant IMAP SELECT commands.
+
 ## Local Store Operations
 
+Store functions are accessible through the `store` namespace:
+
 ```ts
-import { insertSyncLog, getLastSyncLog, listSyncLogs } from '@ghostpaw/email';
+import { store } from '@ghostpaw/email';
 
-// Inspect the last sync pass for a folder.
-const last = getLastSyncLog(db, folderId);
-// { strategy: 'qresync', newMessages: 3, expungedMessages: 0, flagChanges: 5, ... }
+// Record a sync action.
+store.insertSyncLog(db, { folderId, action: 'insert', uid: 42 });
 
-// List recent sync passes.
-const history = listSyncLogs(db, folderId, { limit: 10 });
+// List recent sync log entries for a folder.
+const history = store.listSyncLog(db, folderId, { limit: 10 });
 ```
 
 Sync is triggered through the network surface:
@@ -100,7 +100,7 @@ Sync is triggered through the network surface:
 ```ts
 // Default incremental sync of all subscribed folders.
 const result = await mailbox.network.sync();
-// { totalNew, totalExpunged, folderResults: [{ folderId, path, ... }] }
+// { totalNew, totalExpunged, folders: [{ path, newMessages, ... }] }
 
 // Sync specific folders with body fetch.
 await mailbox.network.sync({
@@ -125,9 +125,8 @@ within the RFC 2177 timeout window.
 
 ## Invariants
 
-- Every successful sync pass writes a `sync_log` row
+- Sync log entries provide a per-UID audit trail of actions taken during sync
 - A UIDVALIDITY reset deletes and rebuilds all message data for the affected folder
-- `highestModSeq` is updated on the `folders` row at the end of each QRESYNC pass
-- `uidNext` is updated on the `folders` row at the end of each sync pass
-- Sync log rows are not deleted automatically; archive them externally if space is a concern
-- The `error` column is null on successful passes and non-null on failed ones; a failed pass still updates `highestModSeq` and `uidNext` if any partial data was processed
+- `highest_mod_seq` is updated on the `folders` row at the end of each QRESYNC pass
+- `uid_next` is updated on the `folders` row at the end of each sync pass
+- `insertMessagesBatch` uses `INSERT OR IGNORE` for idempotent re-syncs

@@ -12,28 +12,28 @@ Stored in the `messages` table:
 | Column | Type | Notes |
 |---|---|---|
 | `id` | INTEGER | Primary key |
-| `folderId` | INTEGER | Foreign key → `folders.id` |
+| `folder_id` | INTEGER | Foreign key → `folders.id` |
 | `uid` | INTEGER | IMAP UID for this message in this folder |
-| `messageId` | TEXT | RFC 2822 `Message-ID:` header |
-| `inReplyTo` | TEXT | RFC 2822 `In-Reply-To:` header |
+| `message_id` | TEXT | RFC 2822 `Message-ID:` header |
+| `in_reply_to` | TEXT | RFC 2822 `In-Reply-To:` header |
 | `references` | TEXT | JSON-encoded `string[]` of `References:` header values |
-| `threadId` | TEXT | Computed JWZ thread identifier |
+| `thread_id` | TEXT | Computed JWZ thread identifier |
+| `subject` | TEXT | Decoded subject line |
 | `from` | TEXT | JSON-encoded `Address` (`{ name?, address }`) |
 | `to` | TEXT | JSON-encoded `Address[]` |
 | `cc` | TEXT | JSON-encoded `Address[]` |
 | `bcc` | TEXT | JSON-encoded `Address[]` |
-| `replyTo` | TEXT | JSON-encoded `Address` |
-| `envelopeFrom` | TEXT | JSON-encoded `Address` (SMTP envelope sender) |
-| `envelopeTo` | TEXT | JSON-encoded `Address[]` (SMTP envelope recipients) |
-| `subject` | TEXT | Decoded subject line |
+| `reply_to` | TEXT | JSON-encoded `Address` |
+| `envelope_from` | TEXT | JSON-encoded `Address` (SMTP envelope sender) |
+| `envelope_to` | TEXT | JSON-encoded `Address[]` (SMTP envelope recipients) |
 | `date` | TEXT | ISO string from RFC 2822 `Date:` header |
-| `receivedAt` | TEXT | Local ingest timestamp |
-| `flags` | TEXT | JSON-encoded `string[]` of IMAP flags |
-| `labels` | TEXT | JSON-encoded `string[]` of IMAP keywords (Gmail labels) |
+| `received_at` | TEXT | Local ingest timestamp |
+| `flags` | TEXT | JSON-encoded `string[]` of IMAP flags, default `'[]'` |
+| `labels` | TEXT | JSON-encoded `string[]` of IMAP keywords (Gmail labels), default `'[]'` |
 | `size` | INTEGER | Message size in bytes (IMAP RFC822.SIZE) |
-| `bodyStructure` | TEXT | JSON-encoded `BodyPart` MIME tree |
-| `hasAttachments` | INTEGER | `1` if any attachment part is present |
-| `modSeq` | INTEGER | HIGHESTMODSEQ at last flag sync (CONDSTORE) |
+| `body_structure` | TEXT | JSON-encoded `BodyPart` MIME tree |
+| `has_attachments` | INTEGER | `1` if any attachment part is present, default `0` |
+| `mod_seq` | INTEGER | HIGHESTMODSEQ at last flag sync (CONDSTORE) |
 
 ## Flags
 
@@ -52,9 +52,9 @@ from system flags.
 
 ## Thread ID
 
-`threadId` is computed by the sync engine using the JWZ algorithm applied to
-the `References` and `In-Reply-To` headers. It is a stable string identifier
-for the conversation tree. Messages with the same `threadId` belong to the
+`thread_id` is computed by the sync engine using the JWZ algorithm applied to
+the `references` and `in_reply_to` headers. It is a stable string identifier
+for the conversation tree. Messages with the same `thread_id` belong to the
 same thread.
 
 Thread IDs are re-computed during sync. They are not stored in a separate
@@ -76,22 +76,30 @@ triggers — it is populated and updated during `network.sync()` passes.
 
 ## Local Store Operations
 
+Store functions are accessible through the `store` namespace:
+
 ```ts
-import { insertMessage, getMessageById, getMessageByUid, listMessages, updateMessageFlags, deleteMessage, searchMessages } from '@ghostpaw/email';
+import { store } from '@ghostpaw/email';
 
-const message = insertMessage(db, { folderId, uid, subject, from, to, flags, ... });
-const byId = getMessageById(db, message.id);
-const byUid = getMessageByUid(db, folderId, uid);
-const all = listMessages(db, folderId, { limit: 50, sort: 'date', order: 'desc' });
+const message = store.insertMessage(db, { folderId, uid, subject, from, to, flags, ... });
+const byId = store.getMessageById(db, message.id);
+const byUid = store.getMessage(db, folderId, uid);
+const all = store.listMessages(db, folderId, { limit: 50, sort: 'date', order: 'desc' });
 
-updateMessageFlags(db, message.id, ['\\Seen', '\\Flagged']);
+store.updateMessageFlags(db, message.id, ['\\Seen', '\\Flagged']);
 
-const results = searchMessages(db, 'quarterly report');
-deleteMessage(db, message.id);
+const results = store.searchMessages(db, 'quarterly report');
+store.deleteMessages(db, [message.id]);
+```
+
+Batch insertion for sync (with `INSERT OR IGNORE` semantics for idempotency):
+
+```ts
+store.insertMessagesBatch(db, [input1, input2, input3]);
 ```
 
 Flag changes through the write surface also send IMAP STORE commands and
-update modSeq:
+update `mod_seq`:
 
 ```ts
 await mailbox.write.markRead('INBOX', [uid]);
@@ -101,8 +109,8 @@ await mailbox.write.markAnswered('INBOX', [uid]);
 
 ## Invariants
 
-- One `messages` row per `(folderId, uid)` combination
+- One `messages` row per `(folder_id, uid)` combination
 - Deleting a message cascades to its body and attachments
-- `threadId` is derived, not user-supplied; it is always assigned by the sync engine
-- `bodyStructure` is a decoded BodyPart tree (from IMAP BODYSTRUCTURE response), not the raw IMAP list
+- `thread_id` is derived, not user-supplied; it is always assigned by the sync engine
+- `body_structure` is a decoded BodyPart tree (from IMAP BODYSTRUCTURE response), not the raw IMAP list
 - All JSON-encoded columns (`references`, `flags`, `labels`, etc.) are always valid JSON arrays or objects; null means the value is unknown or absent

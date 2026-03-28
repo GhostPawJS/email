@@ -276,13 +276,16 @@ That gives the system:
 ## Wiring Example
 
 ```ts
-import { DatabaseSync } from 'node:sqlite';
-import { Mailbox, initSchema, skills, soul, tools } from '@ghostpaw/email';
+import { Mailbox, skills, soul, tools } from '@ghostpaw/email';
 
-const db = new DatabaseSync('mail.db');
-initSchema(db);
+const mailbox = new Mailbox({
+  imap: { host: 'imap.example.com', port: 993, tls: true },
+  smtp: { host: 'smtp.example.com', port: 465, tls: true },
+  auth: { user: 'user@example.com', pass: 'secret' },
+  storage: 'mail.db',
+});
 
-const mailbox = new Mailbox({ db, config: accountConfig });
+await mailbox.connect();
 
 // Build the tool context from the connected mailbox surfaces.
 const ctx = {
@@ -301,6 +304,8 @@ const result = await readTool?.handler(ctx, { view: 'folders' });
 // Load a skill's guidance for a multi-step scenario.
 const triageSkill = skills.getEmailSkillByName('triage-inbox');
 console.log(triageSkill?.content);
+
+await mailbox.disconnect();
 ```
 
 ## Human And AI Use Together

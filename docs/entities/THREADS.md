@@ -1,10 +1,10 @@
 # Threads
 
-A thread is a conversation tree derived from the `References` and `In-Reply-To`
+A thread is a conversation tree derived from the `references` and `in_reply_to`
 headers of a set of messages.
 
 Threads are not stored as rows in their own table. They are computed at read
-time by grouping messages that share the same `threadId` value, and they are
+time by grouping messages that share the same `thread_id` value, and they are
 rendered as a depth-ordered tree.
 
 ## How Thread IDs Are Assigned
@@ -12,16 +12,16 @@ rendered as a depth-ordered tree.
 Thread IDs are computed by the sync engine using the JWZ (Jamie Zawinski)
 threading algorithm:
 
-1. For each message, collect `messageId`, `inReplyTo`, and `references` values.
-2. Build a parent-child map: a message is a child of its `inReplyTo` target,
-   or of the last entry in its `References` list.
+1. For each message, collect `message_id`, `in_reply_to`, and `references` values.
+2. Build a parent-child map: a message is a child of its `in_reply_to` target,
+   or of the last entry in its `references` list.
 3. Find the root of each connected component (the message with no parent in the
    set, or a synthetic root if the root is missing from the local cache).
-4. Assign the root's `messageId` as the `threadId` for all messages in the
+4. Assign the root's `message_id` as the `thread_id` for all messages in the
    component.
 
-`threadId` is stored on the `messages` row as a TEXT column. When a new message
-arrives whose `References` points to an existing `threadId`, it is assigned that
+`thread_id` is stored on the `messages` row as a TEXT column. When a new message
+arrives whose `references` points to an existing `thread_id`, it is assigned that
 same value. This keeps thread membership stable as conversations grow.
 
 ## Thread Read Shape
@@ -60,17 +60,19 @@ replies have `depth: 2`; and so on.
 
 ## Local Store Operations
 
+Store functions are accessible through the `store` namespace:
+
 ```ts
-import { computeThreads, getThread, listThreads } from '@ghostpaw/email';
+import { store } from '@ghostpaw/email';
 
 // Re-compute thread IDs for all messages in a folder (run after sync).
-computeThreads(db, folderId);
+store.computeThreads(db, folderId);
 
 // List threads in a folder sorted by last message date.
-const threads = listThreads(db, folderId, { limit: 20, sort: 'lastMessageAt' });
+const threads = store.listThreads(db, folderId, { limit: 20, sort: 'lastMessageAt' });
 
 // Get one thread by threadId.
-const thread = getThread(db, threadId);
+const thread = store.getThread(db, threadId);
 ```
 
 These are also available through the read surface:
@@ -98,8 +100,8 @@ await mailbox.write.reply('INBOX', latest.uid, { text: 'Response here.' });
 
 ## Invariants
 
-- `threadId` is assigned by the sync engine, not by the user
+- `thread_id` is assigned by the sync engine, not by the user
 - Missing root messages (referenced but not in the local cache) do not prevent thread formation — child messages are grouped under a synthetic root
-- `threadId` values are stable: adding a new message to an existing thread does not change the IDs of existing messages
-- Thread computation is deterministic given the same set of `messageId`, `inReplyTo`, and `references` values
-- Cross-folder threading (same conversation appearing in INBOX and Sent) is supported: `threadId` spans folders
+- `thread_id` values are stable: adding a new message to an existing thread does not change the IDs of existing messages
+- Thread computation is deterministic given the same set of `message_id`, `in_reply_to`, and `references` values
+- Cross-folder threading (same conversation appearing in INBOX and Sent) is supported: `thread_id` spans folders

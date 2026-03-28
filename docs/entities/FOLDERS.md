@@ -12,16 +12,16 @@ Stored in the `folders` table:
 | Column | Type | Notes |
 |---|---|---|
 | `id` | INTEGER | Primary key |
-| `accountId` | INTEGER | Foreign key → `accounts.id` |
+| `account_id` | INTEGER | Foreign key → `accounts.id` |
 | `path` | TEXT | Full IMAP path (e.g. `INBOX`, `INBOX/Work`, `[Gmail]/Sent Mail`) |
-| `delimiter` | TEXT | Server path separator (`/` or `.`) |
+| `delimiter` | TEXT | Server path separator (`/` or `.`), default `/` |
 | `role` | TEXT | Detected special-use role (see below) |
-| `uidValidity` | INTEGER | Current UIDVALIDITY value |
-| `uidNext` | INTEGER | Next expected UID |
-| `highestModSeq` | INTEGER | HIGHESTMODSEQ for CONDSTORE/QRESYNC |
-| `messageCount` | INTEGER | Local count of messages in this folder |
-| `unseenCount` | INTEGER | Local count of unseen messages |
-| `lastSyncedAt` | TEXT | ISO timestamp of last successful sync |
+| `uid_validity` | INTEGER | Current UIDVALIDITY value |
+| `uid_next` | INTEGER | Next expected UID |
+| `highest_mod_seq` | INTEGER | HIGHESTMODSEQ for CONDSTORE/QRESYNC |
+| `message_count` | INTEGER | Local count of messages in this folder |
+| `unseen_count` | INTEGER | Local count of unseen messages |
+| `last_synced_at` | TEXT | ISO timestamp of last successful sync |
 
 ## Role Detection
 
@@ -37,8 +37,8 @@ A `null` role means the folder has no special function detected.
 
 ## UIDVALIDITY And Cache Coherence
 
-`uidValidity` is set by the server and identifies the UID namespace for a
-folder. If the server reports a different `uidValidity` than the locally
+`uid_validity` is set by the server and identifies the UID namespace for a
+folder. If the server reports a different `uid_validity` than the locally
 stored one, all message UIDs for that folder are stale. The sync engine
 responds by clearing the local message cache for that folder and performing a
 full re-sync.
@@ -48,23 +48,25 @@ record the reset.
 
 ## Local Store Operations
 
-```ts
-import { upsertFolder, getFolderByPath, getFolderById, listFolders, deleteFolder } from '@ghostpaw/email';
+Store functions are accessible through the `store` namespace:
 
-const folder = upsertFolder(db, {
+```ts
+import { store } from '@ghostpaw/email';
+
+const folder = store.upsertFolder(db, {
   accountId: account.id,
   path: 'INBOX',
   delimiter: '/',
   role: 'inbox',
 });
 
-const byPath = getFolderByPath(db, account.id, 'INBOX');
-const byId = getFolderById(db, folder.id);
-const all = listFolders(db, account.id);
-deleteFolder(db, folder.id);
+const byPath = store.getFolder(db, account.id, 'INBOX');
+const byId = store.getFolderById(db, folder.id);
+const all = store.listFolders(db, account.id);
+store.deleteFolder(db, folder.id);
 ```
 
-Folder synchronisation is managed through the network surface:
+Folder synchronisation is managed through the network and write surfaces:
 
 ```ts
 // Refresh from server (detects new folders, role changes, subscriptions).
@@ -80,7 +82,8 @@ await mailbox.write.unsubscribeFolder('Updates');
 
 ## Invariants
 
-- One `folders` row per `(accountId, path)` combination
+- One `folders` row per `(account_id, path)` combination
 - Deleting a folder cascades to messages, bodies, attachments, and sync log
-- `uidValidity` mismatch triggers automatic cache invalidation during sync
-- `highestModSeq` is updated at the end of each incremental sync pass and used to compute the CHANGEDSINCE parameter for the next sync
+- `uid_validity` mismatch triggers automatic cache invalidation during sync
+- `highest_mod_seq` is updated at the end of each incremental sync pass and used to compute the CHANGEDSINCE parameter for the next sync
+- Sync metadata (`uid_validity`, `uid_next`, `highest_mod_seq`) is preserved on upsert via `COALESCE` unless explicitly overwritten

@@ -12,12 +12,14 @@ Stored in the `bodies` table:
 
 | Column | Type | Notes |
 |---|---|---|
-| `id` | INTEGER | Primary key |
-| `messageId` | INTEGER | Foreign key → `messages.id` (one-to-one) |
-| `textPlain` | TEXT | Decoded `text/plain` part |
-| `textHtml` | TEXT | Decoded `text/html` part |
+| `message_id` | INTEGER | Primary key, foreign key → `messages.id` |
+| `text_plain` | TEXT | Decoded `text/plain` part |
+| `text_html` | TEXT | Decoded `text/html` part |
 | `raw` | BLOB | Full RFC 2822 message bytes |
-| `fetchedAt` | TEXT | ISO timestamp when body was fetched |
+
+The `message_id` column is both the primary key and the foreign key, enforcing
+a strict one-to-one relationship with the `messages` table. There is no
+separate `id` column.
 
 ## On-Demand Fetch Model
 
@@ -33,37 +35,38 @@ The same pattern applies to `read.getAttachment()`.
 
 ## MIME Decoding
 
-The `textPlain` and `textHtml` columns contain decoded and transfer-decoded
+The `text_plain` and `text_html` columns contain decoded and transfer-decoded
 text:
 
 - Quoted-Printable and Base64 Content-Transfer-Encoding are decoded
 - RFC 2047 encoded-word headers (=?charset?encoding?text?=) are decoded
 - Character set conversion is applied via `TextDecoder`
 
-When only `textHtml` is present, `textPlain` is derived from it via the
+When only `text_html` is present, `text_plain` is derived from it via the
 `htmlToText` utility (strips tags, normalises whitespace).
 
-## Relationship To bodyStructure
+## Relationship To body_structure
 
-The `bodyStructure` column on the `messages` row holds the full decoded
+The `body_structure` column on the `messages` row holds the full decoded
 IMAP BODYSTRUCTURE response as a `BodyPart` tree. The `bodies` row holds the
 actual content bytes. Together they give a complete picture of the message
 structure without requiring re-parsing.
 
 ## Local Store Operations
 
-```ts
-import { upsertBody, getBody, deleteBody } from '@ghostpaw/email';
+Store functions are accessible through the `store` namespace:
 
-const body = upsertBody(db, {
+```ts
+import { store } from '@ghostpaw/email';
+
+const body = store.upsertBody(db, {
   messageId: message.id,
   textPlain: 'Hello world',
   textHtml: '<p>Hello world</p>',
   raw: rawBuffer,
 });
 
-const fetched = getBody(db, message.id);
-deleteBody(db, message.id);
+const fetched = store.getBody(db, message.id);
 ```
 
 Body access through the read surface handles the fetch-on-demand cycle:
@@ -77,6 +80,6 @@ const detail = await mailbox.read.getMessage('INBOX', uid);
 ## Invariants
 
 - At most one `bodies` row per `messages.id`
-- `raw` is the verbatim RFC 2822 bytes from the IMAP FETCH RFC822 response
-- `textPlain` and `textHtml` may both be null for messages with no text parts (binary-only messages)
-- Body rows are deleted when the parent message is deleted
+- `raw` is the verbatim RFC 2822 bytes from the IMAP FETCH BODY[] response
+- `text_plain` and `text_html` may both be null for messages with no text parts (binary-only messages)
+- Body rows are deleted when the parent message is deleted (ON DELETE CASCADE)
