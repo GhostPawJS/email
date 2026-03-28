@@ -1,0 +1,22 @@
+export const DEFAULT_CONNECTION_TIMEOUT = 30_000;
+export const DEFAULT_SOCKET_TIMEOUT = 300_000;
+export const DEFAULT_KEEPALIVE_INTERVAL = 300_000;
+export const DEFAULT_MAX_RECONNECT_DELAY = 60_000;
+export const DEFAULT_MAX_RECONNECT_ATTEMPTS = 10;
+export const DEFAULT_MAX_CONNECTIONS = 6;
+export const DEFAULT_PIPELINING = false;
+export const DEFAULT_COMPRESS = true;
+export const DEFAULT_TAG_PREFIX = 'A';
+
+export const DEFAULT_BATCH_SIZE = 500;
+export const DEFAULT_AUTO_EXPUNGE = false;
+export const DEFAULT_SYNC_DELETED_FOLDERS = false;
+export const DEFAULT_MAX_BODY_CACHE = 1000;
+export const DEFAULT_MAX_ATTACHMENT_CACHE = 100;
+
+export const DEFAULT_IDLE_TIMEOUT = 1_500_000;
+export const DEFAULT_WATCH_FOLDERS = ['INBOX'] as const;
+
+export const DEFAULT_MAX_NESTING_DEPTH = 50;
+export const DEFAULT_MAX_MESSAGE_SIZE = 26_214_400;
+export const DEFAULT_CHARSET = 'utf-8';
