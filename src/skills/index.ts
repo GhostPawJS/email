@@ -1,2 +1,10 @@
-export { emailSkills } from './email_skills.ts';
+export { attachmentWorkflowSkill } from './attachment-workflow.ts';
+export { composeAndSendSkill } from './compose-and-send.ts';
+export { connectAndSyncSkill } from './connect-and-sync.ts';
+export { emailSkills, getEmailSkillByName } from './email_skills.ts';
+export { organizeBulkSkill } from './organize-bulk.ts';
+export { readAndReplySkill } from './read-and-reply.ts';
+export { recoverFromDisruptionSkill } from './recover-from-disruption.ts';
+export { searchAndActSkill } from './search-and-act.ts';
 export type * from './skill_types.ts';
+export { triageInboxSkill } from './triage-inbox.ts';
