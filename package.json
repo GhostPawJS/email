@@ -1,7 +1,7 @@
 {
 	"name": "@ghostpaw/email",
 	"version": "0.1.0",
-	"description": "Standalone email suite core for Node.js — IMAP, SMTP, local sync, zero dependencies, with a built-in LLM tool facade",
+	"description": "Standalone IMAP/SMTP email engine for Node.js — SQLite local cache, threading, sync, zero dependencies, with a built-in LLM tool facade",
 	"type": "module",
 	"exports": {
 		".": {
@@ -46,11 +46,18 @@
 	},
 	"keywords": [
 		"email",
+		"mail",
 		"imap",
+		"imap-client",
 		"smtp",
+		"smtp-client",
 		"mailbox",
-		"message",
-		"local-sync",
+		"inbox",
+		"mime",
+		"threading",
+		"sync",
+		"idle",
+		"local-first",
 		"sqlite",
 		"llm",
 		"ai",
