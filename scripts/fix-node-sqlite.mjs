@@ -1,9 +1,9 @@
 // Post-build: esbuild strips 'node:' from 'node:sqlite' because node:sqlite
 // is a Node 24-only built-in and esbuild writes it as 'sqlite' for compatibility.
 // Node 24 only recognises the 'node:' prefix for this module, so we restore it.
-import { readFileSync, writeFileSync } from 'node:fs';
+import { chmodSync, readFileSync, writeFileSync } from 'node:fs';
 
-const files = ['dist/index.js', 'dist/index.cjs'];
+const files = ['dist/index.js', 'dist/index.cjs', 'dist/cli.js'];
 
 for (const file of files) {
 	const before = readFileSync(file, 'utf8');
@@ -14,4 +14,12 @@ for (const file of files) {
 		writeFileSync(file, after);
 		console.log(`  patched: ${file}`);
 	}
+}
+
+// Ensure the CLI binary is executable on Unix systems.
+try {
+	chmodSync('dist/cli.js', 0o755);
+	console.log('  chmod +x: dist/cli.js');
+} catch {
+	// No-op on Windows where chmod is not meaningful.
 }

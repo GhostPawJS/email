@@ -18,14 +18,18 @@
 	"main": "./dist/index.cjs",
 	"module": "./dist/index.js",
 	"types": "./dist/index.d.ts",
+	"bin": {
+		"email": "./dist/cli.js"
+	},
 	"files": [
-		"dist"
+		"dist",
+		"SKILL.md"
 	],
 	"sideEffects": false,
 	"scripts": {
 		"build": "tsup && node scripts/fix-node-sqlite.mjs",
 		"dev": "tsup --watch",
-		"test": "node --experimental-strip-types --test --test-reporter=dot 'src/**/*.test.ts'",
+		"test": "node --no-warnings --experimental-strip-types --test --test-reporter=dot 'src/**/*.test.ts'",
 		"lint": "biome check",
 		"lint:fix": "biome check --fix",
 		"format": "biome format --write",
@@ -90,6 +94,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "2.4.4",
 		"@types/node": "^25.3.0",
+		"citty": "^0.1.6",
 		"esbuild": "^0.27.4",
 		"tsup": "^8.4.0",
 		"typescript": "^5.9.3"
