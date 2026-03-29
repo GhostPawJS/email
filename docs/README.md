@@ -184,6 +184,7 @@ common trap of treating a staged draft as a sent message.
 - `skills.emailSkills`: 8 workflow skill definitions (see `LLM.md`)
 - `soul.emailSoul`: `Postmaster` thinking foundation (see `LLM.md`)
 - `initSchema(db)`: standalone schema initialiser for advanced use (not needed with `Mailbox`)
+- `email` binary: CLI surface — account management, all five tools as subcommands, `--json` output (see `SKILL.md`)
 
 ## Code Source Of Truth
 
@@ -200,6 +201,7 @@ common trap of treating a staged draft as a sent message.
 - `src/tools/`: LLM tool facade
 - `src/skills/`: LLM workflow skill library
 - `src/soul.ts`: `Postmaster` soul
+- `src/cli/`: CLI binary layer — citty subcommands, XDG account config, stdin/stdout piping, `--json` output
 
 ## Explicit Non-Goals
 
@@ -213,6 +215,7 @@ common trap of treating a staged draft as a sent message.
 
 ## Supplemental Docs
 
+- `SKILL.md` (root): CLI reference for agent operators and Claude Code / OpenClaw users
 - `HUMAN.md`: human-facing guide for developers using the `Mailbox` API
 - `LLM.md`: top-to-bottom overview of the soul, tools, and skills AI surface
 - `PAGES.md`: interactive demo notes

@@ -11,14 +11,17 @@ A standalone email engine for Node.js, built on SQLite.
 Email treats IMAP sync, SMTP send, local caching, threading, search, and
 transport errors as one coherent model instead of a grab bag of protocol
 adapters. It ships as a single prebundled blob with zero runtime dependencies,
-designed for two audiences at once: human developers working directly in code,
-and LLM agents operating through a structured `soul` / `tools` / `skills`
-runtime.
+designed for three audiences at once: human developers working directly in
+code, LLM agents operating through a structured `soul` / `tools` / `skills`
+runtime, and agent operators who want a ready-to-use `email` CLI binary
+without writing any wiring code.
 
 ## Install
 
 ```bash
-npm install @ghostpaw/email
+npm install @ghostpaw/email        # as a library
+npm install -g @ghostpaw/email     # as a global CLI
+npx @ghostpaw/email --help         # one-off, no install needed
 ```
 
 Requires **Node.js 24+** (uses the built-in `node:sqlite` module).
@@ -130,6 +133,36 @@ and `nextSteps` — no thrown exceptions to parse, no ambiguous prose.
 See [LLM.md](docs/LLM.md) for the full AI-facing guide covering soul, tools,
 and skills.
 
+### CLI (bash)
+
+The package ships as a standalone `email` binary. Accounts are stored in
+`~/.config/email/accounts.json` and every command accepts `--json` for
+machine-readable output.
+
+```bash
+# Add an account once
+email account add --name work \
+  --imap-host imap.example.com --smtp-host smtp.example.com \
+  --user you@example.com --pass secret
+
+# Then use it
+email sync                              # pull latest from server
+email read                             # check inbox
+email search "invoice"                 # FTS5 search
+email compose send --to bob@example.com --subject "Hi" --body "Hello"
+
+# Machine-readable output for agents and scripts
+email read queue --json | jq '.entities[].title'
+echo "body text" | email compose send --to bob@example.com --subject "Hi"
+```
+
+All commands return the same `{ outcome, summary, entities, nextSteps }`
+shape as the tool layer, with consistent exit codes (0 success, 1 user error,
+2 config, 3 auth, 4 network, 5 tool error).
+
+See [SKILL.md](SKILL.md) for the complete CLI reference for agent operators
+and Claude Code / OpenClaw users.
+
 ## Tools
 
 Five tools shaped around operator intent, not raw protocol operations:
@@ -212,6 +245,7 @@ import type {
 
 | Document | Audience |
 |---|---|
+| [SKILL.md](SKILL.md) | Agent operators and Claude Code users running `email` as a bash tool |
 | [HUMAN.md](docs/HUMAN.md) | Human developers using the `Mailbox` API with `read` / `write` / `network` |
 | [LLM.md](docs/LLM.md) | Agent builders wiring `soul`, `tools`, and `skills` into LLM systems |
 | [docs/README.md](docs/README.md) | Architecture overview: model, invariants, protocol boundaries, source layout |

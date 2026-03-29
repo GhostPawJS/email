@@ -1,9 +1,10 @@
 # LLM Building Blocks
 
-`@ghostpaw/email` is designed to work in two modes simultaneously:
+`@ghostpaw/email` is designed to work in three modes simultaneously:
 
 - as a clean direct-code library for human developers
 - as a runtime surface that agent harnesses can wire into LLM systems directly
+- as a standalone `email` CLI binary that agents can invoke as a bash tool without any wiring code
 
 LLMs need more than callable functions. They need a shaped way to think, a
 small action surface, and reusable guidance for multi-step email situations.
@@ -308,6 +309,41 @@ console.log(triageSkill?.content);
 await mailbox.disconnect();
 ```
 
+## The CLI Alternative
+
+For agents that run in an environment with bash access — Claude Code, OpenClaw,
+custom agent harnesses — the `email` binary is often the right choice over
+wiring up the library directly.
+
+The CLI wraps all five tools as subcommands with the same structured output
+contract:
+
+```bash
+# Every command returns { outcome, summary, entities, nextSteps } with --json
+email sync --json
+email read queue --json
+email search "invoice" --json
+email compose send --to bob@example.com --subject "Hi" --body "text" --json
+email organize archive --folder INBOX --uids 42,43 --json
+```
+
+Accounts are stored in `~/.config/email/accounts.json` and can also be
+provided entirely through environment variables for ephemeral CI contexts:
+
+```bash
+EMAIL_IMAP_HOST=imap.example.com EMAIL_SMTP_HOST=smtp.example.com \
+EMAIL_USER=you@example.com EMAIL_PASS=secret \
+  email read queue --json
+```
+
+The CLI does not replace the runtime library surface — it is the same tool
+layer, exposed through bash instead of TypeScript. The soul and skills are not
+directly exposed via CLI (they are for LLM system prompts, not command output),
+but the five tools map one-to-one to the five subcommands.
+
+See [SKILL.md](../SKILL.md) for the complete CLI reference, including exit
+codes, piping patterns, multi-step workflow examples, and account setup.
+
 ## Human And AI Use Together
 
 None of this replaces the human-facing library surface.
@@ -319,5 +355,6 @@ and skills are an additional AI-oriented layer on top of that clean core.
 That is the point of the design:
 
 - humans get a clean library with typed surfaces
-- agents get runtime-ready guidance and execution primitives
-- both operate on the same truthful underlying SQLite model
+- agents that build systems get runtime-ready guidance and execution primitives
+- agents with bash access get the same tool surface as a zero-wiring CLI
+- all three operate on the same truthful underlying SQLite model
