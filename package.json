@@ -1,6 +1,6 @@
 {
 	"name": "@ghostpaw/email",
-	"version": "0.2.2",
+	"version": "0.2.3",
 	"description": "Standalone IMAP/SMTP email engine for Node.js — SQLite local cache, threading, sync, zero dependencies, with a built-in LLM tool facade",
 	"type": "module",
 	"exports": {
