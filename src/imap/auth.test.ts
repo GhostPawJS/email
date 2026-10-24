@@ -56,3 +56,53 @@ describe('authenticate', () => {
 		await assert.doesNotReject(p);
 	});
 });
+
+it('OAuth bearer falls back and refreshes failed tokens', async () => {
+	const calls: unknown[][] = [];
+	let refreshed = false;
+	const dispatcher = {
+		async execute(command: string, args: string[]) {
+			calls.push([command, ...args]);
+			if (args[0] === 'OAUTHBEARER') throw new Error('unsupported');
+			if (!refreshed) throw new Error('expired');
+			assert.match(Buffer.from(args[1] ?? '', 'base64').toString(), /Bearer fresh/);
+			return { tagged: { status: 'OK' } };
+		},
+	} as unknown as ImapDispatcher;
+	await authenticate(dispatcher, new Set(['OAUTHBEARER', 'XOAUTH2']), {
+		user: 'u',
+		accessToken: 'old',
+		async refreshFn() {
+			refreshed = true;
+			return 'fresh';
+		},
+	});
+	assert.equal(calls.length, 4);
+});
+
+it('accepts bearer and custom mechanisms, and reports unsupported OAuth', async () => {
+	const dispatcher = {
+		async execute() {
+			return { tagged: { status: 'OK' } };
+		},
+	} as unknown as ImapDispatcher;
+	await authenticate(dispatcher, new Set(['OAUTHBEARER']), { user: 'u', accessToken: 't' });
+	await authenticate(dispatcher, new Set(), { mechanism: 'CUSTOM', credentials: { user: 'u' } });
+	await assert.rejects(
+		authenticate(dispatcher, new Set(), { user: 'u', accessToken: 't' }),
+		/No OAuth/,
+	);
+	const rejected = {
+		async execute() {
+			return { tagged: { status: 'NO' } };
+		},
+	} as unknown as ImapDispatcher;
+	await assert.rejects(
+		authenticate(rejected, new Set(['XOAUTH2']), { user: 'u', accessToken: 't' }),
+		/XOAUTH2 authentication failed/,
+	);
+	await assert.rejects(
+		authenticate(rejected, new Set(), { mechanism: 'CUSTOM', credentials: {} }),
+		/CUSTOM authentication failed/,
+	);
+});

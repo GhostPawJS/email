@@ -117,8 +117,8 @@ surface designed to minimise LLM cognitive load:
 import { skills, soul, tools } from '@ghostpaw/email';
 
 // 5 intent-shaped tools covering the full mailbox lifecycle
-const allTools = tools.emailTools;
-const readTool = tools.getEmailToolByName('mail_read');
+const allTools = tools.aligned.emailTools;
+const readTool = tools.aligned.getEmailToolByName('mail_read');
 
 // 8 reusable workflow skills for multi-step scenarios
 const triageSkill = skills.getEmailSkillByName('triage-inbox');
@@ -127,8 +127,28 @@ const triageSkill = skills.getEmailSkillByName('triage-inbox');
 const systemPrompt = soul.renderEmailSoulPromptFoundation();
 ```
 
-Every tool returns a structured result with `outcome`, `summary`, `entities`,
-and `nextSteps` — no thrown exceptions to parse, no ambiguous prose.
+The shared facade exposes `name`, `description`, `whenToUse`, `whenNotToUse`,
+`inputSchema`, `readOnly`, and `sideEffects`. Handlers take a context containing
+`read`, `write`, and `network` surfaces and the existing tool input. They return
+`{ ok, outcome, summary, next, data }`; `data.entities` contains the message or
+mailbox references, and `next` contains follow-up hints. Errors map to `ok: false`.
+Read operations may refresh the local cache, so metadata conservatively marks
+all tools as writing state.
+
+```ts
+const definitions = tools.aligned.listEmailToolDefinitions();
+const tool = tools.aligned.getEmailToolByName('mail_read');
+if (!tool) throw new Error('mail_read is unavailable');
+const result = await tool.handler(
+  { read: mailbox.read, write: mailbox.write, network: mailbox.network },
+  { view: 'folders' },
+);
+console.log(result.ok, result.summary);
+```
+
+The deprecated `tools.emailTools` and `tools.getEmailToolByName()` remain
+available with the original `{ outcome, summary, entities, nextSteps }` result
+and unchanged inputs. Migrate to `tools.aligned` to use the shared shape.
 
 See [LLM.md](docs/LLM.md) for the full AI-facing guide covering soul, tools,
 and skills.

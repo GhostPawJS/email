@@ -158,7 +158,9 @@ export async function statusFolder(
 	let highestModSeq: number | null = null;
 	for (const u of res.untagged) {
 		if (u.type === 'STATUS' && Array.isArray(u.data)) {
-			const arr = u.data as unknown[];
+			const data = u.data as unknown[];
+			// STATUS includes the mailbox name followed by its attribute list.
+			const arr = Array.isArray(data[1]) ? (data[1] as unknown[]) : data;
 			for (let i = 0; i + 1 < arr.length; i += 2) {
 				const k = tokStr(arr[i]).toUpperCase();
 				const v = tokNum(arr[i + 1]);

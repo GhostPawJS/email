@@ -42,3 +42,51 @@ describe('compileSearchQuery', () => {
 		assert.equal(compileSearchQuery({}), 'ALL');
 	});
 });
+
+it('compiles all supported search criteria and nested expressions', () => {
+	const date = new Date('2026-01-02T00:00:00Z');
+	const query = compileSearchQuery(
+		{
+			all: true,
+			unseen: true,
+			seen: true,
+			flagged: true,
+			answered: true,
+			deleted: true,
+			draft: true,
+			since: date,
+			before: date,
+			on: date,
+			from: 'a',
+			to: 'b',
+			cc: 'c',
+			subject: 's',
+			body: 'b',
+			text: 't',
+			header: { name: 'X-Test', value: 'v' },
+			larger: 10,
+			smaller: 100,
+			uid: '1:2',
+			modseq: 3,
+			gmailRaw: 'in:inbox',
+			or: [{ seen: true }, { unseen: true }],
+			not: { deleted: true },
+		},
+		new Set(['X-GM-EXT-1']),
+	);
+	for (const expected of [
+		'ALL UNSEEN SEEN FLAGGED ANSWERED DELETED DRAFT',
+		'SINCE 02-Jan-2026',
+		'BEFORE 02-Jan-2026',
+		'ON 02-Jan-2026',
+		'FROM "a"',
+		'TO "b"',
+		'CC "c"',
+		'HEADER "X-Test" "v"',
+		'LARGER 10 SMALLER 100 UID 1:2 MODSEQ 3',
+		'X-GM-RAW "in:inbox"',
+		'OR SEEN UNSEEN NOT DELETED',
+	])
+		assert.ok(query.includes(expected), expected);
+	assert.equal(compileSearchQuery({}), 'ALL');
+});

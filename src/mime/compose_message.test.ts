@@ -42,3 +42,37 @@ describe('composeMessage', () => {
 		assert.ok(msg.includes('multipart/mixed'));
 	});
 });
+
+it('composes optional headers and each body format', () => {
+	for (const body of [
+		{ html: '<b>hello</b>' },
+		{ text: 'hello', html: '<b>hello</b>' },
+		{ text: 'hello', attachments: [{ filename: 'a.txt', content: Buffer.from('file') }] },
+		{
+			text: 'hello',
+			html: '<b>hello</b>',
+			attachments: [
+				{ filename: 'a.txt', content: Buffer.from('file'), inline: true, contentId: 'image' },
+			],
+		},
+	]) {
+		const raw = composeMessage({
+			to: [{ address: 'to@example.com' }],
+			cc: [{ address: 'cc@example.com' }],
+			bcc: [{ address: 'bcc@example.com' }],
+			subject: 'test',
+			inReplyTo: '<original>',
+			references: ['<original>'],
+			headers: { 'X-Test': 'value' },
+			...body,
+		}).toString();
+		assert.match(raw, /Cc: cc@example.com/);
+		assert.match(raw, /Bcc: bcc@example.com/);
+		assert.match(raw, /In-Reply-To: <original>/);
+		assert.match(raw, /References: <original>/);
+		assert.match(raw, /X-Test: value/);
+		assert.match(raw, /hello/);
+		if ('attachments' in body) assert.match(raw, /filename="a.txt"/);
+		else assert.match(raw, /text\/html/);
+	}
+});

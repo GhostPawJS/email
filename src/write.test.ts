@@ -152,3 +152,122 @@ test('send() throws when no identity can be derived and session exists', async (
 		db.close();
 	}
 });
+
+test('write operations select folders and send the expected IMAP mutations', async () => {
+	const db = new DatabaseSync(':memory:') as EmailDb;
+	try {
+		initSchema(db);
+		const account = upsertAccount(db, { host: 'h', port: 993, username: 'u' });
+		for (const role of ['inbox', 'archive', 'trash', 'junk', 'drafts'] as const)
+			upsertFolder(db, { accountId: account.id, path: role, role });
+		const calls: unknown[][] = [];
+		const session = {
+			selectedFolder: '',
+			async selectFolder(path: string) {
+				this.selectedFolder = path;
+				calls.push(['select', path]);
+			},
+			async storeFlags(...args: unknown[]) {
+				calls.push(['flags', ...args]);
+			},
+			async moveMessages(...args: unknown[]) {
+				calls.push(['move', ...args]);
+			},
+			async copyMessages(...args: unknown[]) {
+				calls.push(['copy', ...args]);
+			},
+			async uidExpunge(...args: unknown[]) {
+				calls.push(['expunge', ...args]);
+			},
+			async appendMessage(...args: unknown[]) {
+				calls.push(['append', ...args]);
+				return { uid: 42 };
+			},
+			async fetchMessages() {
+				return [{ bodySections: new Map([['', Buffer.from('raw message')]]) }];
+			},
+			async createFolder(...args: unknown[]) {
+				calls.push(['create', ...args]);
+			},
+			async renameFolder(...args: unknown[]) {
+				calls.push(['rename', ...args]);
+			},
+			async deleteFolder(...args: unknown[]) {
+				calls.push(['delete', ...args]);
+			},
+			async subscribeFolder(...args: unknown[]) {
+				calls.push(['subscribe', ...args]);
+			},
+			async unsubscribeFolder(...args: unknown[]) {
+				calls.push(['unsubscribe', ...args]);
+			},
+		};
+		const write = createWriteSurface(db, {
+			config: testConfig,
+			accountId: account.id,
+			session: session as unknown as import('./imap/session.ts').ImapSession,
+		});
+		for (const [method, mode, flag] of [
+			['markRead', '+FLAGS.SILENT', '\\Seen'],
+			['markUnread', '-FLAGS.SILENT', '\\Seen'],
+			['star', '+FLAGS.SILENT', '\\Flagged'],
+			['unstar', '-FLAGS.SILENT', '\\Flagged'],
+			['markAnswered', '+FLAGS.SILENT', '\\Answered'],
+		] as const) {
+			await write[method]('inbox', [1]);
+			assert.deepEqual(calls.at(-1), ['flags', [1], mode, [flag]]);
+		}
+		await write.copyTo('inbox', [1], 'archive');
+		assert.deepEqual(calls.at(-1), ['copy', [1], 'archive']);
+		await write.moveTo('inbox', [1], 'trash');
+		for (const [method, target] of [
+			['archive', 'archive'],
+			['trash', 'trash'],
+			['moveToJunk', 'junk'],
+		] as const) {
+			await write[method]('inbox', [1]);
+			assert.deepEqual(calls.at(-1), ['move', [1], target]);
+		}
+		await write.markNotJunk('junk', [1]);
+		assert.deepEqual(calls.at(-1), ['move', [1], 'inbox']);
+		await write.markNotJunk('junk', [1], 'archive');
+		assert.deepEqual(calls.at(-1), ['move', [1], 'archive']);
+		await write.delete('inbox', [1]);
+		assert.deepEqual(calls.at(-1), ['expunge', [1]]);
+		for (const [method, mode] of [
+			['addLabels', '+FLAGS.SILENT'],
+			['removeLabels', '-FLAGS.SILENT'],
+			['setLabels', 'FLAGS.SILENT'],
+		] as const) {
+			await write[method]('inbox', [1], ['work']);
+			assert.deepEqual(calls.at(-1), ['flags', [1], mode, ['work']]);
+		}
+		const input = { to: [{ address: 'to@example.com' }], subject: 'draft' };
+		assert.equal((await write.saveDraft(input)).uid, 42);
+		const append = calls.at(-1);
+		assert.equal(append?.[1], 'drafts');
+		assert.match(String(append?.[2]), /From: u/);
+		assert.equal((await write.updateDraft(1, input)).uid, 42);
+		assert.equal((await write.exportEml('inbox', 1)).toString(), 'raw message');
+		await write.importEml('inbox', Buffer.from('import'), ['\\Seen']);
+		assert.equal(calls.at(-1)?.[0], 'append');
+		await write.createFolder('A');
+		await write.renameFolder('A', 'B');
+		await write.deleteFolder('B');
+		await write.subscribeFolder('inbox');
+		await write.unsubscribeFolder('inbox');
+		assert.deepEqual(calls.slice(-5), [
+			['create', 'A'],
+			['rename', 'A', 'B'],
+			['delete', 'B'],
+			['subscribe', 'inbox'],
+			['unsubscribe', 'inbox'],
+		]);
+		await assert.rejects(write.reply('missing', 1, {}), /Folder not found/);
+		await assert.rejects(write.reply('inbox', 1, {}), /not found/);
+		await assert.rejects(write.forward('missing', 1, { to: [] }), /Folder not found/);
+		await assert.rejects(write.forward('inbox', 1, { to: [] }), /not found/);
+	} finally {
+		db.close();
+	}
+});

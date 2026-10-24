@@ -128,3 +128,56 @@ describe('createNetworkSurface', () => {
 		}
 	});
 });
+
+it('refreshes folders, searches and streams cached message events', async () => {
+	const db = new DatabaseSync(':memory:') as EmailDb;
+	try {
+		initSchema(db);
+		const account = upsertAccount(db, { host: 'h', port: 143, username: 'u' });
+		const selected: string[] = [];
+		const session = {
+			selectedFolder: 'INBOX',
+			capabilities: new Set<string>(),
+			async selectFolder(path: string) {
+				selected.push(path);
+			},
+			async listFolders() {
+				return [{ path: 'INBOX', delimiter: '/', role: 'inbox' }];
+			},
+			async searchMessages(query: string) {
+				assert.equal(query, 'UNSEEN');
+				return [1];
+			},
+			async fetchMessages() {
+				return [{ uid: 999 }];
+			},
+			async *idle(options: { signal: AbortSignal }) {
+				yield { type: 'exists', count: 1 };
+				yield { type: 'expunge', seqno: 2 };
+				yield { type: 'fetch', seqno: 3 };
+				assert.equal(options.signal.aborted, false);
+			},
+		} as unknown as ImapSession;
+		const network = createNetworkSurface(db, { accountId: account.id, session });
+		assert.equal((await network.refreshFolders())[0]?.path, 'INBOX');
+		assert.deepEqual(await network.searchRemote('INBOX', { unseen: true }), [1]);
+		assert.deepEqual(await network.searchRemote('Other', { unseen: true }), [1]);
+		const events = [];
+		for await (const event of network.watch()) events.push(event);
+		assert.deepEqual(events, [
+			{ type: 'new', folder: 'INBOX', messages: [] },
+			{ type: 'expunge', folder: 'INBOX', uid: 2 },
+			{ type: 'flags', folder: 'INBOX', uid: 3, flags: [] },
+		]);
+		assert.deepEqual(selected, ['Other', 'INBOX']);
+		const missingEvents = [];
+		for await (const event of network.watch({
+			folders: ['Missing'],
+			signal: new AbortController().signal,
+		}))
+			missingEvents.push(event);
+		assert.equal(missingEvents.length, 3);
+	} finally {
+		db.close();
+	}
+});

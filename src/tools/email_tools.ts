@@ -57,6 +57,7 @@ type MailSyncInput =
 
 // ─── Tools ───────────────────────────────────────────────────────────────────
 
+/** @deprecated Use tools.aligned.emailTools for the shared result shape. */
 export const emailTools = [
 	{
 		name: 'mail_read',
