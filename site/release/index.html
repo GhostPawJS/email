@@ -30,7 +30,7 @@
 <main>
   <section class=hero aria-labelledby=hero-title>
     <div class=hero-copy>
-      <p class=kicker><code>@ghostpaw/email</code> 0.4.0</p>
+      <p class=kicker><code>@ghostpaw/email</code> 0.4.1</p>
       <h1 id=hero-title>Your agent can read the inbox. Sending is a separate tool.</h1>
       <p class=lede>email speaks IMAP and SMTP from inside your Node.js process, caches mail in a SQLite file with threads and FTS5 search, and splits what an agent can do into five tools. Give an agent <code>mail_read</code> and <code>mail_search</code>, leave out <code>mail_compose</code>, and it can read and search but not send.</p>
       <div class=install>
@@ -51,7 +51,7 @@
   <section id=run class="sec run-sec" aria-labelledby=run-title>
     <h2 id=run-title>Three messages, six calls, no server</h2>
     <p class=intro>Everything below ran on one machine with no IMAP server contacted.</p>
-    <p class=intro>We built the messages with the library&#39;s own MIME composer, parsed them with its parser and cached them through the store functions its sync uses, all against email 0.4.0 on 2026-10-24 with the clock fixed. Run the steps in order.</p>
+    <p class=intro>We built the messages with the library&#39;s own MIME composer, parsed them with its parser and cached them through the store functions its sync uses, all against email 0.4.1 on 2026-10-24 with the clock fixed. Run the steps in order.</p>
     <div class=run>
       <div class=state role=region aria-labelledby=state-title aria-live=polite>
         <p class=state-label id=state-title>Mailbox</p>
@@ -79,7 +79,9 @@ Date: Thu, 22 Oct 2026 09:12:00 +0000
 MIME-Version: 1.0
 From: Ops &lt;ops@vendor.example&gt;
 To: Mika &lt;mika@example.com&gt;
-Subject: Invoice 4471 for October</code></pre><p class=say>One message in the cache, uid 1. Its body stays in SQLite next to the headers.</p></div>
+Subject: Invoice 4471 for October
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit</code></pre><p class=say>One message in the cache, uid 1. Its body stays in SQLite next to the headers.</p></div>
           <button type=button class="act run-btn">Run step 1</button>
         </li>
         <li class=step id=step-2>
@@ -92,8 +94,8 @@ cache(mime.composeMessage(reply), [&#39;\\Seen&#39;]);</code></pre>
           <div class=result><pre><code>From: Mika &lt;mika@example.com&gt;
 To: Ops &lt;ops@vendor.example&gt;
 Subject: Re: Invoice 4471 for October
-In-Reply-To: 1792660320000.90c76e10…@vendor.example
-References: 1792660320000.90c76e10…@vendor.example</code></pre><p class=say>The reply points back at the original Message-ID. This only builds the message, like a draft that nobody has sent; sending it would take SMTP.</p></div>
+In-Reply-To: &lt;1792660320000.90c76e10…@vendor.example&gt;
+References: &lt;1792660320000.90c76e10…@vendor.example&gt;</code></pre><p class=say>The reply points back at the original Message-ID. This only builds the message, like a draft that nobody has sent; sending it would take SMTP.</p></div>
           <button type=button class="act run-btn">Run step 2</button>
         </li>
         <li class=step id=step-3>
@@ -114,10 +116,12 @@ read.createReadSurface(db, account.id).threads(&#39;INBOX&#39;);</code></pre>
           <h3><span class=n>04</span> Search for the invoice</h3>
           <p>Local search over the cache.</p>
           <pre class=call><code>rs.search(&#39;invoice&#39;);
-rs.search(&#39;climbing&#39;);</code></pre>
+rs.search(&#39;harness&#39;);
+rs.search(&#39;discount&#39;);</code></pre>
           <div class=result><pre><code>// invoice  -&gt; uid 1 Ops &#34;Invoice 4471 for October&#34;
 //            uid 2 Mika &#34;Re: Invoice 4471 for October&#34;
-// climbing -&gt; uid 3 Ren &#34;Climbing on Sunday?&#34;</code></pre><p class=say>Both invoice messages, and only Ren&#39;s for climbing. No server was asked.</p></div>
+// harness  -&gt; uid 3 Ren &#34;Climbing on Sunday?&#34;
+// discount -&gt; uid 2 Mika &#34;Re: Invoice 4471 for October&#34;</code></pre><p class=say>“invoice” is in two subjects. “harness” and “discount” appear only in message bodies, and the search finds them after threading rewrote those rows. No server was asked.</p></div>
           <button type=button class="act run-btn">Run step 4</button>
         </li>
         <li class=step id=step-5>
@@ -150,7 +154,7 @@ rs.search(&#39;climbing&#39;);</code></pre>
     </div>
     <div class=run-tools><button type=button class="button ghost" id=reset>Start over</button><p id=run-status role=status></p></div>
     <p class=note><code>cache()</code> is ten lines of our own glue calling <code>mime.parseMessage</code>, <code>store.insertMessage</code>, <code>store.upsertBody</code> and <code>sync.populateFts</code>. In a real setup <code>mailbox.network.sync()</code> fills the cache from IMAP.</p>
-    <p class=note>Search here matched subjects. We do not claim body search for 0.4.0; in our run, changing a cached message row cleared its body from the search index.</p>
+    <p class=note>Before 0.4.1, updating a cached message row cleared its body from the search index, and reply headers lacked the angle brackets around message IDs. Both are fixed in the release used here.</p>
   </section>
 
   <section class="sec explain" aria-labelledby=explain-title>
@@ -201,13 +205,13 @@ rs.search(&#39;climbing&#39;);</code></pre>
     <dl class=ledger>
       <div><dt>Runtime dependencies</dt><dd>0</dd></div>
       <div><dt>Node.js</dt><dd>24 or newer (node:sqlite)</dd></div>
-      <div><dt>Size of dist/index.js, gzip</dt><dd>47.5 KB</dd></div>
-      <div><dt>Import time</dt><dd>about 11.1 ms</dd></div>
-      <div><dt>Tests</dt><dd>553 passing</dd></div>
-      <div><dt>Line coverage</dt><dd>94.0%</dd></div>
+      <div><dt>Size of dist/index.js, gzip</dt><dd>47.8 KB</dd></div>
+      <div><dt>Import time</dt><dd>about 10.4 ms</dd></div>
+      <div><dt>Tests</dt><dd>563 passing</dd></div>
+      <div><dt>Line coverage</dt><dd>94.2%</dd></div>
       <div><dt>Agent tools</dt><dd>5</dd></div>
     </dl>
-    <p class=note>Measured 2026-10-24 on the maintainer&#39;s machine with Node.js 24.14.0 against email 0.4.0: size of the published dist/index.js at gzip -9, median of 11 cold imports, tests and coverage from the v0.4.0 tag. The replay above was re-run against the same release on that day and gave the same output.</p>
+    <p class=note>Measured 2026-10-24 on the maintainer&#39;s machine with Node.js 24.14.0 against email 0.4.1: size of the published dist/index.js at gzip -9, median of 11 cold imports, tests and coverage from the v0.4.1 tag. The replay above was run against the same release on that day.</p>
   </section>
 
   <section class="sec start" aria-labelledby=start-title>
@@ -239,6 +243,6 @@ await mailbox.disconnect();</code></pre>
 
 
 
-<script type=application/ld+json>{"@context":"https://schema.org","@graph":[{"@type":"SoftwareSourceCode","author":{"@id":"https://ghostpaw.dev/#org","@type":"Organization","name":"GhostPaw"},"codeRepository":"https://github.com/GhostPawJS/email","description":"@ghostpaw/email speaks IMAP and SMTP itself, caches mail in SQLite with JWZ threads and FTS5 search, and splits agent access into five tools, so reading and sending are separate. Node.js 24, zero dependencies, MIT.","license":"https://opensource.org/license/mit","name":"@ghostpaw/email","programmingLanguage":"TypeScript","runtimePlatform":"Node.js 24","version":"0.4.0"}]}</script><script>document.documentElement.classList.add("js");
-</script><script type=module>var M=[{rows:[{k:"Messages",v:"0"},{k:"Threads",v:"0"},{k:"Last search",v:"—"},{k:"Tool result",v:"—"},{k:"IMAP session",v:"none"}],foot:"An empty SQLite cache after initSchema(db)."},{rows:[{k:"Messages",v:"1 · Ops, Invoice 4471",t:"cyan"},{k:"Threads",v:"not computed"},{k:"Last search",v:"—"},{k:"Tool result",v:"—"},{k:"IMAP session",v:"none"}],foot:"Cached as uid 1 in INBOX."},{rows:[{k:"Messages",v:"2 · Ops, Mika",t:"cyan"},{k:"Threads",v:"not computed"},{k:"Last search",v:"—"},{k:"Tool result",v:"—"},{k:"IMAP session",v:"none"}],foot:"The reply carries In-Reply-To and References."},{rows:[{k:"Messages",v:"3 · Ops, Mika, Ren"},{k:"Threads",v:"2 · invoice (2), climbing (1)",t:"violet"},{k:"Last search",v:"—"},{k:"Tool result",v:"—"},{k:"IMAP session",v:"none"}],foot:"Threads come from the headers, not the subjects."},{rows:[{k:"Messages",v:"3 · Ops, Mika, Ren"},{k:"Threads",v:"2"},{k:"Last search",v:"“invoice” → uid 1, 2",t:"cyan"},{k:"Tool result",v:"—"},{k:"IMAP session",v:"none"}],foot:"FTS5 local search, no server."},{rows:[{k:"Messages",v:"3 · Ops, Mika, Ren"},{k:"Threads",v:"2"},{k:"Last search",v:"“invoice” → uid 1, 2"},{k:"Tool result",v:"mail_read · success",t:"ward"},{k:"IMAP session",v:"none"}],foot:"The same call an agent makes."},{rows:[{k:"Messages",v:"3 · Ops, Mika, Ren"},{k:"Threads",v:"2"},{k:"Last search",v:"“invoice” → uid 1, 2"},{k:"Tool result",v:"mail_sync · error",t:"alarm"},{k:"IMAP session",v:"none"}],foot:"Sync needs a live IMAP session. Nothing was faked."}];(()=>{let r=document.getElementById("state-list"),h=document.getElementById("state-foot"),o=Array.from(document.querySelectorAll(".step")),p=document.getElementById("reset"),y=document.getElementById("run-status");if(!r||!o.length)return;let i=!matchMedia("(prefers-reduced-motion: reduce)").matches,n=0;function l(e){let s=M[e];r.textContent="";for(let t of s.rows){let a=document.createElement("li");t.t&&(a.className="t-"+t.t);let u=document.createElement("span");u.className="k",u.textContent=t.k;let m=document.createElement("span");if(m.className="v",m.textContent=t.v,a.append(u,m),t.w!=null){let v=document.createElement("span");v.className="bar";let k=document.createElement("i");v.append(k),a.append(v);let g=Math.max(0,Math.min(1,t.w))*100+"%",f=r.dataset.prev&&JSON.parse(r.dataset.prev)[t.k];k.style.width=i&&f!=null?f:g,i&&f!=null&&requestAnimationFrame(()=>requestAnimationFrame(()=>{k.style.width=g}))}r.append(a)}let c={};for(let t of s.rows)t.w!=null&&(c[t.k]=Math.max(0,Math.min(1,t.w))*100+"%");r.dataset.prev=JSON.stringify(c),h&&(h.textContent=s.foot||"")}function d(){o.forEach((e,s)=>{e.classList.toggle("done",s<n),e.classList.toggle("next",s===n)}),y&&(y.textContent=n<o.length?"Step "+(n+1)+" of "+o.length+" is next.":"All "+o.length+" steps replayed.")}o.forEach((e,s)=>{e.querySelector(".run-btn").addEventListener("click",()=>{if(s!==n)return;n=s+1,l(n),d(),e.classList.contains("refused")&&i&&(e.classList.add("flash"),e.addEventListener("animationend",()=>e.classList.remove("flash"),{once:!0}));let t=o[n]&&o[n].querySelector(".run-btn"),a=e.querySelector(".result");a&&(a.setAttribute("tabindex","-1"),a.focus({preventScroll:!0})),t&&t.setAttribute("aria-describedby","run-status")})}),p&&p.addEventListener("click",()=>{n=0,r.dataset.prev="",l(0),d(),o[0].querySelector(".run-btn").focus()}),l(0),d(),document.querySelectorAll(".copy").forEach(e=>{e.addEventListener("click",async()=>{let s=document.getElementById(e.dataset.copy);try{await navigator.clipboard.writeText(s.value)}catch{s.select(),document.execCommand("copy")}let c=e.textContent;e.textContent="Copied",setTimeout(()=>{e.textContent=c},1400)})})})();
+<script type=application/ld+json>{"@context":"https://schema.org","@graph":[{"@type":"SoftwareSourceCode","author":{"@id":"https://ghostpaw.dev/#org","@type":"Organization","name":"GhostPaw"},"codeRepository":"https://github.com/GhostPawJS/email","description":"@ghostpaw/email speaks IMAP and SMTP itself, caches mail in SQLite with JWZ threads and FTS5 search, and splits agent access into five tools, so reading and sending are separate. Node.js 24, zero dependencies, MIT.","license":"https://opensource.org/license/mit","name":"@ghostpaw/email","programmingLanguage":"TypeScript","runtimePlatform":"Node.js 24","version":"0.4.1"}]}</script><script>document.documentElement.classList.add("js");
+</script><script type=module>var M=[{rows:[{k:"Messages",v:"0"},{k:"Threads",v:"0"},{k:"Last search",v:"—"},{k:"Tool result",v:"—"},{k:"IMAP session",v:"none"}],foot:"An empty SQLite cache after initSchema(db)."},{rows:[{k:"Messages",v:"1 · Ops, Invoice 4471",t:"cyan"},{k:"Threads",v:"not computed"},{k:"Last search",v:"—"},{k:"Tool result",v:"—"},{k:"IMAP session",v:"none"}],foot:"Cached as uid 1 in INBOX."},{rows:[{k:"Messages",v:"2 · Ops, Mika",t:"cyan"},{k:"Threads",v:"not computed"},{k:"Last search",v:"—"},{k:"Tool result",v:"—"},{k:"IMAP session",v:"none"}],foot:"The reply carries In-Reply-To and References."},{rows:[{k:"Messages",v:"3 · Ops, Mika, Ren"},{k:"Threads",v:"2 · invoice (2), climbing (1)",t:"violet"},{k:"Last search",v:"—"},{k:"Tool result",v:"—"},{k:"IMAP session",v:"none"}],foot:"Threads come from the headers, not the subjects."},{rows:[{k:"Messages",v:"3 · Ops, Mika, Ren"},{k:"Threads",v:"2"},{k:"Last search",v:"“harness” → uid 3",t:"cyan"},{k:"Tool result",v:"—"},{k:"IMAP session",v:"none"}],foot:"FTS5 over subjects and bodies, no server."},{rows:[{k:"Messages",v:"3 · Ops, Mika, Ren"},{k:"Threads",v:"2"},{k:"Last search",v:"“invoice” → uid 1, 2"},{k:"Tool result",v:"mail_read · success",t:"ward"},{k:"IMAP session",v:"none"}],foot:"The same call an agent makes."},{rows:[{k:"Messages",v:"3 · Ops, Mika, Ren"},{k:"Threads",v:"2"},{k:"Last search",v:"“invoice” → uid 1, 2"},{k:"Tool result",v:"mail_sync · error",t:"alarm"},{k:"IMAP session",v:"none"}],foot:"Sync needs a live IMAP session. Nothing was faked."}];(()=>{let r=document.getElementById("state-list"),h=document.getElementById("state-foot"),o=Array.from(document.querySelectorAll(".step")),p=document.getElementById("reset"),y=document.getElementById("run-status");if(!r||!o.length)return;let i=!matchMedia("(prefers-reduced-motion: reduce)").matches,n=0;function l(e){let s=M[e];r.textContent="";for(let t of s.rows){let a=document.createElement("li");t.t&&(a.className="t-"+t.t);let u=document.createElement("span");u.className="k",u.textContent=t.k;let m=document.createElement("span");if(m.className="v",m.textContent=t.v,a.append(u,m),t.w!=null){let v=document.createElement("span");v.className="bar";let k=document.createElement("i");v.append(k),a.append(v);let g=Math.max(0,Math.min(1,t.w))*100+"%",f=r.dataset.prev&&JSON.parse(r.dataset.prev)[t.k];k.style.width=i&&f!=null?f:g,i&&f!=null&&requestAnimationFrame(()=>requestAnimationFrame(()=>{k.style.width=g}))}r.append(a)}let c={};for(let t of s.rows)t.w!=null&&(c[t.k]=Math.max(0,Math.min(1,t.w))*100+"%");r.dataset.prev=JSON.stringify(c),h&&(h.textContent=s.foot||"")}function d(){o.forEach((e,s)=>{e.classList.toggle("done",s<n),e.classList.toggle("next",s===n)}),y&&(y.textContent=n<o.length?"Step "+(n+1)+" of "+o.length+" is next.":"All "+o.length+" steps replayed.")}o.forEach((e,s)=>{e.querySelector(".run-btn").addEventListener("click",()=>{if(s!==n)return;n=s+1,l(n),d(),e.classList.contains("refused")&&i&&(e.classList.add("flash"),e.addEventListener("animationend",()=>e.classList.remove("flash"),{once:!0}));let t=o[n]&&o[n].querySelector(".run-btn"),a=e.querySelector(".result");a&&(a.setAttribute("tabindex","-1"),a.focus({preventScroll:!0})),t&&t.setAttribute("aria-describedby","run-status")})}),p&&p.addEventListener("click",()=>{n=0,r.dataset.prev="",l(0),d(),o[0].querySelector(".run-btn").focus()}),l(0),d(),document.querySelectorAll(".copy").forEach(e=>{e.addEventListener("click",async()=>{let s=document.getElementById(e.dataset.copy);try{await navigator.clipboard.writeText(s.value)}catch{s.select(),document.execCommand("copy")}let c=e.textContent;e.textContent="Copied",setTimeout(()=>{e.textContent=c},1400)})})})();
 </script></body></html>

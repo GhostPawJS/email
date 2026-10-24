@@ -29,7 +29,7 @@ A Node.js developer wiring an agent to a real mailbox over IMAP and SMTP, who ha
 5. How do I start? → install line, MCP line, quick start, GitHub, README.
 
 ## Mechanism
-Chosen: a replayed real run against email 0.4.0 on 2026-10-24 with no network. Messages are built with the library's own MIME composer, parsed with its parser and cached through the store functions its sync uses; threads are computed; the read surface searches subjects; the mail_read tool reads a thread; mail_sync without a session returns an error. A state panel shows cached messages, threads, the last search and the session. Speed: on screen at load; proof: real headers and tool results; effort: six presses; honesty: labelled as a replay with no IMAP server contacted; share value: the reply headers.
+Chosen: a replayed real run against email 0.4.1 on 2026-10-24 with no network. Messages are built with the library's own MIME composer, parsed with its parser and cached through the store functions its sync uses; threads are computed; the read surface searches subjects; the mail_read tool reads a thread; mail_sync without a session returns an error. A state panel shows cached messages, threads, the last search and the session. Speed: on screen at load; proof: real headers and tool results; effort: six presses; honesty: labelled as a replay with no IMAP server contacted; share value: the reply headers.
 Rejected: a live inbox demo: needs credentials and a server, and would put mail in a browser.
 Rejected: a comparison table against hosted inboxes: claims about others.
 Rejected: a triage animation sorting mail into buckets: the library does not classify mail.
@@ -40,7 +40,7 @@ Price: free, MIT licence
 Delivery: `npm install @ghostpaw/email` into a Node.js 24+ project, `npx -y @ghostpaw/email mcp` as a local MCP server, or the `email` CLI
 
 ## Facts
-- email 0.4.0 is on npm with zero runtime dependencies and requires Node.js 24+ for node:sqlite. https://www.npmjs.com/package/@ghostpaw/email
+- email 0.4.1 is on npm with zero runtime dependencies and requires Node.js 24+ for node:sqlite. https://www.npmjs.com/package/@ghostpaw/email
 - The README calls it a standalone email engine for Node.js, built on SQLite, covering IMAP sync, SMTP send, caching, threading, search and transport errors. https://github.com/GhostPawJS/email
 - Five tools: mail_read, mail_search, mail_compose, mail_organize, mail_sync. https://github.com/GhostPawJS/email
 - The MCP server keeps cached messages in ~/.ghostpaw/email.db and reads EMAIL_IMAP_HOST, EMAIL_SMTP_HOST, EMAIL_USER and EMAIL_PASS or EMAIL_ACCESS_TOKEN; cached reads need no credentials. https://github.com/GhostPawJS/email
@@ -138,10 +138,11 @@ Reduced motion: no sweep or flash.
 - Use: "read", "draft", "send", "inbox" in the voices' plain sense V059 V053
 - Show tool names and file paths as code. V021
 - Avoid: "email for your AI", "Email access for AI agents", "agent native" P003 P004 V022
-- Avoid: "full-text body search"; say FTS5 local search, as the README does. P001
+- Avoid: "full-text body search" as a headline; say FTS5 local search, as the README does. The run shows body words found since 0.4.1. P001
 - Plain second person; say the run used no server. V057
 - Never present voices as customers. V048
 
 ## Changelog
 - 2026-10-24: first concept from the 2026-10-24 research batch (64 voices, 12 peers); split tools chosen; replay of a real email 0.4.0 run without network. Body search left off the page: in 0.4.0 the FTS update trigger clears body text when a message row changes.
 - 2026-10-24: depth pass (10 more voices, now 74); replay re-run against the current release; import time re-measured; comparison section added; page moved to https://email.ghostpaw.dev/.
+- 2026-10-24: email 0.4.1 released (bracketed threading headers, body text kept in the search index, contiguous MIME headers, refused connections reported). Replay re-run against 0.4.1: search now finds body-only words ("harness", "discount") after threading rewrote the rows; the page shows them and the old caveat became a release note. Tests 563, line coverage 94.2%, 47.8 KB gzip.
