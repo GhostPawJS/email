@@ -1,13 +1,14 @@
+<a href="https://email.ghostpaw.dev/"><img src="https://raw.githubusercontent.com/GhostPawJS/email/main/.github/social-preview.png" alt="GhostPaw email: Your agent can read the inbox. Sending is a separate tool." width="100%"></a>
+
 # @ghostpaw/email
 
-[![npm](https://img.shields.io/npm/v/@ghostpaw/email)](https://www.npmjs.com/package/@ghostpaw/email)
-[![node](https://img.shields.io/node/v/@ghostpaw/email)](https://nodejs.org)
-[![license](https://img.shields.io/npm/l/@ghostpaw/email)](LICENSE)
-[![dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)](package.json)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
-[![MCP Registry](https://img.shields.io/badge/MCP_Registry-io.github.GhostPawJS%2Femail-06d6a0)](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.GhostPawJS%2Femail/versions/latest)
-[![Site](https://img.shields.io/badge/site-email.ghostpaw.dev-62e6f2)](https://email.ghostpaw.dev/)
-[![Docs](https://img.shields.io/badge/docs-email.ghostpaw.dev%2Fdocs-62e6f2)](https://email.ghostpaw.dev/docs/)
+[![npm](https://img.shields.io/npm/v/@ghostpaw/email?style=flat-square&labelColor=0a1119&color=62e6f2&label=npm)](https://www.npmjs.com/package/@ghostpaw/email) [![CI](https://img.shields.io/github/actions/workflow/status/GhostPawJS/email/ci.yml?branch=main&style=flat-square&labelColor=0a1119&label=CI)](https://github.com/GhostPawJS/email/actions/workflows/ci.yml) [![site](https://img.shields.io/badge/site-email.ghostpaw.dev-62e6f2?style=flat-square&labelColor=0a1119)](https://email.ghostpaw.dev/) [![runtime deps](https://img.shields.io/badge/runtime_deps-0-7af0b4?style=flat-square&labelColor=0a1119)](package.json) [![MCP Registry](https://img.shields.io/badge/MCP_Registry-io.github.GhostPawJS%2Femail-b39dff?style=flat-square&labelColor=0a1119)](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.GhostPawJS%2Femail/versions/latest) [![node](https://img.shields.io/badge/node-%E2%89%A524-93a5b9?style=flat-square&labelColor=0a1119)](https://nodejs.org) [![license](https://img.shields.io/npm/l/@ghostpaw/email?style=flat-square&labelColor=0a1119&color=93a5b9)](LICENSE)
+
+**Agent email: IMAP and SMTP in-process, cached in SQLite, with reading and sending as separate tools.**
+
+```bash
+npm install @ghostpaw/email
+```
 
 A standalone email engine for Node.js, built on SQLite.
 
