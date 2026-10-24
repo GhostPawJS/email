@@ -1,0 +1,36 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.GhostPawJS/email",
+  "description": "Email tools with a local SQLite cache and IMAP/SMTP account configuration.",
+  "title": "GhostPaw Email",
+  "version": "0.3.0",
+  "repository": {
+    "url": "https://github.com/GhostPawJS/email.git",
+    "source": "github"
+  },
+  "websiteUrl": "https://github.com/GhostPawJS/email",
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "@ghostpaw/email",
+      "version": "0.3.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "packageArguments": [
+        {
+          "type": "positional",
+          "value": "mcp"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "name": "GHOSTPAW_EMAIL_DB",
+          "description": "SQLite database path (default: ~/.ghostpaw/email.db)",
+          "isRequired": false
+        }
+      ]
+    }
+  ]
+}

@@ -3,12 +3,20 @@
 // Node 24 only recognises the 'node:' prefix for this module, so we restore it.
 import { chmodSync, readFileSync, writeFileSync } from 'node:fs';
 
-const files = ['dist/index.js', 'dist/index.cjs', 'dist/cli.js'];
+const files = [
+	'dist/index.js',
+	'dist/index.cjs',
+	'dist/mcp.js',
+	'dist/mcp.cjs',
+	'dist/cli.js',
+	'dist/mcp-server.js',
+];
 
 for (const file of files) {
 	const before = readFileSync(file, 'utf8');
 	const after = before
 		.replace(/from 'sqlite'/g, "from 'node:sqlite'")
+		.replace(/import\('sqlite'\)/g, "import('node:sqlite')")
 		.replace(/require\('sqlite'\)/g, "require('node:sqlite')");
 	if (before !== after) {
 		writeFileSync(file, after);

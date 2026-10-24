@@ -1,0 +1,1 @@
+{"mcpServers":{"ghostpaw-email":{"command":"npx","args":["-y","@ghostpaw/email","mcp"]}}}

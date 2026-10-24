@@ -8,3 +8,7 @@ coverage/
 *.log
 .env
 .env.*
+
+.mcpb-build/
+server.mcpb
+bench-results.json

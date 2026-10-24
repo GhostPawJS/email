@@ -1,283 +1,131 @@
-# SKILL.md — `email` CLI as an Agent Tool Surface
-
-The `email` binary is a local-first email CLI built on top of `@ghostpaw/email`. It exposes five
-intent-shaped commands that map directly to the library's tool layer. Agents invoke it as a
-subprocess via bash; no MCP server or standing process is needed.
-
+---
+name: email
+description: "Read, search, compose, organize and synchronize email with a local SQLite cache. Use when managing email or searching cached messages."
+license: "MIT"
+compatibility: "Node.js 24 or newer. MCP stdio or email CLI."
 ---
 
-## Prerequisites
-
-- Node.js ≥ 24
-- Install once:
-  ```bash
-  npm install -g @ghostpaw/email        # global install, `email` in PATH
-  npx @ghostpaw/email account add ...   # or zero-install via npx
-  ```
-
----
-
-## Account Setup
-
-```bash
-email account add \
-  --name work \
-  --imap-host imap.fastmail.com --imap-port 993 \
-  --smtp-host smtp.fastmail.com --smtp-port 587 \
-  --user me@fastmail.com --pass "app-password"
-
-email account list          # see all accounts
-email account set-default --name work
-email account show          # shows config (password redacted)
-```
-
-### Environment variables (no config file needed — useful in CI)
-
-| Variable | Purpose |
-|---|---|
-| `EMAIL_ACCOUNT` | Select account by slug |
-| `EMAIL_IMAP_HOST` | IMAP hostname |
-| `EMAIL_IMAP_PORT` | IMAP port (default: 993) |
-| `EMAIL_IMAP_TLS` | `"false"` to disable TLS |
-| `EMAIL_SMTP_HOST` | SMTP hostname |
-| `EMAIL_SMTP_PORT` | SMTP port (default: 587) |
-| `EMAIL_SMTP_TLS` | `"false"` to disable TLS |
-| `EMAIL_USER` | Auth username |
-| `EMAIL_PASS` | Password auth |
-| `EMAIL_ACCESS_TOKEN` | OAuth2 access token |
-| `EMAIL_REFRESH_TOKEN` | OAuth2 refresh token |
-| `EMAIL_CONFIG_DIR` | Override config directory (full path) |
-| `EMAIL_DATA_DIR` | Override SQLite data directory (full path) |
-| `NO_COLOR` | Disable ANSI color output |
-
----
-
-## `--json` — Machine-Readable Output
-
-**Always use `--json` when invoking from an agent.** Every command outputs a JSON object:
-
-```json
-{
-  "outcome": "success",
-  "summary": "42 message(s) in INBOX.",
-  "entities": [
-    { "kind": "message", "id": "1921", "title": "Re: Q2 roadmap" }
-  ],
-  "nextSteps": [
-    "Use view: \"message\" with folder and uid to read a specific message."
-  ]
-}
-```
-
-`outcome` values:
-- `"success"` — operation completed
-- `"no_op"` — nothing to do (not an error)
-- `"needs_clarification"` — more information required; check `nextSteps`
-- `"error"` — operation failed; check `summary` for details and `nextSteps` for guidance
-
-**On error, `--json` output still goes to stdout** (not stderr) so downstream parsers can always
-parse stdout unconditionally.
-
----
-
-## Exit Codes
-
-| Code | When |
-|---|---|
-| `0` | `success` or `no_op` |
-| `1` | Missing required flag, invalid value, body required |
-| `2` | No config, malformed config, unknown account, no default account |
-| `3` | Authentication failure |
-| `4` | Network / connection failure |
-| `5` | Tool returned `outcome: "error"` |
-| `6` | Tool returned `outcome: "needs_clarification"` |
-| `127` | Unexpected / unhandled error |
-
----
-
-## Commands
-
-### `email read [view]`
-
-Read mailbox state. Default view: `queue` (INBOX).
-
-```bash
-email read --json                                      # queue view, INBOX
-email read folders --json                              # list all folders
-email read queue --folder Sent --limit 20 --json
-email read queue --unread-only --json
-email read thread --thread-id <id> --json
-email read message --folder INBOX --uid 1921 --json
-email read attachment --folder INBOX --uid 1921 --json # list attachments
-email read eml --folder INBOX --uid 1921               # raw EML bytes to stdout
-```
-
-**`eml` view:** writes raw EML bytes to stdout. In `--json` mode the bytes are base64-encoded
-under a `"data"` key.
+# email
 
-```bash
-email read eml --folder INBOX --uid 42 > message.eml
-email read eml --folder INBOX --uid 42 --json | jq -r '.data' | base64 -d > message.eml
-```
+Read and search cached email offline. Configure live accounts with email account add before network operations. Inspect messages before replying or changing folders. Confirm recipients and content before sending; trash and folder deletion can remove mail. Credentials use the existing email CLI account configuration or EMAIL_* environment variables.
 
-### `email search <query>`
+## Calling tools
 
-Search messages via local FTS5 (default) or remote IMAP SEARCH.
+MCP: connect to ghostpaw-email, then call a tool by name with its JSON arguments.
 
-```bash
-email search "invoice" --json
-email search "from:boss@work.com subject:quarterly" --json
-email search "budget 2026" --folder Archive --limit 10 --json
-email search "urgent" --mode remote --json
-email search "report" --since 2026-01-01 --before 2026-04-01 --json
-email search "contract" --has-attachments --json
-```
+CLI: `ghostpaw-email call <tool> '<JSON object>'` or `ghostpaw-email <tool> --parameter value` (without a global install: `npx -y @ghostpaw/email <tool> ...`).
 
-### `email compose <action>`
+Inspect schemas with `ghostpaw-email describe <tool>`. Use `--db <path>` to select a database.
 
-Compose and send email. Body comes from `--body` or piped stdin.
+## mail_read
 
-```bash
-# Send
-email compose send --to alice@example.com --subject "Hello" --body "Hi there" --json
-echo "Meeting at 3pm?" | email compose send --to alice@example.com --subject "Quick question"
+Read mailbox state: folder list, message queue, thread view, single message body, attachment metadata, or raw EML export.
 
-# Reply (body from stdin)
-echo "Sounds good!" | email compose reply --folder INBOX --uid 1921
+Use when: Inspect folders, cached messages, threads, attachments or raw message content.
 
-# Reply-all
-email compose reply --folder INBOX --uid 1921 --body "Thanks all" --reply-all --json
+Not for: Use mail_search to find messages by query or mail_organize to change them.
 
-# Forward
-email compose forward --folder INBOX --uid 1921 --to bob@example.com --body "FYI" --json
+Writes: writes_state.
 
-# Attach files (comma-separated paths)
-email compose send --to a@b.com --subject "Report" --body "See attached" \
-  --attach /path/to/report.pdf,/path/to/data.csv --json
+| Parameter | Type | Required | Values / description |
+| --- | --- | --- | --- |
+| view | string | yes | folders, queue, thread, message, attachment, eml. What to read. |
+| folder | string | no | Folder path (required for queue/message/attachment/eml). |
+| uid | integer | no | Message UID (required for message/attachment/eml). |
+| threadId | string | no | Thread ID (required for thread view). |
+| partPath | string | no | Part path for a specific attachment (optional for attachment view). |
+| limit | integer | no | Maximum messages to return (queue view). |
+| unreadOnly | boolean | no | Filter to unread messages only (queue view). |
+| refresh | boolean | no | Fetch live folder list from server before returning (folders/queue view). |
 
-# Drafts
-email compose draft --save --to a@b.com --subject "Draft" --body "WIP" --json
-email compose draft --send-draft 42 --json
-```
+## mail_search
 
-### `email organize <action>`
+Search for messages locally via FTS or remotely via IMAP SEARCH. Returns matching message references.
 
-Organize messages and folders. `--uids` accepts comma-separated UIDs.
+Use when: Find messages by a local full-text query or a remote IMAP search.
 
-```bash
-email organize mark-read --folder INBOX --uids 1,2,3 --json
-email organize star --folder INBOX --uids 42 --json
-email organize archive --folder INBOX --uids 1921,1922 --json
-email organize trash --folder INBOX --uids 1800 --json
-email organize move --folder INBOX --uids 100 --destination Archive --json
-email organize set-labels --folder INBOX --uids 42 --labels "work,priority" --json
-email organize create-folder --path "Projects/2026" --json
-email organize rename-folder --old-path "Projects" --new-path "Work/Projects" --json
-email organize delete-folder --path "OldFolder" --json
-```
+Not for: Use mail_read when the folder and message UID are already known.
 
-### `email sync [action]`
+Writes: writes_state.
 
-Manage IMAP connection and sync local SQLite state. Default action: `sync`.
+| Parameter | Type | Required | Values / description |
+| --- | --- | --- | --- |
+| query | string | yes | Free-text search query or FTS5 expression. |
+| folder | string | no | Restrict search to a specific folder. |
+| mode | string | no | local, remote. local (default) or remote IMAP SEARCH. |
+| since | string | no | ISO date string — only messages after this date. |
+| before | string | no | ISO date string — only messages before this date. |
+| hasAttachments | boolean | no | Filter to messages with attachments. |
+| unreadOnly | boolean | no | Filter to unread messages. |
+| limit | integer | no | Maximum number of results. |
 
-```bash
-email sync --json                           # sync all folders (default)
-email sync sync --folders INBOX,Sent --json
-email sync sync --bodies all --json         # fetch all bodies
-email sync refresh-folders --json
-email sync connect --json
-email sync disconnect --json
-email sync watch --json                     # syncs then exits; continuous watching needs the library
-```
+## mail_compose
 
----
+Compose and send email: send new message, reply, forward, save/update/send a draft.
 
-## Multi-Step Workflow Examples
+Use when: Send, reply, forward, or save and manage a draft after its content is agreed.
 
-### Triage inbox
+Not for: Use mail_read to inspect an existing message without sending or saving content.
 
-```bash
-# Get unread messages
-UNREAD=$(email read queue --unread-only --json)
-echo "$UNREAD" | jq '.entities[].id'
+Writes: writes_state.
 
-# Archive a batch
-email organize archive --folder INBOX --uids 1,2,3 --json
-```
+| Parameter | Type | Required | Values / description |
+| --- | --- | --- | --- |
+| action | string | yes | send, reply, forward, save_draft, update_draft, send_draft.  |
+| folder | string | no | Source folder (required for reply/forward). |
+| uid | integer | no | Source message UID (required for reply/forward/update_draft/send_draft). |
+| input | object | no | ComposeInput / ReplyInput / ForwardInput payload. |
 
-### Read and reply
+## mail_organize
 
-```bash
-# Read a specific message
-MSG=$(email read message --folder INBOX --uid 1921 --json)
-echo "$MSG" | jq '.summary'
+Organize messages: mark read/unread/starred/answered, copy, move, archive, trash, junk, label, or manage folders.
 
-# Reply
-echo "Thanks, will do." | email compose reply --folder INBOX --uid 1921 --json
-```
+Use when: Change message flags, labels, destinations or folder organization.
 
-### Search and act
+Not for: Use mail_read or mail_search when only inspection is requested.
 
-```bash
-# Find all invoices from last month
-RESULTS=$(email search "invoice" --since 2026-02-01 --before 2026-03-01 --json)
-UIDS=$(echo "$RESULTS" | jq -r '.entities[].id' | tr '\n' ',' | sed 's/,$//')
+Writes: writes_state.
 
-# Move them to an Archive folder
-email organize move --folder INBOX --uids "$UIDS" --destination Archive --json
-```
+| Parameter | Type | Required | Values / description |
+| --- | --- | --- | --- |
+| action | string | yes | mark_read, mark_unread, star, unstar, mark_answered, copy, move, archive, trash, junk, not_junk, set_labels, add_labels, remove_labels, create_folder, rename_folder, delete_folder, subscribe_folder, unsubscribe_folder.  |
+| folder | string | no | Source folder (required for message actions). |
+| uids | array | no | Message UIDs to act on. |
+| destination | string | no | Destination folder (required for copy/move). |
+| labels | array | no | Labels to set/add/remove. |
+| path | string | no | Folder path (required for folder actions). |
+| oldPath | string | no | Old folder path (required for rename_folder). |
+| newPath | string | no | New folder path (required for rename_folder). |
 
-### Full sync then read
+## mail_sync
 
-```bash
-email sync --json
-email read queue --limit 20 --json
-```
+Manage the IMAP connection lifecycle and sync local state: connect, disconnect, reconnect, sync folders, or refresh the folder list.
 
-### Export an attachment
+Use when: Connect, disconnect, reconnect, refresh folders or synchronize the cache.
 
-```bash
-# List attachments
-ATTS=$(email read attachment --folder INBOX --uid 1921 --json)
-PART=$(echo "$ATTS" | jq -r '.entities[0].id')
+Not for: Use mail_read for cached content or the network watch stream for continuous monitoring.
 
-# Download raw bytes
-email read attachment --folder INBOX --uid 1921 --part-path "$PART" > attachment.pdf
-```
-
----
-
-## Error Handling for Agents
-
-- **Always check `outcome`** before acting on `entities`. Even exit code 0 can return `"no_op"`.
-- **Do not retry auth errors** (exit 3) — they require credential changes.
-- **On `needs_clarification`** (exit 6) — read `nextSteps` and ask the user for more information.
-- **On `error`** (exit 5) — the tool's `summary` and `nextSteps` contain actionable guidance.
-- **Network errors** (exit 4) — retry after a brief pause; check host/port if it persists.
-
----
-
-## Piping Patterns
-
-```bash
-# Pipe body from stdin
-echo "Hello" | email compose send --to x@y.com --subject "Hi"
-
-# Export EML and forward to another tool
-email read eml --folder INBOX --uid 42 | mail -s "fwd" target@example.com
-
-# JSON pipeline
-email read queue --json | jq '.entities[] | select(.title | test("invoice"; "i")) | .id'
-
-# Quiet mode — only exit code matters
-email organize archive --folder INBOX --uids 42 --quiet && echo "archived"
-```
-
----
-
-## What the CLI Does NOT Do
-
-- **No persistent daemon.** Every invocation opens a fresh IMAP connection and closes it cleanly.
-- **No continuous IDLE watch.** `email sync watch` syncs once and exits. For push-style updates,
-  use `Mailbox.network.watch()` from the library directly.
-- **No interactive prompts.** All input comes from flags or stdin.
+Writes: writes_state.
+
+| Parameter | Type | Required | Values / description |
+| --- | --- | --- | --- |
+| action | string | yes | connect, disconnect, reconnect, sync, refresh_folders, watch.  |
+| folders | array | no | Folders to sync or watch (optional — defaults to all subscribed folders). |
+| bodies | string | no | none, missing, all. Body fetch strategy for sync (default: missing). |
+
+## Workflow guides
+
+- [triage-inbox](skills/email/references/triage-inbox.md): Process a full inbox from scratch: sync to get latest state, read message queue, selectively fetch bodies for decisions, then bulk-organize by priority.
+- [read-and-reply](skills/email/references/read-and-reply.md): Read a message with full thread context, then compose and send a properly-threaded reply with quoted attribution.
+- [connect-and-sync](skills/email/references/connect-and-sync.md): Establish or restore an IMAP connection, refresh the folder list, and pull new messages — handling first-run vs incremental scenarios.
+- [search-and-act](skills/email/references/search-and-act.md): Find messages matching criteria (local FTS first, remote IMAP SEARCH as fallback), verify targets, then act — organize, reply, or present.
+- [compose-and-send](skills/email/references/compose-and-send.md): Full draft lifecycle — save, review, update, then send — plus direct send, reply, and forward with proper threading and forwarded-header blocks.
+- [organize-bulk](skills/email/references/organize-bulk.md): Bulk organize messages across folders — flagging, moving, archiving, labelling — and manage the folder hierarchy as part of the flow.
+- [attachment-workflow](skills/email/references/attachment-workflow.md): Discover, inspect, and fetch email attachments on demand; embed attachments in outbound messages; and export or import full .eml files.
+- [recover-from-disruption](skills/email/references/recover-from-disruption.md): Detect and recover from connection loss or IMAP/SMTP failures — reconnect with back-off, re-sync to reconcile state, and handle auth vs transient errors distinctly.
+- [cli](skills/email/references/cli.md): Complete existing email CLI guide.
+
+## Principles
+
+- Inspect before changing messages.
+- Confirm recipients and content before sending.

@@ -1,0 +1,102 @@
+{
+  "manifest_version": "0.3",
+  "name": "ghostpaw-email",
+  "display_name": "GhostPaw Email",
+  "version": "0.3.0",
+  "description": "Email tools with a local SQLite cache and IMAP/SMTP account configuration.",
+  "long_description": "Read, search and manage email with a local SQLite cache. Configure network accounts using email account add.",
+  "author": {
+    "name": "Anonyfox",
+    "email": "max@anonyfox.com",
+    "url": "https://anonyfox.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GhostPawJS/email.git"
+  },
+  "homepage": "https://github.com/GhostPawJS/email",
+  "documentation": "https://github.com/GhostPawJS/email/blob/main/README.md",
+  "support": "https://github.com/GhostPawJS/email/issues",
+  "license": "MIT",
+  "keywords": [
+    "email",
+    "mail",
+    "imap",
+    "imap-client",
+    "smtp",
+    "smtp-client",
+    "mailbox",
+    "inbox",
+    "mime",
+    "threading",
+    "sync",
+    "idle",
+    "local-first",
+    "sqlite",
+    "llm",
+    "ai",
+    "agent",
+    "tools",
+    "typescript",
+    "zero-dependencies",
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "agent-skills",
+    "cli"
+  ],
+  "server": {
+    "type": "node",
+    "entry_point": "server/mcp-server.js",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/server/mcp-server.js"
+      ],
+      "env": {
+        "GHOSTPAW_EMAIL_DB": "${user_config.db_path}"
+      }
+    }
+  },
+  "user_config": {
+    "db_path": {
+      "type": "string",
+      "title": "Database path",
+      "description": "Path to the local SQLite database.",
+      "required": false,
+      "default": "${HOME}/.ghostpaw/email.db"
+    }
+  },
+  "tools": [
+    {
+      "name": "mail_read",
+      "description": "Read mailbox state: folder list, message queue, thread view, single message body, attachment metadata, or raw EML export."
+    },
+    {
+      "name": "mail_search",
+      "description": "Search for messages locally via FTS or remotely via IMAP SEARCH. Returns matching message references."
+    },
+    {
+      "name": "mail_compose",
+      "description": "Compose and send email: send new message, reply, forward, save/update/send a draft."
+    },
+    {
+      "name": "mail_organize",
+      "description": "Organize messages: mark read/unread/starred/answered, copy, move, archive, trash, junk, label, or manage folders."
+    },
+    {
+      "name": "mail_sync",
+      "description": "Manage the IMAP connection lifecycle and sync local state: connect, disconnect, reconnect, sync folders, or refresh the folder list."
+    }
+  ],
+  "compatibility": {
+    "platforms": [
+      "darwin",
+      "win32",
+      "linux"
+    ],
+    "runtimes": {
+      "node": ">=24.0.0"
+    }
+  }
+}

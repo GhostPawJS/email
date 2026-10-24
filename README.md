@@ -6,6 +6,8 @@
 [![dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)](package.json)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 
+[![MCP Registry](https://img.shields.io/badge/MCP_Registry-io.github.GhostPawJS%2Femail-06d6a0)](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.GhostPawJS%2Femail/versions/latest)
+
 A standalone email engine for Node.js, built on SQLite.
 
 Email treats IMAP sync, SMTP send, local caching, threading, search, and
@@ -15,6 +17,77 @@ designed for three audiences at once: human developers working directly in
 code, LLM agents operating through a structured `soul` / `tools` / `skills`
 runtime, and agent operators who want a ready-to-use `email` CLI binary
 without writing any wiring code.
+
+## MCP server
+
+Every client below starts the same stdio server: `npx -y @ghostpaw/email mcp`.
+Cached messages live in `~/.ghostpaw/email.db` unless the `GHOSTPAW_EMAIL_DB`
+environment variable (absolute path) or `--db <path>` says otherwise.
+
+**Claude Code**
+
+```bash
+claude mcp add ghostpaw-email -- npx -y @ghostpaw/email mcp
+```
+
+or as a plugin, which also installs the skill:
+
+```bash
+/plugin marketplace add GhostPawJS/email
+/plugin install ghostpaw-email@ghostpaw-email
+```
+
+**Email CLI** (`~/.email/config.toml`)
+
+```toml
+[mcp_servers.ghostpaw-email]
+command = "npx"
+args = ["-y", "@ghostpaw/email", "mcp"]
+```
+
+**Cursor** (`.cursor/mcp.json`), **Claude Desktop** (`claude_desktop_config.json`)
+or a project `.mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "ghostpaw-email": {
+      "command": "npx",
+      "args": ["-y", "@ghostpaw/email", "mcp"]
+    }
+  }
+}
+```
+
+Claude Desktop users can also install `server.mcpb` from the
+[latest GitHub release](https://github.com/GhostPawJS/email/releases/latest).
+A Dockerfile is included for container hosts:
+`docker build -t ghostpaw-email . && docker run -i --rm -v email:/data ghostpaw-email`.
+
+The server speaks MCP 2026-07-28 (stateless, `server/discover`) and the
+initialize-based revisions 2025-11-25, 2025-06-18, 2025-03-26 and 2024-11-05.
+
+Network operations use the existing CLI account configuration (`email account add`) or
+`EMAIL_IMAP_HOST`, `EMAIL_SMTP_HOST`, `EMAIL_USER` and `EMAIL_PASS` (or
+`EMAIL_ACCESS_TOKEN`). Discovery and cached reads need no account or credentials.
+The surface database defaults to `~/.ghostpaw/email.db`; point `--db` at an
+existing account cache to read it. Each network call opens and closes its IMAP
+session. Connection commands do not retain a session between calls.
+
+## Tool CLI
+
+```bash
+npx -y @ghostpaw/email tools
+npx -y @ghostpaw/email call mail_read '{"view":"folders"}' --db :memory:
+npx -y @ghostpaw/email call mail_search '{"query":"invoice"}'
+```
+
+Both `email` and `ghostpaw-email` run the same CLI. Existing account, read,
+search, compose, organize and sync commands remain available. The full guide
+is preserved in [skills/email/references/cli.md](skills/email/references/cli.md).
+
+Agent Skill: `SKILL.md` and `skills/email/` ship in the package; print the skill
+with `npx -y @ghostpaw/email skill`.
 
 ## Install
 

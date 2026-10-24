@@ -1,0 +1,13 @@
+{
+  "name": "ghostpaw-email",
+  "owner": {
+    "name": "Anonyfox"
+  },
+  "plugins": [
+    {
+      "name": "ghostpaw-email",
+      "source": "./",
+      "description": "Email tools with a local SQLite cache and IMAP/SMTP account configuration."
+    }
+  ]
+}

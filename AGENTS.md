@@ -40,6 +40,11 @@ needs_clarification and error. The deprecated `tools.emailTools` and
 - `src/sync/`, `src/tools/`, `src/skills/`: synchronization and workflow facades.
 - `src/cli/`: CLI; `docs/`: detailed usage; `scripts/`: build checks.
 
+- `src/surfaces/`: shared MCP, CLI, skill and manifest implementations.
+- `src/surface/`: email bindings; `src/mcp.ts`, `src/cli.ts` and `src/mcp_server_bin.ts`: entries.
+- `scripts/surfaces/`: generates SKILL.md, skills/email workflow references and directory manifests. Run `npm run surfaces`; do not edit generated outputs manually. The preserved `skills/email/references/cli.md` is a static reference.
+- `scripts/guard/`, `scripts/bench/`: compatibility guards and offline benchmarks.
+
 ## Contribute
 
 Use Node 24. Dependencies are already installed in the maintenance workspace.
@@ -51,7 +56,7 @@ existing ones when their result shapes differ.
 Run the full gate:
 
 ```sh
-npm run lint && npm run typecheck && npm test && npm run build
+npm run check
 ```
 
 Tests use `node:test` and `node:assert/strict` in adjacent `*.test.ts` files.
@@ -65,3 +70,10 @@ Record changes under Unreleased in CHANGELOG.md using Added, Changed or Fixed.
 Releases use `npm run release:patch` or `npm run release:minor`; these commands
 update the version, tag and push, and CI publishes with provenance. Maintainers
 run release commands after review; maintenance work stays uncommitted.
+
+The single gate includes generated-surface drift, size and startup budgets,
+API snapshots, a packed consumer check and ratchet tests. The consumer check
+installs a local tarball offline in a temporary directory.
+Budget increases require `[budget-increase-approved]`, API snapshot changes
+require `[api-change-approved]`, and guard, workflow or lint configuration
+changes require `[guardrails-change-approved]` in the reviewed commit message.

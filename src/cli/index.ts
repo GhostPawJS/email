@@ -1,4 +1,5 @@
 import { defineCommand, runMain } from 'citty';
+import { emailVersion } from '../version.ts';
 import { accountCommand } from './commands/account.ts';
 import { composeCommand } from './commands/compose.ts';
 import { organizeCommand } from './commands/organize.ts';
@@ -9,10 +10,22 @@ import { syncCommand } from './commands/sync.ts';
 const main = defineCommand({
 	meta: {
 		name: 'email',
-		version: '0.2.0',
+		version: emailVersion,
 		description: 'Local-first email CLI powered by @ghostpaw/email.',
 	},
 	subCommands: {
+		mcp: defineCommand({
+			meta: { name: 'mcp', description: 'Serve the aligned email tools over MCP stdio.' },
+		}),
+		tools: defineCommand({
+			meta: { name: 'tools', description: 'List aligned email tools and schemas.' },
+		}),
+		call: defineCommand({
+			meta: { name: 'call', description: 'Call an aligned tool with JSON input.' },
+		}),
+		skill: defineCommand({
+			meta: { name: 'skill', description: 'Print the generated Agent Skill.' },
+		}),
 		account: accountCommand,
 		read: readCommand,
 		search: searchCommand,
@@ -25,4 +38,18 @@ const main = defineCommand({
 // runMain handles --help, --version, and subcommand routing.
 // All errors from command run() functions are caught by safeRun() inside each
 // command, so they never reach runMain's own error handler.
-runMain(main);
+const args = process.argv.slice(2);
+let index = 0;
+while (args[index] === '--db' || args[index] === '--compact') {
+	index += args[index] === '--db' ? 2 : 1;
+}
+const command = args[index];
+if (
+	command &&
+	(['mcp', 'tools', 'call', 'skill', 'describe', '--version', '-v'].includes(command) ||
+		command.startsWith('mail_'))
+) {
+	await import('../surface_cli.ts');
+} else {
+	runMain(main);
+}
