@@ -457,3 +457,120 @@ Observer note: 1 likes at fetch
 > And for EU teams that BCC is not only a security incident: every copied email is a personal data breach, with 72 hours to notify the regulator. Pinning helps, plus a lockfile and reading the diff of any MCP server that touches customer data before bumping it.
 <https://bsky.app/profile/stacklegal.bsky.social/post/3mycdfzbhii22>
 Observer note: 3 likes at fetch
+
+## Batch 2026-10-24 · ongoing: depth pass for the subdomain move · queries: "AI agent email inbox", "IMAP agent LLM", "email MCP server", "agent sends email on my behalf", "ai agent email inbox", "email mcp", "imap mcp server" · unreachable: YouTube (429), Reddit (challenge page)
+
+### V065 · GitHub (chatmcp/mcpso issue #4851) · creator · posted 2026-10-07 · fetched 2026-10-24 · via fetch
+> ## Project
+>
+> **QQ Mail Read-only MCP** — a local-first MCP for reviewing QQ Mail subscription, renewal, billing, price-change and cancellation notices.
+>
+> - Repository: https://github.com/ChuluuMGL/qqmail-readonly-mcp
+> - Maintainer: Chuluu / [ChuluuMGL](https://github.com/ChuluuMGL)
+> - License: MIT, Copyright (c) 2026 Chuluu
+> - Version: 0.1.0 public prototype
+> - Downloads: https://github.com/ChuluuMGL/qqmail-readonly-mcp/releases/tag/v0.1.0
+> - Transport: local stdio; no remote service endpoint
+> - Runtime: Python 3.13+, standard-library-only runtime
+>
+> ## Features
+>
+> 1. List folders with modified UTF-7 mailbox-name decoding.
+> 2. Search by date and decoded MIME sender/subject, including Chinese.
+> 3. …
+<https://github.com/chatmcp/mcpso/issues/4851>
+Observer note: issue title: Submit MCP Server: QQ Mail Read-only MCP
+
+### V066 · Hacker News (Ask HN: What are you working on? [September 2026]) · creator · posted 2026-09-17 · fetched 2026-10-24 · via fetch
+> I have built an intelligent email product based on MCP and agents, which will be available initially as a ChatGPT app. The codebase is pretty much done (having been written by me over six months with help from Cursor, Codex and Claude Code) and the system is up and running in the cloud (for Gmail and Outlook mailboxes initially but later IMAP providers and others). But the product is only running in private beta right now while I get the relevant approvals from Google, Microsoft and OpenAI, which is turning out to be a tedious process.
+>
+> Why did I build it? Well, there are other email products that connect to (e.g. Gmail/Outlook) mailboxes and use AI to process email content e.g. …
+<https://news.ycombinator.com/item?id=49743163>
+
+### V067 · Hacker News (Claude Duet) · buyer · posted 2026-10-22 · fetched 2026-10-24 · via fetch
+> I'm always a bit wary about doing write up on things like this, as I kind of just muddle things together and definitely don't follow best practices.
+>
+> I used OpenClaw a while back, I did find it useful, but it wasn't as reliable.
+>
+> This time around, I found hermes a lot easier to use and configure. One thing I think has improved it is building apps to "pre-compute" data.
+>
+> For example, with my email, instead of accessing my email servers directly, I have an IMAP server running locally; with mbsync running to download all the mail from all my email accounts locally. …
+<https://news.ycombinator.com/item?id=50194656>
+
+### V068 · Hacker News (Software factories and the agentic moment) · buyer · posted 2026-02-09 · fetched 2026-10-24 · via fetch
+> I'm building a platform of AI agents, and each agent can have its own email address. AgentMail handles that. You create an inbox via their REST API and they POST to your webhook when mail arrives.
+>
+> On the agent side, it just gets tools: send email, reply to email, list inbox, read message. Those tools call the AgentMail API. So the fake implements the same interface.. same send/reply/list/read methods, but recording calls instead of making HTTP requests. You can pre-populate inboxes with test messages, simulate "username taken" errors, etc.
+>
+> AgentMail is actually one of the simpler fakes because there's no internal state to maintain. …
+<https://news.ycombinator.com/item?id=46945091>
+
+### V069 · Hacker News ([dead]) · buyer · posted 2026-03-03 · fetched 2026-10-24 · via fetch
+> I started working with Claude Code in my off time on side projects. It worked on my stuff while I worked on paying the rent. But it would get stuck sometimes, sitting there waiting till I checked back in and answered its question.
+> I wanted to let it email me so it could ask questions, and I wanted to email it back with my thoughts or new ideas. But I only wanted it to be able to email me. And I didn't want anyone else to be able to email it. Just a locked-down 1:1 channel between me and my agent.
+> I looked around and nothing like this existed. Every "email for agents" product gives your agent a full inbox, open to the world. …
+<https://news.ycombinator.com/item?id=47234295>
+
+### V070 · Hacker News (Show HN: AgenticMail – Email, SMS, and multi-agent coordination for AI agents) · creator · posted 2026-02-16 · fetched 2026-10-24 · via fetch
+> Hi HN! AgenticMail is a self-hosted email and SMS platform for AI agents.
+>
+> Key features:
+> - Each agent gets its own email address, inbox, and API key
+> - Two internet gateway modes: Gmail relay (2 min setup) or custom domain via Cloudflare (full DKIM/SPF/DMARC)
+> - Google Voice SMS integration - agents can receive verification codes and sign up for services
+> - Multi-agent coordination: task queues, synchronous RPC calls, async execution
+> - Outbound security guard - scans for leaked API keys, passwords, PII. Blocked emails require human approval
+>
+> It works as an MCP server (62 tools) for Claude Desktop, Cursor, Windsurf, etc. and as an OpenClaw plugin (63 tools). …
+<https://news.ycombinator.com/item?id=47031883>
+
+### V071 · Hacker News (Show HN: Agent.email – sign up via curl, claim with a human OTP) · buyer · posted 2026-05-21 · fetched 2026-10-24 · via fetch
+> > We give AI agents their own email inboxes.
+>
+> An inbox to receive mail seems good and valuable.
+>
+> But I'm seeing that your service is also for sending e-mail.
+>
+> Having a domain oriented toward AI e-mail sending feels like a fast path straight to spam block lists.
+>
+> However good your intentions are, this will be used for AI spam. People hate AI spam. They will press the report spam button.
+<https://news.ycombinator.com/item?id=48229543>
+
+### V072 · GitHub (EdmundLimBoEn/imap-mcp issue #1) · creator · posted 2026-10-24 · fetched 2026-10-24 · via fetch
+> Adds `plugins/imap-mcp/`: Agent Plugin `plugin.json` + `mcp.json` (streamable-http, `${IMAP_MCP_URL}` + `Bearer ${IMAP_MCP_TOKEN}`), `.cursor-plugin/plugin.json` with variables, and a thin `imap-mail` skill.
+>
+> IMAP credentials (`IMAP_ACCOUNTS`, `IMAP_<NAME>_HOST/USER/PASS`) live only in the server env (src/config.ts), so the plugin needs only URL + token. The server has no stdio mode. `mark_read`/`mark_unread` change the `\Seen` flag, so the plugin is not strictly read-only; the skill says so.
+>
+> Verified: both manifests validate against the agent-plugins 1.0.0 schemas. …
+<https://github.com/EdmundLimBoEn/imap-mcp/pull/1>
+Observer note: issue title: Add imap-mcp Agent/Cursor plugin
+
+### V073 · GitHub (punkpeye/awesome-mcp-servers issue #15377) · creator · posted 2026-09-30 · fetched 2026-10-24 · via fetch
+> Adds [mailsocket](https://github.com/mailsocket/mailsocket-sdk/tree/main/mcp) to 💬 Communication.
+>
+> Email inboxes for AI agents: create a throwaway inbox, use its address in a signup/login flow, then block until the one-time code or magic link arrives and get it back as a field (no IMAP, no polling code).
+>
+> - Glama: https://glama.ai/mcp/servers/mailsocket/mailsocket-sdk
+> - Official MCP Registry: `app.mailsocket/mailsocket-mcp`
+> - PyPI: https://pypi.org/project/mailsocket-mcp/ (`uvx mailsocket-mcp`)
+> - License: MIT
+>
+> Placed alphabetically after MailFlat/mailflat-sdks.
+<https://github.com/punkpeye/awesome-mcp-servers/pull/15377>
+Observer note: issue title: Add mailsocket MCP server (Communication)
+
+### V074 · Hacker News (Show HN: Agent.email – sign up via curl, claim with a human OTP) · adjacent · posted 2026-05-21 · fetched 2026-10-24 · via fetch
+> I received this email the other day:
+>
+>   From: Kushal <kushal@kushalsm.com>
+>   Date: Mon, 18 May 2026 05:03:11 +0000
+>
+>   Saw your question on the Agent Vault thread about websocket-frame auth
+>   (Home Assistant) and the worry about the model reflecting the bearer
+>   token back into its own context.
+>
+>   chrome-relay's answer is structurally different: the credential never
+>   enters the agent's context because the agent never touches it — the HA
+>   session lives in your real Chrome (cookies, WS handshake and all), and
+>   the agent drives the tab over CDP, only ever seeing the rendered page. …
+<https://news.ycombinator.com/item?id=48228900>

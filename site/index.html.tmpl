@@ -186,18 +186,29 @@ rs.search('climbing');</code></pre>
     </div>
   </section>
 
+  <section class="sec field" aria-labelledby="field-title">
+    <h2 id="field-title">How agents get at mail today</h2>
+    <p class="intro">Three setups come up again and again when developers give an agent an inbox. Each one solves part of the problem.</p>
+    <div class="field-rows">
+      <article class="field-row"><h3>A hosted inbox API for agents</h3><p class="gap">The agent gets a new address on someone else's service, and mail arrives by webhook.</p><p class="here">It works with the IMAP and SMTP account you already have, synced into a SQLite cache inside your process.</p></article>
+      <article class="field-row"><h3>A read-only mail MCP server</h3><p class="gap">Safe to hand to an agent, but the agent cannot answer anything.</p><p class="here">Reading and sending are separate tools, so you can give an agent one without the other.</p></article>
+      <article class="field-row"><h3>mbsync plus a local IMAP server</h3><p class="gap">A full local copy, at the price of two more programs to run and keep configured.</p><p class="here">Sync, cache, threading and FTS5 search are one package and one SQLite file.</p></article>
+    </div>
+    <p class="note">Sending from an agent can get an address reported as spam. Leaving the send tool out is a supported setup.</p>
+  </section>
+
   <section class="sec numbers" aria-labelledby="numbers-title">
     <h2 id="numbers-title">What it costs to add</h2>
     <dl class="ledger">
       <div><dt>Runtime dependencies</dt><dd>0</dd></div>
       <div><dt>Node.js</dt><dd>24 or newer (node:sqlite)</dd></div>
       <div><dt>Size of dist/index.js, gzip</dt><dd>47.5 KB</dd></div>
-      <div><dt>Import time</dt><dd>about 12.3 ms</dd></div>
+      <div><dt>Import time</dt><dd>about 11.1 ms</dd></div>
       <div><dt>Tests</dt><dd>553 passing</dd></div>
       <div><dt>Line coverage</dt><dd>94.0%</dd></div>
       <div><dt>Agent tools</dt><dd>5</dd></div>
     </dl>
-    <p class="note">Measured 2026-10-24 on the maintainer's machine with Node.js 24.14.0 against email 0.4.0: size of the published dist/index.js at gzip -9, median of 11 cold imports, tests and coverage from the v0.4.0 tag.</p>
+    <p class="note">Measured 2026-10-24 on the maintainer's machine with Node.js 24.14.0 against email 0.4.0: size of the published dist/index.js at gzip -9, median of 11 cold imports, tests and coverage from the v0.4.0 tag. The replay above was re-run against the same release on that day and gave the same output.</p>
   </section>
 
   <section class="sec start" aria-labelledby="start-title">

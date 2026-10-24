@@ -1,5 +1,8 @@
 # Concept: GhostPaw Email
 
+## Diagnosis
+Depth pass on 2026-10-24 for the subdomain move. What stays strong: the replayed run, re-run against email 0.4.0 with identical output apart from random Message-ID parts. What was thin: no comparison with the three setups developers actually use for agent mail. Added: hosted agent inboxes, read-only mail MCP servers and mbsync with a local IMAP server, and a note that leaving the send tool out is supported.
+
 ## Voices
 - The arrangement people trust: the agent reads and drafts, and a human sends. V059 V008 V053
 - Handing an agent the inbox is a trust boundary; waking up to what it did overnight is the fear. V056 V057 V054 V027
@@ -10,6 +13,10 @@
 - Mail should stay local and private; people like assistants that process locally. V037 V005 V052
 - Agents triage the inbox into needs-reply, leads and can-wait. V030 V032 V028
 - Self-hosted local email infrastructure for agents is being built by hand. V017 V014 V011
+- Hosted agent inboxes give each agent a new address and deliver mail by webhook. V068 V071 V073
+- Read-only mail MCP servers are published as the safe option. V065 V072
+- Some run mbsync and a local IMAP server so the agent never touches the provider directly. V067
+- Sending from an agent is expected to draw spam reports. V071 (disagreement)
 
 ## Buyer
 A Node.js developer wiring an agent to a real mailbox over IMAP and SMTP, who has looked at hosted agent inboxes and at email MCP servers (V021 V011) and does not want to hand credentials or mail to another company (V042 V012). They arrive from a thread about agents reading mail or about the postmark-mcp incident (V056 V050), compare against AgentMail, Nylas, email-mcp, ImapFlow and Nodemailer (P003 P006 P001 P008 P009), and need to see that reading and sending are separate, the cache is a local SQLite file, and the package has no dependencies to poison (V059 V051). The hesitation most likely to stop them: an agent with send access.
@@ -43,7 +50,7 @@ Delivery: `npm install @ghostpaw/email` into a Node.js 24+ project, `npx -y @gho
 - In the recorded run, composeReply produced "Re: Invoice 4471 for October" with In-Reply-To and References set to the original Message-ID, and computeThreads grouped the two into one thread of depth 0 and 1. https://github.com/GhostPawJS/email#quick-start
 - In the recorded run, mail_sync without an IMAP session returned "mail_sync failed: Use Mailbox.connect() — network surface requires an active IMAP session", an EmailUnsupportedError that is not retriable. https://github.com/GhostPawJS/email
 - 553 tests with 94.00% line, 85.29% branch and 93.90% function coverage, measured 2026-10-24. https://github.com/GhostPawJS/email
-- dist is 47.5 KB gzip and imports in about 12.3 ms on the maintainer box, measured 2026-10-24. https://github.com/GhostPawJS/email
+- dist is 47.5 KB gzip and imports in about 11.1 ms on the maintainer box, measured 2026-10-24. https://github.com/GhostPawJS/email
 - People let agents draft mail and keep sending for themselves. V059 V008
 
 ## Axes
@@ -88,7 +95,7 @@ Read without send. The page leads with the separation the voices trust (V059 V05
 2. The run: three messages, six replayed steps. V056 V057
 3. Explainer: the five tools and what each may do. V021 V023
 4. Worry: dependencies, credentials, what needs a server. V050 V042
-5. Numbers: 0 deps, Node 24+, 553 tests, 94.0% lines, 47.5 KB gzip, about 12.3 ms import, 5 tools.
+5. Numbers: 0 deps, Node 24+, 553 tests, 94.0% lines, 47.5 KB gzip, about 11.1 ms import, 5 tools.
 6. Start: install, quick start, GitHub, README, home and siblings.
 7. Footer: Impressum, Datenschutz.
 
@@ -137,3 +144,4 @@ Reduced motion: no sweep or flash.
 
 ## Changelog
 - 2026-10-24: first concept from the 2026-10-24 research batch (64 voices, 12 peers); split tools chosen; replay of a real email 0.4.0 run without network. Body search left off the page: in 0.4.0 the FTS update trigger clears body text when a message row changes.
+- 2026-10-24: depth pass (10 more voices, now 74); replay re-run against the current release; import time re-measured; comparison section added; page moved to https://email.ghostpaw.dev/.
