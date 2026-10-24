@@ -21,17 +21,17 @@
 </head>
 <body>
 <header class="top">
-  <a class="brand" href="{{.urls.home}}">GhostPaw</a>
+  <a class="brand" href="{{.urls.home}}">GhostPaw<span class="crumb">/email</span></a>
   <nav aria-label="email elsewhere">
+    <a href="{{.urls.docs}}">Docs</a>
     <a href="{{.urls.github}}">GitHub</a>
     <a href="{{.urls.npm}}">npm</a>
-    <a href="{{.urls.readme}}">README</a>
   </nav>
 </header>
 <main>
   <section class="hero" aria-labelledby="hero-title">
     <div class="hero-copy">
-      <p class="kicker"><code>@ghostpaw/email</code> 0.4.1</p>
+      <p class="kicker"><code>@ghostpaw/email</code> <span class="ver">0.4.1</span></p>
       <h1 id="hero-title">Your agent can read the inbox. Sending is a separate tool.</h1>
       <p class="lede">email speaks IMAP and SMTP from inside your Node.js process, caches mail in a SQLite file with threads and FTS5 search, and splits what an agent can do into five tools. Give an agent <code>mail_read</code> and <code>mail_search</code>, leave out <code>mail_compose</code>, and it can read and search but not send.</p>
       <div class="install">
@@ -233,13 +233,13 @@ const messages = mailbox.read.messages('INBOX', { limit: 20 });
 
 await mailbox.disconnect();</code></pre>
     <p>To run it as an MCP server, add <code>npx -y @ghostpaw/email mcp</code> to your client.</p>
-    <p class="links"><a class="more" href="{{.urls.readme}}">Read the README</a><a href="{{.urls.npm}}">email on npm</a></p>
-    <p class="links"><a href="{{.urls.home}}">All seven GhostPaw libraries</a><a href="{{.urls.agentMemory}}">codex, for memory</a><a href="{{.urls.agentTasks}}">questlog, for tasks</a><a href="{{.urls.agentContacts}}">affinity, for contacts</a><a href="{{.urls.agentIdentity}}">souls, for identity</a><a href="{{.urls.agentSkills}}">grimoire, for skills</a><a href="{{.urls.agentTelegram}}">telegram, for chats</a></p>
+    <p class="links"><a class="more" href="{{.urls.readme}}">Read the README</a><a href="{{.urls.docs}}">Read the docs</a><a href="{{.urls.npm}}">email on npm</a></p>
   </section>
 </main>
 <footer class="foot">
-  <p>email is maintained in the open by GhostPaw under the MIT licence.</p>
-  <p class="foot-links"><a href="{{.urls.github}}">Source</a><a href="{{.urls.impressum}}">Impressum</a><a href="{{.urls.privacy}}">Datenschutz</a></p>
+  <nav class="foot-libs" aria-label="GhostPaw libraries"><a href="{{.urls.agentMemory}}">codex</a><a href="{{.urls.agentTasks}}">questlog</a><a href="{{.urls.agentContacts}}">affinity</a><a href="{{.urls.agentIdentity}}">souls</a><a href="{{.urls.agentSkills}}">grimoire</a><a href="{{.url}}" aria-current="page">email</a><a href="{{.urls.agentTelegram}}">telegram</a></nav>
+  <p>email is one of seven GhostPaw libraries, maintained in the open under the MIT licence.</p>
+  <p class="foot-links"><a href="{{.urls.home}}">GhostPaw home</a><a href="{{.urls.github}}">Source on GitHub</a><a href="{{.urls.npm}}">email on npm</a><a href="{{.urls.impressum}}">Impressum</a><a href="{{.urls.privacy}}">Datenschutz</a></p>
 </footer>
 {{script "assets/scripts/main.js"}}
 </body>

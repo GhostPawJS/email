@@ -120,7 +120,7 @@ Read without send. The page leads with the separation the voices trust (V059 V05
 | code | Martian Mono, Cascadia Mono, Consolas, monospace | headers, calls and tool results |
 
 ## Form
-Shared panes with chamfer and lit top bar; the mailbox pane lists messages, threads, last search, last tool result and IMAP session. Steps with call and result. One column on phones; desktop keeps the pane beside the steps. Shared 48px grid.
+Shared panes with chamfer and lit top bar; the mailbox pane lists messages, threads, last search, last tool result and IMAP session. Steps with call and result. One column on phones; desktop keeps the pane beside the steps. Plain void ground with one faint cyan glow.
 
 ## Imagery
 | Image | Job | Art direction | Source |
@@ -146,3 +146,4 @@ Reduced motion: no sweep or flash.
 - 2026-10-24: first concept from the 2026-10-24 research batch (64 voices, 12 peers); split tools chosen; replay of a real email 0.4.0 run without network. Body search left off the page: in 0.4.0 the FTS update trigger clears body text when a message row changes.
 - 2026-10-24: depth pass (10 more voices, now 74); replay re-run against the current release; import time re-measured; comparison section added; page moved to https://email.ghostpaw.dev/.
 - 2026-10-24: email 0.4.1 released (bracketed threading headers, body text kept in the search index, contiguous MIME headers, refused connections reported). Replay re-run against 0.4.1: search now finds body-only words ("harness", "discount") after threading rewrote the rows; the page shows them and the old caveat became a release note. Tests 563, line coverage 94.2%, 47.8 KB gzip.
+- 2026-10-24: portal chrome pass. Shared top bar (GhostPaw/<lib>, Live demo or Docs, GitHub, npm), version badge, footer row of all seven libraries; sibling links row dropped from the start section; the ruled grid on the page ground was replaced by one radial glow (lfm 0.1.9 rejects ruled ground textures); share card relabelled GhostPaw/<lib> with the install line.

@@ -22,7 +22,8 @@
     "agentContacts": "https://affinity.ghostpaw.dev/",
     "agentIdentity": "https://souls.ghostpaw.dev/",
     "agentSkills": "https://grimoire.ghostpaw.dev/",
-    "agentTelegram": "https://telegram.ghostpaw.dev/"
+    "agentTelegram": "https://telegram.ghostpaw.dev/",
+    "docs": "https://email.ghostpaw.dev/docs/"
   },
   "jsonld": {
     "@context": "https://schema.org",
