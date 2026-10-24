@@ -4,6 +4,17 @@ All notable changes are documented here using [Keep a Changelog 1.1.0](https://k
 
 ## [Unreleased]
 
+### Changed
+
+- The homepage and MCP Registry website URL point to https://email.ghostpaw.dev/.
+
+### Fixed
+
+- Emit bracketed message IDs in In-Reply-To and References headers without duplicating brackets.
+- Preserve indexed body text when cached message metadata changes.
+- Keep MIME headers contiguous with the message header block during composition.
+- Reject refused IMAP and SMTP connections with a connection error naming the endpoint, without an uncaught error event.
+
 ## [0.4.0] - 2026-10-24
 
 ### Added

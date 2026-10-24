@@ -1,5 +1,6 @@
 import * as net from 'node:net';
 import * as tls from 'node:tls';
+import { connectionError } from '../lib/connection_error.ts';
 import type { SmtpResponse } from '../types/smtp.ts';
 import { parseSmtpResponse } from './parse_response.ts';
 
@@ -46,7 +47,9 @@ export class SmtpConnection {
 					return;
 				}
 
-				this.#socket.once('error', reject);
+				this.#socket.once('error', (error: Error) => {
+					reject(connectionError(error, this.#host, this.#port));
+				});
 				this.#socket.once(
 					'secureConnect' in this.#socket ? 'secureConnect' : 'connect',
 					async () => {

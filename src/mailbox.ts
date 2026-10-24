@@ -39,7 +39,13 @@ export class Mailbox {
 		});
 
 		const session = new ImapSession(this.#config);
-		await session.connect();
+		try {
+			await session.connect();
+		} catch (error) {
+			db.close();
+			this.#db = null;
+			throw error;
+		}
 		this.#session = session;
 
 		this.#read = createReadSurface(db, account.id, { session });

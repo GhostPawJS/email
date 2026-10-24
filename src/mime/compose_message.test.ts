@@ -76,3 +76,25 @@ it('composes optional headers and each body format', () => {
 		else assert.match(raw, /text\/html/);
 	}
 });
+
+it('brackets threading IDs exactly once', () => {
+	const raw = composeMessage({
+		to: [],
+		subject: 'reply',
+		inReplyTo: 'parent@host',
+		references: ['root@host', '<parent@host>'],
+	}).toString();
+	assert.match(raw, /In-Reply-To: <parent@host>\r\n/);
+	assert.match(raw, /References: <root@host> <parent@host>\r\n/);
+});
+it('keeps single-part MIME headers in the header block', () => {
+	for (const body of [{ text: 'hello' }, { html: '<b>hello</b>' }]) {
+		const raw = composeMessage({ to: [], subject: 'test', ...body }).toString();
+		const separator = raw.indexOf('\r\n\r\n');
+		assert.match(
+			raw.slice(0, separator),
+			/Content-Type: text\/(plain|html); charset=utf-8\r\nContent-Transfer-Encoding: 7bit$/,
+		);
+		assert.equal(raw.slice(separator + 4), body.text ?? body.html);
+	}
+});

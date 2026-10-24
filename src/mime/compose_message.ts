@@ -5,6 +5,11 @@ import { encodeAttachment } from './encode_attachment.ts';
 import { encodeDate } from './encode_date.ts';
 import { encodeHeader } from './encode_header.ts';
 
+function bracketId(id: string): string {
+	const value = id.trim();
+	return value.startsWith('<') && value.endsWith('>') ? value : `<${value}>`;
+}
+
 export function composeMessage(input: ComposeInput): Buffer {
 	const lines: string[] = [];
 	const from = input.from ?? { address: 'unknown@local' };
@@ -22,10 +27,10 @@ export function composeMessage(input: ComposeInput): Buffer {
 	}
 	lines.push(encodeHeader('Subject', input.subject).trim());
 	if (input.inReplyTo) {
-		lines.push(encodeHeader('In-Reply-To', input.inReplyTo).trim());
+		lines.push(encodeHeader('In-Reply-To', bracketId(input.inReplyTo)).trim());
 	}
 	if (input.references?.length) {
-		lines.push(encodeHeader('References', input.references.join(' ')).trim());
+		lines.push(encodeHeader('References', input.references.map(bracketId).join(' ')).trim());
 	}
 	if (input.headers) {
 		for (const [k, v] of Object.entries(input.headers)) {
@@ -60,6 +65,6 @@ export function composeMessage(input: ComposeInput): Buffer {
 		body = `Content-Type: multipart/mixed; boundary="${b}"\r\n\r\n--${b}\r\n${inner}\r\n--${b}\r\n${attBlocks}\r\n--${b}--`;
 	}
 
-	const raw = `${lines.join('\r\n')}\r\n\r\n${body}`;
+	const raw = `${lines.join('\r\n')}\r\n${body}`;
 	return Buffer.from(raw, 'utf8');
 }

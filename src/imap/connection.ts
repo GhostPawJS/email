@@ -3,6 +3,7 @@ import * as net from 'node:net';
 import type { Duplex } from 'node:stream';
 import * as tls from 'node:tls';
 import * as zlib from 'node:zlib';
+import { connectionError } from '../lib/connection_error.ts';
 import { DEFAULT_CONNECTION_TIMEOUT, DEFAULT_KEEPALIVE_INTERVAL } from '../types/defaults.ts';
 
 export interface ImapConnectionConfig {
@@ -40,8 +41,9 @@ export class ImapConnection extends EventEmitter {
 
 			const onError = (err: Error) => {
 				this.#connected = false;
-				this.emit('error', err);
-				reject(err);
+				const error = connectionError(err, this.#config.host, this.#config.port);
+				if (this.listenerCount('error') > 0) this.emit('error', error);
+				reject(error);
 			};
 
 			if (useTls) {

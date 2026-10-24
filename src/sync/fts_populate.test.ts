@@ -10,7 +10,7 @@ import { upsertFolder } from '../store/upsert_folder.ts';
 import { populateFts } from './fts_populate.ts';
 
 describe('populateFts', () => {
-	it('updates FTS so body text is searchable', () => {
+	it('keeps populated body text searchable after metadata updates and schema initialization', () => {
 		const db = new DatabaseSync(':memory:') as EmailDb;
 		initSchema(db);
 		const a = upsertAccount(db, { host: 'h', port: 993, username: 'u' });
@@ -49,6 +49,20 @@ describe('populateFts', () => {
 
 		const after = searchMessages(db, 'budgetary');
 		assert.equal(after.length, 1);
+		assert.equal(
+			(
+				db.prepare('SELECT body_text FROM messages_fts WHERE rowid = ?').get(m.id) as {
+					body_text: string;
+				}
+			).body_text,
+			'The budgetary forecast is attached.',
+		);
+		initSchema(db);
+		db.prepare('UPDATE messages SET subject = ? WHERE id = ?').run('revised report', m.id);
+		db.prepare('UPDATE messages SET flags = ? WHERE id = ?').run('["\\\\Seen"]', m.id);
+		assert.equal(searchMessages(db, 'revised').length, 1);
+		assert.equal(searchMessages(db, 'quarterly').length, 0);
+		assert.equal(searchMessages(db, 'budgetary').length, 1);
 		db.close();
 	});
 });
