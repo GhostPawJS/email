@@ -4,6 +4,8 @@ All notable changes are documented here using [Keep a Changelog 1.1.0](https://k
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-10-24
+
 ### Changed
 
 - The homepage and MCP Registry website URL point to https://email.ghostpaw.dev/.
@@ -76,7 +78,8 @@ All notable changes are documented here using [Keep a Changelog 1.1.0](https://k
 - Preserve SQLite built-in imports in bundled output and handle IMAP responses split across TCP chunks.
 - Refine envelope decoding.
 
-[Unreleased]: https://github.com/GhostPawJS/email/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/GhostPawJS/email/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/GhostPawJS/email/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/GhostPawJS/email/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/GhostPawJS/email/compare/v0.2.3...v0.3.0
 [0.2.3]: https://github.com/GhostPawJS/email/compare/v0.2.2...v0.2.3
