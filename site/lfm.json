@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "url": "https://email.ghostpaw.dev/",
+  "language": "en",
+  "title": "email: IMAP and SMTP for Node.js agents, cached in SQLite",
+  "description": "@ghostpaw/email speaks IMAP and SMTP itself, caches mail in SQLite with JWZ threads and FTS5 search, and splits agent access into five tools, so reading and sending are separate. Node.js 24, zero dependencies, MIT.",
+  "socialImage": {
+    "src": "assets/images/share.png",
+    "alt": "Wireframe envelopes in cyan light streaming into a hexagonal vault with a ghost paw on its lid, beside the line: Your agent can read the inbox. Sending is a separate tool."
+  },
+  "urls": {
+    "home": "https://ghostpaw.dev/",
+    "github": "https://github.com/GhostPawJS/email",
+    "readme": "https://github.com/GhostPawJS/email#readme",
+    "npm": "https://www.npmjs.com/package/@ghostpaw/email",
+    "impressum": "https://lab.anonyfox.com/impressum/",
+    "privacy": "https://lab.anonyfox.com/datenschutz/",
+    "mit": "https://opensource.org/license/mit",
+    "orgId": "https://ghostpaw.dev/#org",
+    "agentMemory": "https://codex.ghostpaw.dev/",
+    "agentTasks": "https://questlog.ghostpaw.dev/",
+    "agentContacts": "https://affinity.ghostpaw.dev/",
+    "agentIdentity": "https://souls.ghostpaw.dev/",
+    "agentSkills": "https://grimoire.ghostpaw.dev/",
+    "agentTelegram": "https://telegram.ghostpaw.dev/"
+  },
+  "jsonld": {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareSourceCode",
+        "name": "@ghostpaw/email",
+        "description": "{{.description}}",
+        "codeRepository": "{{.urls.github}}",
+        "programmingLanguage": "TypeScript",
+        "runtimePlatform": "Node.js 24",
+        "version": "0.4.0",
+        "license": "{{.urls.mit}}",
+        "author": {
+          "@type": "Organization",
+          "@id": "{{.urls.orgId}}",
+          "name": "GhostPaw"
+        }
+      }
+    ]
+  }
+}

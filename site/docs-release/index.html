@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>@ghostpaw/email documentation</title>
+<meta name="description" content="This folder is the operator and implementer manual for @ghostpaw/email.">
+<link rel="canonical" href="https://email.ghostpaw.dev/docs/">
+<link rel="icon" href="./../favicon.png" type="image/png">
+<link rel="preload" href="./tektur-var.woff2" as="font" type="font/woff2" crossorigin>
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="GhostPaw">
+<meta property="og:title" content="@ghostpaw/email documentation">
+<meta property="og:description" content="This folder is the operator and implementer manual for @ghostpaw/email.">
+<meta property="og:url" content="https://email.ghostpaw.dev/docs/">
+<meta property="og:image" content="https://email.ghostpaw.dev/docs/share.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Wireframe envelopes in cyan light streaming into a hexagonal vault with a ghost paw on its lid, beside the line: Your agent can read the inbox. Sending is a separate tool.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#04070b">
+<style>@font-face{font-family:"Tektur";src:url("./tektur-var.woff2") format("woff2");font-weight:500 900;font-stretch:75% 100%;font-display:swap}
+:root{color-scheme:dark;--void:#04070b;--panel:#0a1119;--rule:#1d2c3c;--ghost:#e3edf5;--haze:#93a5b9;--spectral:#62e6f2;--wraith:#b39dff;--display:"Tektur",Bahnschrift,"Arial Narrow",sans-serif;--body:system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--mono:ui-monospace,"Cascadia Mono",Consolas,monospace}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}body{margin:0;background:var(--void);color:var(--ghost);font:400 1rem/1.65 var(--body)}
+a{color:var(--spectral);text-underline-offset:.18em}a:focus-visible{outline:2px solid var(--spectral);outline-offset:2px}
+.skip{position:absolute;left:-999px}.skip:focus{left:1rem;top:1rem;background:var(--panel);padding:.5rem 1rem;z-index:9}
+header{border-bottom:1px solid var(--rule)}.bar{max-width:76rem;margin:0 auto;padding:1rem 1.25rem;display:flex;gap:1.25rem;align-items:center;flex-wrap:wrap}
+.brand{font:700 1.05rem var(--display);color:var(--ghost);text-decoration:none}.brand span{color:var(--spectral)}
+.bar nav{margin-left:auto;display:flex;gap:1.1rem;flex-wrap:wrap}.bar nav a{color:var(--haze);text-decoration:none}.bar nav a:hover{color:var(--ghost)}
+.wrap{max-width:76rem;margin:0 auto;padding:2rem 1.25rem 4rem;display:grid;gap:2.5rem;grid-template-columns:minmax(0,1fr)}
+@media (min-width:60rem){.wrap{grid-template-columns:14rem minmax(0,1fr)}}
+.side .h{font:600 .8rem var(--display);letter-spacing:.06em;text-transform:uppercase;color:var(--haze);margin:1.25rem 0 .4rem}.side .h:first-child{margin-top:0}
+.side ul{list-style:none;margin:0;padding:0}.side li{margin:.15rem 0}.side a{color:var(--haze);text-decoration:none}.side a[aria-current]{color:var(--spectral)}.side a:hover{color:var(--ghost)}
+.ver{display:inline-block;font:500 .85rem var(--mono);color:var(--haze);margin-bottom:.75rem}
+article{min-width:0;max-width:48rem}article h1,article h2,article h3{font-family:var(--display);line-height:1.2;font-weight:700}
+article h1{font-size:clamp(1.9rem,4vw,2.6rem);margin:0 0 1rem}article h2{font-size:1.45rem;margin:2.4rem 0 .75rem;padding-top:1.2rem;border-top:1px solid var(--rule)}article h3{font-size:1.12rem;margin:1.8rem 0 .5rem}
+article code{font:400 .9em var(--mono);color:var(--spectral);overflow-wrap:anywhere}article pre{background:var(--panel);border:1px solid var(--rule);border-left:2px solid var(--wraith);padding:1rem;overflow-x:auto;line-height:1.5}article pre code{color:var(--ghost);overflow-wrap:normal}
+article table{border-collapse:collapse;width:100%;display:block;overflow-x:auto;font-size:.95rem}article th,article td{border:1px solid var(--rule);padding:.45rem .6rem;text-align:left;vertical-align:top}article th{background:var(--panel)}
+article blockquote{margin:1rem 0;padding:.25rem 1rem;border-left:2px solid var(--spectral);color:var(--haze)}
+footer{border-top:1px solid var(--rule)}footer .bar{color:var(--haze);font-size:.9rem}footer .bar nav a{color:var(--haze)}</style>
+</head>
+<body>
+<a class="skip" href="#doc">Skip to the documentation</a>
+<header><div class="bar"><a class="brand" href="https://ghostpaw.dev/">GhostPaw<span>/</span>email</a><nav aria-label="Site"><a href="https://email.ghostpaw.dev/">email</a><a href="./">Docs</a><a href="https://github.com/GhostPawJS/email">GitHub</a><a href="https://www.npmjs.com/package/@ghostpaw/email">npm</a></nav></div></header>
+<div class="wrap">
+<nav class="side" aria-label="Documentation"><p class="h">Guides</p><ul><li><a href="./" aria-current="page">Overview</a></li><li><a href="./human/">Using the API</a></li><li><a href="./llm/">Agent tools and skills</a></li></ul><p class="h">Concepts</p><ul><li><a href="./entities/accounts/">Accounts</a></li><li><a href="./entities/attachments/">Attachments</a></li><li><a href="./entities/bodies/">Bodies</a></li><li><a href="./entities/folders/">Folders</a></li><li><a href="./entities/messages/">Messages</a></li><li><a href="./entities/sync/">Sync</a></li><li><a href="./entities/threads/">Threads</a></li></ul><p class="h">Source</p><ul><li><a href="https://github.com/GhostPawJS/email/blob/main/docs/CONCEPT.md">Design concept</a></li><li><a href="https://github.com/GhostPawJS/email#readme">README</a></li><li><a href="https://github.com/GhostPawJS/email/blob/main/CHANGELOG.md">Changelog</a></li></ul></nav>
+<main id="doc"><article><span class="ver">@ghostpaw/email 0.4.0</span>
+<h1 id="ghostpaw-email-docs">@ghostpaw/email Docs</h1>
+<p>This folder is the operator and implementer manual for <code>@ghostpaw/email</code>.</p>
+<p>The source of truth for table shapes lives in <code>src/schema/</code>. These docs do not
+repeat column-by-column DDL. They explain what each concept is for, how it fits
+the IMAP/SMTP model, and which operations apply to it.</p>
+<h2 id="what-this-package-is">What This Package Is</h2>
+<p><code>@ghostpaw/email</code> is a SQLite-backed email engine that manages the full lifecycle
+of a mailbox, syncing from IMAP, composing and sending via SMTP, storing
+messages locally, and exposing a structured surface for human developers and AI
+agents alike.</p>
+<p>The package resolves around seven stored concepts and three derived ones:</p>
+<p><strong>Stored:</strong></p>
+<ul>
+<li><code>Account</code>: one email identity with connection config</li>
+<li><code>Folder</code>: one IMAP mailbox path (INBOX, Sent, Drafts, etc.)</li>
+<li><code>Message</code>: a locally cached email header record</li>
+<li><code>Body</code>: the decoded text and raw content of one message</li>
+<li><code>Attachment</code>: a decoded MIME part with its binary data</li>
+<li><code>SyncLog</code>: a record of one completed sync pass per folder</li>
+</ul>
+<p><strong>Derived:</strong></p>
+<ul>
+<li><code>Thread</code>: a JWZ conversation tree computed from References/In-Reply-To</li>
+<li><code>FolderStatus</code>: live counts (messages, unseen, uidNext) from the server</li>
+<li><code>AccountStats</code>: aggregate storage and unread counts</li>
+</ul>
+<h2 id="why-this-package-exists">Why This Package Exists</h2>
+<p>Email inboxes are among the highest-value information surfaces an agent can
+operate. They contain commitments, deadlines, decisions, relationships, and
+context that does not exist anywhere else.</p>
+<p>A reliable agent email layer needs three things that raw IMAP access does not
+provide: a local cache that survives disconnection, a structured read surface
+that supports threading and search, and a clean write surface that enforces
+correct protocol behaviour (threading headers, literal handling, UIDVALIDITY
+resets, exponential backoff).</p>
+<p>This package provides all three as a zero-npm-dependency Node.js library using
+only built-in modules: <code>node:sqlite</code>, <code>node:tls</code>, <code>node:net</code>, <code>node:zlib</code>,
+<code>node:crypto</code>, <code>node:buffer</code>, <code>TextDecoder</code>, and <code>node:events</code>.</p>
+<h2 id="protocol-boundaries">Protocol Boundaries</h2>
+<p>IMAP and SMTP are intentionally treated as different verbs.</p>
+<p><strong>IMAP</strong> (pull) reads a shared remote mailbox and materializes a local snapshot.
+It is reversible up to the point of EXPUNGE. The sync engine supports:</p>
+<ul>
+<li>Initial sync (batched UID FETCH with BODYSTRUCTURE and envelope data)</li>
+<li>Incremental sync (QRESYNC with HIGHESTMODSEQ for flag changes and expunges;
+UID-comparison fallback when QRESYNC is unavailable)</li>
+<li>UIDVALIDITY detection and automatic cache rebuild on mismatch</li>
+<li>COMPRESS=DEFLATE for bandwidth reduction</li>
+<li>IDLE (RFC 2177) for push notification</li>
+<li>CONDSTORE / QRESYNC (RFC 7162)</li>
+<li>XOAUTH2 / OAUTHBEARER / PLAIN / LOGIN authentication</li>
+<li>Token-refresh callback for OAuth providers</li>
+</ul>
+<p><strong>SMTP</strong> (push) deposits a new message into a foreign outbound queue. It is
+permanent once the <code>250 OK</code> response arrives. The SMTP client supports:</p>
+<ul>
+<li>TLS (port 465), STARTTLS (port 587), and plaintext</li>
+<li>PLAIN / LOGIN / XOAUTH2 authentication</li>
+<li>Dot-stuffing and proper DATA termination</li>
+<li>APPEND to Sent after successful send</li>
+</ul>
+<p>These two surfaces share credentials but have separate connections and separate
+error recovery paths.</p>
+<h2 id="entity-manuals">Entity Manuals</h2>
+<p>Concept-level manuals under <code>docs/entities/</code>:</p>
+<ul>
+<li><code>ACCOUNTS.md</code>: one email identity per account</li>
+<li><code>FOLDERS.md</code>: IMAP mailbox paths and their role assignments</li>
+<li><code>MESSAGES.md</code>: message header records and flag semantics</li>
+<li><code>BODIES.md</code>: decoded text, raw RFC 2822 content, and BODYSTRUCTURE</li>
+<li><code>ATTACHMENTS.md</code>: MIME parts with on-demand binary fetch</li>
+<li><code>THREADS.md</code>: JWZ conversation trees derived from threading headers</li>
+<li><code>SYNC.md</code>: sync log, QRESYNC engine, and fetch-on-demand strategies</li>
+</ul>
+<h2 id="how-to-read-the-model">How To Read The Model</h2>
+<p>The primary entry point is the <code>Mailbox</code> class. A single <code>connect()</code> call
+opens the SQLite database, initialises the schema, upserts the account, and
+authenticates the IMAP session:</p>
+<ol>
+<li>Construct a <code>Mailbox</code> with an <code>EmailConfig</code> (includes IMAP/SMTP hosts, auth, and optional storage path).</li>
+<li>Call <code>await mailbox.connect()</code> to initialise everything.</li>
+<li>Use <code>mailbox.network.sync()</code> to pull messages into the local cache.</li>
+<li>Use <code>mailbox.read.*</code> for all local reads.</li>
+<li>Use <code>mailbox.write.*</code> for flag changes, composition, and folder management.</li>
+<li>Use <code>mailbox.network.watch()</code> for ongoing IDLE-based push monitoring.</li>
+<li>Call <code>await mailbox.disconnect()</code> to close the session and database.</li>
+</ol>
+<h2 id="lifecycle-truth">Lifecycle Truth</h2>
+<h3 id="messages">Messages</h3>
+<p>A message enters the local cache during sync. Its lifecycle:</p>
+<ul>
+<li><strong>Absent</strong>: not yet fetched (uid exists on server but not in local DB)</li>
+<li><strong>Present</strong>: header record exists locally</li>
+<li><strong>Body fetched</strong>: <code>bodies</code> row exists for this message id</li>
+<li><strong>Attachment fetched</strong>: one or more <code>attachments</code> rows exist for this message id</li>
+</ul>
+<p>Bodies and attachments are fetched on demand, not during initial sync.</p>
+<p>Message flags follow RFC 3501 semantics:</p>
+<ul>
+<li><code>\Seen</code>: read by at least one client</li>
+<li><code>\Flagged</code>: starred/important</li>
+<li><code>\Answered</code>: a reply was sent</li>
+<li><code>\Deleted</code>: marked for expunge (not yet removed)</li>
+<li><code>\Draft</code>: a draft message</li>
+</ul>
+<p>Labels (Gmail keywords) are stored separately from flags.</p>
+<h3 id="folders">Folders</h3>
+<p>A folder&#39;s <code>uidValidity</code> tracks whether the UID namespace is still valid. When
+the server changes <code>uidValidity</code>, all message UIDs for that folder are stale and
+the local cache for that folder is cleared and rebuilt.</p>
+<p><code>uidNext</code> and <code>highestModSeq</code> are updated after each sync pass and used to
+compute the delta for the next incremental sync.</p>
+<h3 id="sync">Sync</h3>
+<p>Each <code>sync_log</code> row records one completed folder sync pass: folder id,
+direction, message count delta, duration, and outcome. The sync engine writes
+these rows atomically at the end of each pass.</p>
+<h2 id="core-invariants">Core Invariants</h2>
+<ul>
+<li>Every message belongs to exactly one folder</li>
+<li>A body belongs to exactly one message</li>
+<li>Attachments belong to exactly one message via message id</li>
+<li>Thread ids are computed from References/In-Reply-To headers at ingest time; they are not stored separately</li>
+<li>FTS5 index (<code>messages_fts</code>) is populated during sync and kept in sync by the sync engine</li>
+<li><code>uidValidity</code> changes trigger full folder cache invalidation</li>
+<li>Folder roles are detected from IMAP special-use attributes and XLIST; the detection is best-effort</li>
+<li><code>initSchema(db)</code> is idempotent: safe to call on an already-initialised database</li>
+<li><code>Mailbox.connect()</code> calls <code>initSchema</code> automatically: manual schema init is not required</li>
+</ul>
+<h2 id="temporal-and-flag-semantics">Temporal And Flag Semantics</h2>
+<ul>
+<li><code>date</code> on a message is the RFC 2822 <code>Date:</code> header value (sender-supplied)</li>
+<li><code>receivedAt</code> is the local ingest timestamp</li>
+<li><code>modSeq</code> is the HIGHESTMODSEQ value at the time of last sync, used by CONDSTORE</li>
+<li>Flags are stored as a JSON-encoded <code>string[]</code> column</li>
+<li>Labels are stored as a JSON-encoded <code>string[]</code> column</li>
+<li><code>bodyStructure</code> is stored as a JSON-encoded <code>BodyPart</code> tree</li>
+</ul>
+<h2 id="operation-philosophy">Operation Philosophy</h2>
+<p>The engine exposes intention-shaped operations, not raw SQL writes:</p>
+<ul>
+<li><strong>sync</strong> pulls the remote state into the local cache</li>
+<li><strong>send</strong> deposits a new message into the SMTP queue</li>
+<li><strong>reply</strong> sets correct threading headers and sends</li>
+<li><strong>archive / trash / junk</strong> map to server-detected special-use folders</li>
+<li><strong>saveDraft</strong> stages a message locally before committing to the wire</li>
+</ul>
+<p>That keeps protocol truth aligned with what actually happened, and avoids the
+common trap of treating a staged draft as a sent message.</p>
+<h2 id="public-surface">Public Surface</h2>
+<ul>
+<li><code>Mailbox</code>: the main porcelain class: accepts <code>EmailConfig</code>, manages its own DB</li>
+<li><code>Mailbox.connect()</code>: initialise DB + schema + IMAP session (one call)</li>
+<li><code>Mailbox.disconnect()</code>: close session and database</li>
+<li><code>read.*</code>: <code>EmailReadSurface</code>: local reads, FTS search, stats</li>
+<li><code>write.*</code>: <code>EmailWriteSurface</code>: flag changes, compose, folders, drafts</li>
+<li><code>network.*</code>: <code>EmailNetworkSurface</code>: connect, sync, watch, remote search</li>
+<li><code>tools.emailTools</code>: 5 LLM-oriented tool definitions (see <code>LLM.md</code>)</li>
+<li><code>skills.emailSkills</code>: 8 workflow skill definitions (see <code>LLM.md</code>)</li>
+<li><code>soul.emailSoul</code>: <code>Postmaster</code> thinking foundation (see <code>LLM.md</code>)</li>
+<li><code>initSchema(db)</code>: standalone schema initialiser for advanced use (not needed with <code>Mailbox</code>)</li>
+<li><code>email</code> binary: CLI surface: account management, all five tools as subcommands, <code>--json</code> output (see <code>SKILL.md</code>)</li>
+</ul>
+<h2 id="code-source-of-truth">Code Source Of Truth</h2>
+<ul>
+<li><code>src/schema/</code>: DDL for all six tables, FTS5, and indexes</li>
+<li><code>src/store/</code>: CRUD operations per entity</li>
+<li><code>src/imap/</code>: IMAP tokenizer, parser, dispatcher, session, auth, compression</li>
+<li><code>src/smtp/</code>: SMTP client (response parser, connection, auth, send flow)</li>
+<li><code>src/mime/</code>: MIME parser (headers, addresses, decode, BODYSTRUCTURE, compose)</li>
+<li><code>src/sync/</code>: sync engine (initial, incremental, body fetch, FTS population)</li>
+<li><code>src/lib/</code>: utility codecs (MUTF-7, Base64, QP, ID, html-to-text)</li>
+<li><code>src/read.ts</code>, <code>src/write.ts</code>, <code>src/network.ts</code>: surface implementations</li>
+<li><code>src/mailbox.ts</code>: <code>Mailbox</code> porcelain class</li>
+<li><code>src/runtime.ts</code>: DB initialisation and schema bootstrap</li>
+<li><code>src/tools/</code>: LLM tool facade</li>
+<li><code>src/skills/</code>: LLM workflow skill library</li>
+<li><code>src/soul.ts</code>: <code>Postmaster</code> soul</li>
+<li><code>src/cli/</code>: CLI binary layer: citty subcommands, XDG account config, stdin/stdout piping, <code>--json</code> output</li>
+</ul>
+<h2 id="explicit-non-goals">Explicit Non-Goals</h2>
+<ul>
+<li>no browser runtime (Node.js built-ins only: <code>node:sqlite</code>, <code>node:tls</code>, etc.)</li>
+<li>no multi-account fanout in v1 (one <code>Mailbox</code> instance per account)</li>
+<li>no push notification gateway (IDLE is pull-on-event, not server-push)</li>
+<li>no calendar or contact sync</li>
+<li>no PGP or S/MIME decryption</li>
+<li>no message rules engine</li>
+<li>no archive format other than raw <code>.eml</code></li>
+</ul>
+<h2 id="supplemental-docs">Supplemental Docs</h2>
+<ul>
+<li><code>SKILL.md</code> (root): CLI reference for agent operators and Claude Code / OpenClaw users</li>
+<li><code>HUMAN.md</code>: human-facing guide for developers using the <code>Mailbox</code> API</li>
+<li><code>LLM.md</code>: top-to-bottom overview of the soul, tools, and skills AI surface</li>
+<li><code>PAGES.md</code>: interactive demo notes</li>
+</ul>
+<h2 id="quality-bar">Quality Bar</h2>
+<p>Every non-type module under <code>src/</code> has a colocated <code>*.test.ts</code> sibling. The
+behaviour described in these docs is backed by executable coverage.</p>
+<p>Relative imports use explicit <code>.ts</code> specifiers so Node can run tests directly
+with <code>--experimental-strip-types</code> without a separate TypeScript compilation step.</p>
+</article></main>
+</div>
+<footer><div class="bar"><span>Rendered from <a href="https://github.com/GhostPawJS/email/tree/main/docs">docs/</a> in the repository, MIT licensed.</span><nav aria-label="Legal"><a href="https://ghostpaw.dev/">All GhostPaw libraries</a><a href="https://lab.anonyfox.com/impressum/">Impressum</a><a href="https://lab.anonyfox.com/datenschutz/">Datenschutz</a></nav></div></footer>
+</body>
+</html>

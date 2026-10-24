@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLM Building Blocks · @ghostpaw/email docs</title>
+<meta name="description" content="@ghostpaw/email is designed to work in three modes simultaneously:">
+<link rel="canonical" href="https://email.ghostpaw.dev/docs/llm/">
+<link rel="icon" href="../../favicon.png" type="image/png">
+<link rel="preload" href="../tektur-var.woff2" as="font" type="font/woff2" crossorigin>
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="GhostPaw">
+<meta property="og:title" content="LLM Building Blocks · @ghostpaw/email docs">
+<meta property="og:description" content="@ghostpaw/email is designed to work in three modes simultaneously:">
+<meta property="og:url" content="https://email.ghostpaw.dev/docs/llm/">
+<meta property="og:image" content="https://email.ghostpaw.dev/docs/share.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Wireframe envelopes in cyan light streaming into a hexagonal vault with a ghost paw on its lid, beside the line: Your agent can read the inbox. Sending is a separate tool.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#04070b">
+<style>@font-face{font-family:"Tektur";src:url("../tektur-var.woff2") format("woff2");font-weight:500 900;font-stretch:75% 100%;font-display:swap}
+:root{color-scheme:dark;--void:#04070b;--panel:#0a1119;--rule:#1d2c3c;--ghost:#e3edf5;--haze:#93a5b9;--spectral:#62e6f2;--wraith:#b39dff;--display:"Tektur",Bahnschrift,"Arial Narrow",sans-serif;--body:system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--mono:ui-monospace,"Cascadia Mono",Consolas,monospace}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}body{margin:0;background:var(--void);color:var(--ghost);font:400 1rem/1.65 var(--body)}
+a{color:var(--spectral);text-underline-offset:.18em}a:focus-visible{outline:2px solid var(--spectral);outline-offset:2px}
+.skip{position:absolute;left:-999px}.skip:focus{left:1rem;top:1rem;background:var(--panel);padding:.5rem 1rem;z-index:9}
+header{border-bottom:1px solid var(--rule)}.bar{max-width:76rem;margin:0 auto;padding:1rem 1.25rem;display:flex;gap:1.25rem;align-items:center;flex-wrap:wrap}
+.brand{font:700 1.05rem var(--display);color:var(--ghost);text-decoration:none}.brand span{color:var(--spectral)}
+.bar nav{margin-left:auto;display:flex;gap:1.1rem;flex-wrap:wrap}.bar nav a{color:var(--haze);text-decoration:none}.bar nav a:hover{color:var(--ghost)}
+.wrap{max-width:76rem;margin:0 auto;padding:2rem 1.25rem 4rem;display:grid;gap:2.5rem;grid-template-columns:minmax(0,1fr)}
+@media (min-width:60rem){.wrap{grid-template-columns:14rem minmax(0,1fr)}}
+.side .h{font:600 .8rem var(--display);letter-spacing:.06em;text-transform:uppercase;color:var(--haze);margin:1.25rem 0 .4rem}.side .h:first-child{margin-top:0}
+.side ul{list-style:none;margin:0;padding:0}.side li{margin:.15rem 0}.side a{color:var(--haze);text-decoration:none}.side a[aria-current]{color:var(--spectral)}.side a:hover{color:var(--ghost)}
+.ver{display:inline-block;font:500 .85rem var(--mono);color:var(--haze);margin-bottom:.75rem}
+article{min-width:0;max-width:48rem}article h1,article h2,article h3{font-family:var(--display);line-height:1.2;font-weight:700}
+article h1{font-size:clamp(1.9rem,4vw,2.6rem);margin:0 0 1rem}article h2{font-size:1.45rem;margin:2.4rem 0 .75rem;padding-top:1.2rem;border-top:1px solid var(--rule)}article h3{font-size:1.12rem;margin:1.8rem 0 .5rem}
+article code{font:400 .9em var(--mono);color:var(--spectral);overflow-wrap:anywhere}article pre{background:var(--panel);border:1px solid var(--rule);border-left:2px solid var(--wraith);padding:1rem;overflow-x:auto;line-height:1.5}article pre code{color:var(--ghost);overflow-wrap:normal}
+article table{border-collapse:collapse;width:100%;display:block;overflow-x:auto;font-size:.95rem}article th,article td{border:1px solid var(--rule);padding:.45rem .6rem;text-align:left;vertical-align:top}article th{background:var(--panel)}
+article blockquote{margin:1rem 0;padding:.25rem 1rem;border-left:2px solid var(--spectral);color:var(--haze)}
+footer{border-top:1px solid var(--rule)}footer .bar{color:var(--haze);font-size:.9rem}footer .bar nav a{color:var(--haze)}</style>
+</head>
+<body>
+<a class="skip" href="#doc">Skip to the documentation</a>
+<header><div class="bar"><a class="brand" href="https://ghostpaw.dev/">GhostPaw<span>/</span>email</a><nav aria-label="Site"><a href="https://email.ghostpaw.dev/">email</a><a href="../">Docs</a><a href="https://github.com/GhostPawJS/email">GitHub</a><a href="https://www.npmjs.com/package/@ghostpaw/email">npm</a></nav></div></header>
+<div class="wrap">
+<nav class="side" aria-label="Documentation"><p class="h">Guides</p><ul><li><a href="../">Overview</a></li><li><a href="../human/">Using the API</a></li><li><a href="../llm/" aria-current="page">Agent tools and skills</a></li></ul><p class="h">Concepts</p><ul><li><a href="../entities/accounts/">Accounts</a></li><li><a href="../entities/attachments/">Attachments</a></li><li><a href="../entities/bodies/">Bodies</a></li><li><a href="../entities/folders/">Folders</a></li><li><a href="../entities/messages/">Messages</a></li><li><a href="../entities/sync/">Sync</a></li><li><a href="../entities/threads/">Threads</a></li></ul><p class="h">Source</p><ul><li><a href="https://github.com/GhostPawJS/email/blob/main/docs/CONCEPT.md">Design concept</a></li><li><a href="https://github.com/GhostPawJS/email#readme">README</a></li><li><a href="https://github.com/GhostPawJS/email/blob/main/CHANGELOG.md">Changelog</a></li></ul></nav>
+<main id="doc"><article><span class="ver">@ghostpaw/email 0.4.0</span>
+<h1 id="llm-building-blocks">LLM Building Blocks</h1>
+<p><code>@ghostpaw/email</code> is designed to work in three modes simultaneously:</p>
+<ul>
+<li>as a clean direct-code library for human developers</li>
+<li>as a runtime surface that agent harnesses can wire into LLM systems directly</li>
+<li>as a standalone <code>email</code> CLI binary that agents can invoke as a bash tool without any wiring code</li>
+</ul>
+<p>LLMs need more than callable functions. They need a shaped way to think, a
+small action surface, and reusable guidance for multi-step email situations.</p>
+<p>The package therefore exposes three AI-oriented building blocks, top to bottom:</p>
+<ol>
+<li>soul</li>
+<li>tools</li>
+<li>skills</li>
+</ol>
+<p>The lower layers are still useful on their own, but together they form a clean
+stack for reliable LLM-driven mailbox management.</p>
+<h2 id="runtime-surfaces">Runtime Surfaces</h2>
+<p>All three layers are exported from the package root through named namespaces:</p>
+<pre><code class="language-ts">import { skills, soul, tools } from &#39;@ghostpaw/email&#39;;
+</code></pre>
+<p>The source files are:</p>
+<ul>
+<li><code>src/soul.ts</code>: thinking foundation</li>
+<li><code>src/tools/</code>: action surface</li>
+<li><code>src/skills/</code>: workflow guidance</li>
+</ul>
+<h2 id="soul">Soul</h2>
+<p>The soul is the thinking foundation.</p>
+<p>It does not define what the model can do. It defines how the model should
+reason about a mailbox, which epistemic positions to distinguish, which
+boundaries to protect, and what class of judgment to apply before modifying
+state.</p>
+<p><code>@ghostpaw/email</code> exports the soul through the <code>soul</code> namespace:</p>
+<ul>
+<li><code>soul.emailSoul</code></li>
+<li><code>soul.emailSoulEssence</code></li>
+<li><code>soul.emailSoulTraits</code></li>
+<li><code>soul.renderEmailSoulPromptFoundation()</code></li>
+</ul>
+<p>The runtime soul shape is:</p>
+<pre><code class="language-ts">interface EmailSoul {
+  slug: string;
+  name: string;
+  description: string;
+  essence: string;
+  traits: readonly {
+    principle: string;
+    provenance: string;
+  }[];
+}
+</code></pre>
+<p>The current soul is <code>Postmaster</code>, with the slug <code>postmaster</code>.</p>
+<p>Its job is to keep the model&#39;s operational instincts correct before any tool
+call happens. That means:</p>
+<ul>
+<li>distinguishing local-cache reads from live server fetches from unsent drafts</li>
+<li>reading thread context before composing or archiving</li>
+<li>moving down the irreversibility gradient (read → flag → archive → send →
+delete) only as far as necessary</li>
+<li>classifying connection errors, auth failures, protocol rejections, and
+partial-send states as distinct situations requiring distinct responses</li>
+</ul>
+<p>The exported traits are:</p>
+<ul>
+<li>Local state is a snapshot, not the truth.</li>
+<li>Read threads, not messages.</li>
+<li>Fetch only what the intent requires.</li>
+<li>Irreversibility has a gradient: move down it deliberately.</li>
+<li>Classify the failure before you respond to it.</li>
+</ul>
+<p>In practice, <code>renderEmailSoulPromptFoundation()</code> is the best starting point
+for a system prompt or agent role prompt. It renders the name, description,
+full essence, and each trait&#39;s principle and provenance as a single string,
+ready to be prepended to any agent configuration.</p>
+<h2 id="tools">Tools</h2>
+<p>The tools are the action surface.</p>
+<p><code>@ghostpaw/email</code> exposes a dedicated LLM-oriented tool facade under
+<code>src/tools/</code>. This surface is additive: it does not replace the lower-level
+<code>read</code>/<code>write</code>/<code>network</code> surfaces, but it packages the engine into a smaller,
+intent-shaped contract for agent systems.</p>
+<p>The count is deliberately small, five tools cover the full daily mailbox
+lifecycle without overwhelming tool selection.</p>
+<p>Each tool exports:</p>
+<ul>
+<li>a name and description</li>
+<li>a <code>sideEffects</code> classification (<code>read</code>, <code>write</code>, <code>external</code>)</li>
+<li>a JSON-Schema-compatible <code>inputSchema</code></li>
+<li>an async <code>handler(ctx, input)</code> function</li>
+</ul>
+<p>The shared runtime tool definition shape is:</p>
+<pre><code class="language-ts">interface EmailToolDefinition&lt;TInput = unknown&gt; {
+  name: string;
+  description: string;
+  sideEffects: &#39;external&#39; | &#39;none&#39; | &#39;read&#39; | &#39;write&#39;;
+  inputSchema: JsonSchema;
+  handler(ctx: EmailToolContext, input: TInput): Promise&lt;EmailToolResult&gt;;
+}
+</code></pre>
+<p>The handler takes an <code>EmailToolContext</code> rather than raw database access:</p>
+<pre><code class="language-ts">interface EmailToolContext {
+  read: EmailReadSurface;
+  write: EmailWriteSurface;
+  network: EmailNetworkSurface;
+}
+</code></pre>
+<p>This means a consumer builds the context from a connected <code>Mailbox</code> instance
+and passes it to every tool handler. The tool layer has no privileged database
+access, it only calls the same surfaces a human developer would use.</p>
+<p>The registry is surfaced through <code>tools</code>:</p>
+<ul>
+<li><code>tools.emailTools</code></li>
+<li><code>tools.getEmailToolByName(name)</code></li>
+</ul>
+<p>Tool results use a consistent outcome contract:</p>
+<ul>
+<li><code>success</code></li>
+<li><code>no_op</code></li>
+<li><code>needs_clarification</code></li>
+<li><code>error</code></li>
+</ul>
+<p>That keeps unusual cases explicit rather than requiring an LLM adapter to infer
+intent from thrown exceptions.</p>
+<p>The five tools and their scopes:</p>
+<h3 id="mail-read-sideeffects-read"><code>mail_read</code> (sideEffects: read)</h3>
+<p>Read the mailbox state. Accepts a <code>view</code> discriminator:</p>
+<ul>
+<li><code>folders</code>: list folders (optionally refreshing from server with <code>refresh: true</code>)</li>
+<li><code>queue</code>: list messages in a folder (with optional <code>unreadOnly</code> and <code>limit</code>)</li>
+<li><code>thread</code>: fetch a full conversation by <code>threadId</code></li>
+<li><code>message</code>: fetch a single message with full body (triggers on-demand fetch if not cached)</li>
+<li><code>attachment</code>: list attachment metadata, or fetch specific attachment bytes via <code>partPath</code></li>
+<li><code>eml</code>: export a message as raw RFC 2822 bytes</li>
+</ul>
+<h3 id="mail-search-sideeffects-read"><code>mail_search</code> (sideEffects: read)</h3>
+<p>Search for messages. Two modes:</p>
+<ul>
+<li><code>local</code> (default): FTS5 full-text search with optional folder, date range,
+<code>hasAttachments</code>, and <code>unreadOnly</code> filters</li>
+<li><code>remote</code>: IMAP SEARCH on the server (requires an active session; returns UIDs)</li>
+</ul>
+<h3 id="mail-compose-sideeffects-external"><code>mail_compose</code> (sideEffects: external)</h3>
+<p>Compose and send. Accepts an <code>action</code> discriminator:</p>
+<ul>
+<li><code>send</code>: send a new message directly via SMTP</li>
+<li><code>reply</code>: compose a reply (sets threading headers, prepends attribution + quoted body)</li>
+<li><code>forward</code>: forward a message (inline with header block, or as <code>.eml</code> attachment)</li>
+<li><code>save_draft</code>: save a draft to the Drafts folder</li>
+<li><code>update_draft</code>: replace the current draft content</li>
+<li><code>send_draft</code>: send the staged draft, then expunge from Drafts</li>
+</ul>
+<h3 id="mail-organize-sideeffects-write"><code>mail_organize</code> (sideEffects: write)</h3>
+<p>Organize messages and folders. Accepts an <code>action</code> discriminator across 19
+operations: <code>mark_read</code>, <code>mark_unread</code>, <code>star</code>, <code>unstar</code>, <code>mark_answered</code>,
+<code>copy</code>, <code>move</code>, <code>archive</code>, <code>trash</code>, <code>junk</code>, <code>not_junk</code>, <code>set_labels</code>,
+<code>add_labels</code>, <code>remove_labels</code>, <code>create_folder</code>, <code>rename_folder</code>,
+<code>delete_folder</code>, <code>subscribe_folder</code>, <code>unsubscribe_folder</code>.</p>
+<h3 id="mail-sync-sideeffects-external"><code>mail_sync</code> (sideEffects: external)</h3>
+<p>Manage the connection lifecycle and sync state. Accepts an <code>action</code>
+discriminator: <code>connect</code>, <code>disconnect</code>, <code>reconnect</code>, <code>sync</code>,
+<code>refresh_folders</code>, <code>watch</code>.</p>
+<p><code>reconnect</code> applies exponential back-off internally (1s → 2s → 4s → …, capped
+at 30s, up to 5 attempts). <code>watch</code> syncs the requested folders and confirms
+that continuous IDLE monitoring is available via the application-layer
+<code>Mailbox.network.watch()</code> call.</p>
+<h2 id="skills">Skills</h2>
+<p>The skills are the workflow layer.</p>
+<p><code>@ghostpaw/email</code> ships a built-in runtime skill surface under <code>src/skills/</code>.
+Each skill describes a reusable operating pattern for a specific multi-step
+email scenario.</p>
+<p>Where the soul says how to think and the tools define what actions are
+available, the skills describe how to combine those actions well in recurring
+real-world situations.</p>
+<p>Each skill exports:</p>
+<ul>
+<li><code>name</code></li>
+<li><code>description</code></li>
+<li><code>content</code></li>
+</ul>
+<p>The shared runtime shape is:</p>
+<pre><code class="language-ts">interface EmailSkill {
+  name: string;
+  description: string;
+  content: string;
+}
+</code></pre>
+<p>The skill <code>content</code> is a markdown document that references the tool facade
+directly and teaches:</p>
+<ul>
+<li>which tools to use</li>
+<li>how to sequence them</li>
+<li>how to interpret outcomes</li>
+<li>how to handle errors, no-ops, and recovery paths</li>
+</ul>
+<p>The registry is surfaced through <code>skills</code>:</p>
+<ul>
+<li><code>skills.emailSkills</code></li>
+<li><code>skills.getEmailSkillByName(name)</code></li>
+<li><code>skills.defineEmailSkill()</code></li>
+</ul>
+<p>The eight built-in skills and what multi-step problem each solves:</p>
+<table>
+<thead>
+<tr>
+<th>Skill</th>
+<th>Problem it solves</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>triage-inbox</code></td>
+<td>Sync → read queue → selective body fetch → bulk organize</td>
+</tr>
+<tr>
+<td><code>read-and-reply</code></td>
+<td>On-demand body fetch → thread context → reply with attribution</td>
+</tr>
+<tr>
+<td><code>connect-and-sync</code></td>
+<td>Connect → refresh folders → initial vs incremental sync</td>
+</tr>
+<tr>
+<td><code>search-and-act</code></td>
+<td>Local FTS → remote fallback → read targets → act</td>
+</tr>
+<tr>
+<td><code>compose-and-send</code></td>
+<td>Draft → review → update → send; reply/forward threading</td>
+</tr>
+<tr>
+<td><code>organize-bulk</code></td>
+<td>Identify → flag → dispose; folder creation before move</td>
+</tr>
+<tr>
+<td><code>attachment-workflow</code></td>
+<td>List metadata → selective fetch → outbound embed</td>
+</tr>
+<tr>
+<td><code>recover-from-disruption</code></td>
+<td>Auth vs transient error classification → reconnect → re-sync</td>
+</tr>
+</tbody></table>
+<h2 id="how-the-layers-fit-together">How The Layers Fit Together</h2>
+<p>A well-designed <code>@ghostpaw/email</code>-based LLM system uses the layers in this
+order:</p>
+<ol>
+<li>Start from the soul so the model is primed with the correct judgment style
+, in particular, the snapshot/live/unsent distinction and the
+irreversibility gradient.</li>
+<li>Expose the tools so the model has a clean action surface that maps to user
+intent rather than raw protocol operations.</li>
+<li>Load relevant skills so multi-step scenarios do not have to be improvised
+from scratch.</li>
+</ol>
+<p>That gives the system:</p>
+<ul>
+<li>a thinking posture (Postmaster)</li>
+<li>an execution surface (5 tools)</li>
+<li>reusable operational playbooks (8 skills)</li>
+<li>all backed by real runtime exports, not prose-only conventions</li>
+</ul>
+<h2 id="wiring-example">Wiring Example</h2>
+<pre><code class="language-ts">import { Mailbox, skills, soul, tools } from &#39;@ghostpaw/email&#39;;
+
+const mailbox = new Mailbox({
+  imap: { host: &#39;imap.example.com&#39;, port: 993, tls: true },
+  smtp: { host: &#39;smtp.example.com&#39;, port: 465, tls: true },
+  auth: { user: &#39;user@example.com&#39;, pass: &#39;secret&#39; },
+  storage: &#39;mail.db&#39;,
+});
+
+await mailbox.connect();
+
+// Build the tool context from the connected mailbox surfaces.
+const ctx = {
+  read: mailbox.read,
+  write: mailbox.write,
+  network: mailbox.network,
+};
+
+// Prime the system prompt with the soul.
+const systemPrompt = soul.renderEmailSoulPromptFoundation();
+
+// Look up a tool and call it.
+const readTool = tools.getEmailToolByName(&#39;mail_read&#39;);
+const result = await readTool?.handler(ctx, { view: &#39;folders&#39; });
+
+// Load a skill&#39;s guidance for a multi-step scenario.
+const triageSkill = skills.getEmailSkillByName(&#39;triage-inbox&#39;);
+console.log(triageSkill?.content);
+
+await mailbox.disconnect();
+</code></pre>
+<h2 id="the-cli-alternative">The CLI Alternative</h2>
+<p>For agents that run in an environment with bash access, Claude Code, OpenClaw,
+custom agent harnesses, the <code>email</code> binary is often the right choice over
+wiring up the library directly.</p>
+<p>The CLI wraps all five tools as subcommands with the same structured output
+contract:</p>
+<pre><code class="language-bash"># Every command returns { outcome, summary, entities, nextSteps } with --json
+email sync --json
+email read queue --json
+email search &quot;invoice&quot; --json
+email compose send --to bob@example.com --subject &quot;Hi&quot; --body &quot;text&quot; --json
+email organize archive --folder INBOX --uids 42,43 --json
+</code></pre>
+<p>Accounts are stored in <code>~/.config/email/accounts.json</code> and can also be
+provided entirely through environment variables for ephemeral CI contexts:</p>
+<pre><code class="language-bash">EMAIL_IMAP_HOST=imap.example.com EMAIL_SMTP_HOST=smtp.example.com \
+EMAIL_USER=you@example.com EMAIL_PASS=secret \
+  email read queue --json
+</code></pre>
+<p>The CLI does not replace the runtime library surface, it is the same tool
+layer, exposed through bash instead of TypeScript. The soul and skills are not
+directly exposed via CLI (they are for LLM system prompts, not command output),
+but the five tools map one-to-one to the five subcommands.</p>
+<p>See <a href="https://github.com/GhostPawJS/email/blob/main/SKILL.md">SKILL.md</a> for the complete CLI reference, including exit
+codes, piping patterns, multi-step workflow examples, and account setup.</p>
+<h2 id="human-and-ai-use-together">Human And AI Use Together</h2>
+<p>None of this replaces the human-facing library surface.</p>
+<p><code>@ghostpaw/email</code> still works as a direct-code library through its normal
+TypeScript API via <code>Mailbox</code>, <code>read</code>, <code>write</code>, and <code>network</code>. The soul, tools,
+and skills are an additional AI-oriented layer on top of that clean core.</p>
+<p>That is the point of the design:</p>
+<ul>
+<li>humans get a clean library with typed surfaces</li>
+<li>agents that build systems get runtime-ready guidance and execution primitives</li>
+<li>agents with bash access get the same tool surface as a zero-wiring CLI</li>
+<li>all three operate on the same truthful underlying SQLite model</li>
+</ul>
+</article></main>
+</div>
+<footer><div class="bar"><span>Rendered from <a href="https://github.com/GhostPawJS/email/tree/main/docs">docs/</a> in the repository, MIT licensed.</span><nav aria-label="Legal"><a href="https://ghostpaw.dev/">All GhostPaw libraries</a><a href="https://lab.anonyfox.com/impressum/">Impressum</a><a href="https://lab.anonyfox.com/datenschutz/">Datenschutz</a></nav></div></footer>
+</body>
+</html>

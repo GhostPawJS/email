@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="{{.language}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{.title}}</title>
+<meta name="description" content="{{.description}}">
+<link rel="canonical" href="{{.url}}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{.url}}">
+<meta property="og:title" content="{{.title}}">
+<meta property="og:description" content="{{.description}}">
+<meta property="og:image" content="{{.socialImage.src}}">
+<meta property="og:image:alt" content="{{.socialImage.alt}}">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="assets/fonts/tektur-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/martian-mono-var.woff2" as="font" type="font/woff2" crossorigin>
+<meta name="theme-color" content="#04070b">
+<script>document.documentElement.classList.add("js")</script>
+{{style "assets/styles/main.css"}}
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="{{.urls.home}}">GhostPaw</a>
+  <nav aria-label="email elsewhere">
+    <a href="{{.urls.github}}">GitHub</a>
+    <a href="{{.urls.npm}}">npm</a>
+    <a href="{{.urls.readme}}">README</a>
+  </nav>
+</header>
+<main>
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-copy">
+      <p class="kicker"><code>@ghostpaw/email</code> 0.4.0</p>
+      <h1 id="hero-title">Your agent can read the inbox. Sending is a separate tool.</h1>
+      <p class="lede">email speaks IMAP and SMTP from inside your Node.js process, caches mail in a SQLite file with threads and FTS5 search, and splits what an agent can do into five tools. Give an agent <code>mail_read</code> and <code>mail_search</code>, leave out <code>mail_compose</code>, and it can read and search but not send.</p>
+      <div class="install">
+        <p class="cmd-label" id="lib-label">As a library</p>
+        <div class="cmd"><input id="cmd-lib" readonly value="npm install @ghostpaw/email" aria-labelledby="lib-label" spellcheck="false"><button type="button" class="copy" data-copy="cmd-lib">Copy</button></div>
+        <p class="cmd-label" id="mcp-label">As a local MCP server</p>
+        <div class="cmd"><input id="cmd-mcp" readonly value="npx -y @ghostpaw/email mcp" aria-labelledby="mcp-label" spellcheck="false"><button type="button" class="copy" data-copy="cmd-mcp">Copy</button></div>
+      </div>
+      <p class="actions"><a class="button" href="#run">Replay the run</a> <a href="{{.urls.github}}">Read the source on GitHub</a></p>
+      <p class="terms">Free and MIT licensed for Node.js 24 or newer, with zero runtime dependencies. The cache is a SQLite file on your disk; credentials stay in your environment.</p>
+    </div>
+    <figure class="hero-art frame">
+      <div class="scope"><picture><source media="(min-width: 52rem)" srcset="assets/images/hero-720.webp" width="720" height="540"><img src="assets/images/hero-480.webp" width="480" height="360" alt="Wireframe envelopes drawn in cyan light streaming into a hexagonal vault, a ghost paw on its lid, one envelope glowing violet." fetchpriority="high"></picture><span class="scan" aria-hidden="true"></span></div>
+      <p class="readout" aria-label="Zero runtime dependencies"><span class="big">0</span><span>runtime dependencies</span></p>
+    </figure>
+  </section>
+
+  <section id="run" class="sec run-sec" aria-labelledby="run-title">
+    <h2 id="run-title">Three messages, six calls, no server</h2>
+    <p class="intro">Everything below ran on one machine with no IMAP server contacted.</p>
+    <p class="intro">We built the messages with the library's own MIME composer, parsed them with its parser and cached them through the store functions its sync uses, all against email 0.4.0 on 2026-10-24 with the clock fixed. Run the steps in order.</p>
+    <div class="run">
+      <div class="state" role="region" aria-labelledby="state-title" aria-live="polite">
+        <p class="state-label" id="state-title">Mailbox</p>
+        <ul id="state-list">
+          <li><span class="k">Messages</span><span class="v">0</span></li>
+          <li><span class="k">Threads</span><span class="v">0</span></li>
+          <li><span class="k">Last search</span><span class="v">—</span></li>
+          <li><span class="k">Tool result</span><span class="v">—</span></li>
+          <li><span class="k">IMAP session</span><span class="v">none</span></li>
+        </ul>
+        <p class="state-foot" id="state-foot">An empty SQLite cache after initSchema(db).</p>
+      </div>
+      <ol class="steps">
+        <li class="step" id="step-1">
+          <h3><span class="n">01</span> An invoice arrives</h3>
+          <p>Composed by the library and cached the way sync caches it.</p>
+          <pre class="call"><code>const raw = mime.composeMessage({
+  from: ops, to: [mika],
+  subject: 'Invoice 4471 for October',
+  text: 'Hi Mika, invoice 4471 for October: 1,280 EUR, due 7 November.',
+});
+cache(raw); // parseMessage -&gt; store.insertMessage -&gt; upsertBody -&gt; populateFts</code></pre>
+          <div class="result"><pre><code>Message-ID: &lt;1792660320000.90c76e10…@vendor.example&gt;
+Date: Thu, 22 Oct 2026 09:12:00 +0000
+MIME-Version: 1.0
+From: Ops &lt;ops@vendor.example&gt;
+To: Mika &lt;mika@example.com&gt;
+Subject: Invoice 4471 for October</code></pre><p class="say">One message in the cache, uid 1. Its body stays in SQLite next to the headers.</p></div>
+          <button type="button" class="act run-btn">Run step 1</button>
+        </li>
+        <li class="step" id="step-2">
+          <h3><span class="n">02</span> Reply to it</h3>
+          <p>composeReply builds the reply from the cached original.</p>
+          <pre class="call"><code>const reply = mime.composeReply(original, {
+  text: 'Thanks. Is the 1,280 EUR before or after the volume discount?',
+}, [mika]);
+cache(mime.composeMessage(reply), ['\\Seen']);</code></pre>
+          <div class="result"><pre><code>From: Mika &lt;mika@example.com&gt;
+To: Ops &lt;ops@vendor.example&gt;
+Subject: Re: Invoice 4471 for October
+In-Reply-To: 1792660320000.90c76e10…@vendor.example
+References: 1792660320000.90c76e10…@vendor.example</code></pre><p class="say">The reply points back at the original Message-ID. This only builds the message, like a draft that nobody has sent; sending it would take SMTP.</p></div>
+          <button type="button" class="act run-btn">Run step 2</button>
+        </li>
+        <li class="step" id="step-3">
+          <h3><span class="n">03</span> A note from a friend, then threads</h3>
+          <p>A third message with no headers in common.</p>
+          <pre class="call"><code>cache(mime.composeMessage({ from: ren, to: [mika],
+  subject: 'Climbing on Sunday?', text: 'Gym opens at ten. …' }));
+store.computeThreads(db, inbox.id);
+read.createReadSurface(db, account.id).threads('INBOX');</code></pre>
+          <div class="result"><pre><code>// Climbing on Sunday?        1 message, 1 unread
+//   uid 3  Ren   depth 0
+// Invoice 4471 for October   2 messages, 1 unread
+//   uid 1  Ops   depth 0
+//   uid 2  Mika  depth 1</code></pre><p class="say">Two threads, computed from References and In-Reply-To.</p></div>
+          <button type="button" class="act run-btn">Run step 3</button>
+        </li>
+        <li class="step" id="step-4">
+          <h3><span class="n">04</span> Search for the invoice</h3>
+          <p>Local search over the cache.</p>
+          <pre class="call"><code>rs.search('invoice');
+rs.search('climbing');</code></pre>
+          <div class="result"><pre><code>// invoice  -&gt; uid 1 Ops "Invoice 4471 for October"
+//            uid 2 Mika "Re: Invoice 4471 for October"
+// climbing -&gt; uid 3 Ren "Climbing on Sunday?"</code></pre><p class="say">Both invoice messages, and only Ren's for climbing. No server was asked.</p></div>
+          <button type="button" class="act run-btn">Run step 4</button>
+        </li>
+        <li class="step" id="step-5">
+          <h3><span class="n">05</span> Read the thread as an agent</h3>
+          <p>The <code>mail_read</code> tool, with no write or network surface handed in.</p>
+          <pre class="call"><code>getEmailToolByName('mail_read').handler(
+  { read: rs, write: null, network: null },
+  { view: 'thread', threadId },
+);</code></pre>
+          <div class="result"><pre><code>// { ok: true, outcome: 'success',
+//   summary: 'Thread "Invoice 4471 for October" has 2 message(s).',
+//   next: [{ kind: 'use_tool',
+//     message: 'Use view: "message" to read individual messages in the thread.' }] }</code></pre><p class="say">Reading worked with <code>write: null</code>. The tool never needed the sending side.</p></div>
+          <button type="button" class="act run-btn">Run step 5</button>
+        </li>
+        <li class="step refused" id="step-6">
+          <h3><span class="n">06</span> Ask for a sync without a server</h3>
+          <p><code>mail_sync</code> with a network surface that has no session.</p>
+          <pre class="call"><code>getEmailToolByName('mail_sync').handler(
+  { read: rs, write: null, network: createNetworkSurface(db, { accountId, session: null }) },
+  { action: 'sync' },
+);</code></pre>
+          <div class="result"><pre><code>// { ok: false, outcome: 'error',
+//   summary: 'mail_sync failed: Use Mailbox.connect() — network surface
+//             requires an active IMAP session' }
+// underlying: EmailUnsupportedError, code 'unsupported', retriable: false</code></pre><p class="say">Refused with a typed error. The page stops here because the next step needs a real mailbox.</p></div>
+          <button type="button" class="act run-btn">Run step 6</button>
+        </li>
+      </ol>
+    </div>
+    <div class="run-tools"><button type="button" class="button ghost" id="reset">Start over</button><p id="run-status" role="status"></p></div>
+    <p class="note"><code>cache()</code> is ten lines of our own glue calling <code>mime.parseMessage</code>, <code>store.insertMessage</code>, <code>store.upsertBody</code> and <code>sync.populateFts</code>. In a real setup <code>mailbox.network.sync()</code> fills the cache from IMAP.</p>
+    <p class="note">Search here matched subjects. We do not claim body search for 0.4.0; in our run, changing a cached message row cleared its body from the search index.</p>
+  </section>
+
+  <section class="sec explain" aria-labelledby="explain-title">
+    <div class="sec-head">
+    <h2 id="explain-title">Five tools, and what each one may do</h2>
+    <img class="graph" src="assets/images/art-640.webp" width="640" height="360" alt="A diagonal chain of wireframe envelopes branching like a conversation, cyan lines between them and one reply glowing violet." loading="lazy">
+    </div>
+    <p class="intro">The tools follow what an operator wants done, not IMAP commands. Which ones an agent gets is up to your harness.</p>
+    <dl class="form">
+      <div><dt><code>mail_read</code></dt><dd>Folder lists, message queues, threads, bodies, attachments or raw EML, from the cache.</dd></div>
+      <div><dt><code>mail_search</code></dt><dd>FTS5 local search, or IMAP SEARCH on the server.</dd></div>
+      <div><dt><code>mail_compose</code></dt><dd>Send, reply, forward, and save, update or send drafts.</dd></div>
+      <div><dt><code>mail_organize</code></dt><dd>Flags, labels, copy, move, archive, trash, junk and folder management.</dd></div>
+      <div><dt><code>mail_sync</code></dt><dd>Connect, disconnect, reconnect, sync, refresh folders and watch with IDLE.</dd></div>
+      <div><dt>Thread</dt><dd>A JWZ conversation tree computed from References and In-Reply-To at sync time.</dd></div>
+      <div><dt>Body</dt><dd>Fetched on demand. The first sync pulls headers and BODYSTRUCTURE only.</dd></div>
+    </dl>
+    <p class="note">Each tool returns the same shape: <code>ok</code>, <code>outcome</code>, <code>summary</code>, <code>next</code> and <code>data</code>. The <code>email</code> CLI returns it too with <code>--json</code>.</p>
+  </section>
+
+  <section class="sec worry" aria-labelledby="worry-title">
+    <h2 id="worry-title">If an email package is the dependency you fear most</h2>
+    <div class="worry-grid">
+      <p>An email MCP package once added a single BCC line in a patch release. email cannot promise you anything about other packages, but it keeps its own surface small.</p>
+      <ul>
+        <li>Zero runtime dependencies. It uses only <code>node:sqlite</code>, <code>node:tls</code>, <code>node:net</code>, <code>node:zlib</code> and <code>node:crypto</code>, in one bundled file.</li>
+        <li>The MCP server reads <code>EMAIL_IMAP_HOST</code>, <code>EMAIL_SMTP_HOST</code>, <code>EMAIL_USER</code> and <code>EMAIL_PASS</code> or <code>EMAIL_ACCESS_TOKEN</code> from your environment. Cached reads need no credentials.</li>
+        <li>Cached mail lives in <code>~/.ghostpaw/email.db</code> unless <code>GHOSTPAW_EMAIL_DB</code> or <code>--db</code> says otherwise.</li>
+        <li>IMAP with IDLE, CONDSTORE and QRESYNC, COMPRESS=DEFLATE and XOAUTH2 or OAUTHBEARER; SMTP over TLS or STARTTLS, with a copy appended to Sent.</li>
+        <li>Node.js 24 or newer, because it uses the built-in <code>node:sqlite</code>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="sec numbers" aria-labelledby="numbers-title">
+    <h2 id="numbers-title">What it costs to add</h2>
+    <dl class="ledger">
+      <div><dt>Runtime dependencies</dt><dd>0</dd></div>
+      <div><dt>Node.js</dt><dd>24 or newer (node:sqlite)</dd></div>
+      <div><dt>Size of dist/index.js, gzip</dt><dd>47.5 KB</dd></div>
+      <div><dt>Import time</dt><dd>about 12.3 ms</dd></div>
+      <div><dt>Tests</dt><dd>553 passing</dd></div>
+      <div><dt>Line coverage</dt><dd>94.0%</dd></div>
+      <div><dt>Agent tools</dt><dd>5</dd></div>
+    </dl>
+    <p class="note">Measured 2026-10-24 on the maintainer's machine with Node.js 24.14.0 against email 0.4.0: size of the published dist/index.js at gzip -9, median of 11 cold imports, tests and coverage from the v0.4.0 tag.</p>
+  </section>
+
+  <section class="sec start" aria-labelledby="start-title">
+    <h2 id="start-title">Start from the README</h2>
+    <pre><code>import { Mailbox } from '@ghostpaw/email';
+
+const mailbox = new Mailbox({
+  imap: { host: 'imap.example.com', port: 993, tls: true },
+  smtp: { host: 'smtp.example.com', port: 465, tls: true },
+  auth: { user: 'user@example.com', pass: process.env.EMAIL_PASS },
+  storage: 'mail.db',
+});
+
+await mailbox.connect();
+
+await mailbox.network.sync();
+const messages = mailbox.read.messages('INBOX', { limit: 20 });
+
+await mailbox.disconnect();</code></pre>
+    <p>To run it as an MCP server, add <code>npx -y @ghostpaw/email mcp</code> to your client.</p>
+    <p class="links"><a class="more" href="{{.urls.readme}}">Read the README</a><a href="{{.urls.npm}}">email on npm</a></p>
+    <p class="links"><a href="{{.urls.home}}">All seven GhostPaw libraries</a><a href="{{.urls.agentMemory}}">codex, for memory</a><a href="{{.urls.agentTasks}}">questlog, for tasks</a><a href="{{.urls.agentContacts}}">affinity, for contacts</a><a href="{{.urls.agentIdentity}}">souls, for identity</a><a href="{{.urls.agentSkills}}">grimoire, for skills</a><a href="{{.urls.agentTelegram}}">telegram, for chats</a></p>
+  </section>
+</main>
+<footer class="foot">
+  <p>email is maintained in the open by GhostPaw under the MIT licence.</p>
+  <p class="foot-links"><a href="{{.urls.github}}">Source</a><a href="{{.urls.impressum}}">Impressum</a><a href="{{.urls.privacy}}">Datenschutz</a></p>
+</footer>
+{{script "assets/scripts/main.js"}}
+</body>
+</html>

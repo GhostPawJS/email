@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Attachments · @ghostpaw/email docs</title>
+<meta name="description" content="An attachment is a locally cached MIME part with binary data.">
+<link rel="canonical" href="https://email.ghostpaw.dev/docs/entities/attachments/">
+<link rel="icon" href="../../../favicon.png" type="image/png">
+<link rel="preload" href="../../tektur-var.woff2" as="font" type="font/woff2" crossorigin>
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="GhostPaw">
+<meta property="og:title" content="Attachments · @ghostpaw/email docs">
+<meta property="og:description" content="An attachment is a locally cached MIME part with binary data.">
+<meta property="og:url" content="https://email.ghostpaw.dev/docs/entities/attachments/">
+<meta property="og:image" content="https://email.ghostpaw.dev/docs/share.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Wireframe envelopes in cyan light streaming into a hexagonal vault with a ghost paw on its lid, beside the line: Your agent can read the inbox. Sending is a separate tool.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#04070b">
+<style>@font-face{font-family:"Tektur";src:url("../../tektur-var.woff2") format("woff2");font-weight:500 900;font-stretch:75% 100%;font-display:swap}
+:root{color-scheme:dark;--void:#04070b;--panel:#0a1119;--rule:#1d2c3c;--ghost:#e3edf5;--haze:#93a5b9;--spectral:#62e6f2;--wraith:#b39dff;--display:"Tektur",Bahnschrift,"Arial Narrow",sans-serif;--body:system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--mono:ui-monospace,"Cascadia Mono",Consolas,monospace}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}body{margin:0;background:var(--void);color:var(--ghost);font:400 1rem/1.65 var(--body)}
+a{color:var(--spectral);text-underline-offset:.18em}a:focus-visible{outline:2px solid var(--spectral);outline-offset:2px}
+.skip{position:absolute;left:-999px}.skip:focus{left:1rem;top:1rem;background:var(--panel);padding:.5rem 1rem;z-index:9}
+header{border-bottom:1px solid var(--rule)}.bar{max-width:76rem;margin:0 auto;padding:1rem 1.25rem;display:flex;gap:1.25rem;align-items:center;flex-wrap:wrap}
+.brand{font:700 1.05rem var(--display);color:var(--ghost);text-decoration:none}.brand span{color:var(--spectral)}
+.bar nav{margin-left:auto;display:flex;gap:1.1rem;flex-wrap:wrap}.bar nav a{color:var(--haze);text-decoration:none}.bar nav a:hover{color:var(--ghost)}
+.wrap{max-width:76rem;margin:0 auto;padding:2rem 1.25rem 4rem;display:grid;gap:2.5rem;grid-template-columns:minmax(0,1fr)}
+@media (min-width:60rem){.wrap{grid-template-columns:14rem minmax(0,1fr)}}
+.side .h{font:600 .8rem var(--display);letter-spacing:.06em;text-transform:uppercase;color:var(--haze);margin:1.25rem 0 .4rem}.side .h:first-child{margin-top:0}
+.side ul{list-style:none;margin:0;padding:0}.side li{margin:.15rem 0}.side a{color:var(--haze);text-decoration:none}.side a[aria-current]{color:var(--spectral)}.side a:hover{color:var(--ghost)}
+.ver{display:inline-block;font:500 .85rem var(--mono);color:var(--haze);margin-bottom:.75rem}
+article{min-width:0;max-width:48rem}article h1,article h2,article h3{font-family:var(--display);line-height:1.2;font-weight:700}
+article h1{font-size:clamp(1.9rem,4vw,2.6rem);margin:0 0 1rem}article h2{font-size:1.45rem;margin:2.4rem 0 .75rem;padding-top:1.2rem;border-top:1px solid var(--rule)}article h3{font-size:1.12rem;margin:1.8rem 0 .5rem}
+article code{font:400 .9em var(--mono);color:var(--spectral);overflow-wrap:anywhere}article pre{background:var(--panel);border:1px solid var(--rule);border-left:2px solid var(--wraith);padding:1rem;overflow-x:auto;line-height:1.5}article pre code{color:var(--ghost);overflow-wrap:normal}
+article table{border-collapse:collapse;width:100%;display:block;overflow-x:auto;font-size:.95rem}article th,article td{border:1px solid var(--rule);padding:.45rem .6rem;text-align:left;vertical-align:top}article th{background:var(--panel)}
+article blockquote{margin:1rem 0;padding:.25rem 1rem;border-left:2px solid var(--spectral);color:var(--haze)}
+footer{border-top:1px solid var(--rule)}footer .bar{color:var(--haze);font-size:.9rem}footer .bar nav a{color:var(--haze)}</style>
+</head>
+<body>
+<a class="skip" href="#doc">Skip to the documentation</a>
+<header><div class="bar"><a class="brand" href="https://ghostpaw.dev/">GhostPaw<span>/</span>email</a><nav aria-label="Site"><a href="https://email.ghostpaw.dev/">email</a><a href="../../">Docs</a><a href="https://github.com/GhostPawJS/email">GitHub</a><a href="https://www.npmjs.com/package/@ghostpaw/email">npm</a></nav></div></header>
+<div class="wrap">
+<nav class="side" aria-label="Documentation"><p class="h">Guides</p><ul><li><a href="../../">Overview</a></li><li><a href="../../human/">Using the API</a></li><li><a href="../../llm/">Agent tools and skills</a></li></ul><p class="h">Concepts</p><ul><li><a href="../../entities/accounts/">Accounts</a></li><li><a href="../../entities/attachments/" aria-current="page">Attachments</a></li><li><a href="../../entities/bodies/">Bodies</a></li><li><a href="../../entities/folders/">Folders</a></li><li><a href="../../entities/messages/">Messages</a></li><li><a href="../../entities/sync/">Sync</a></li><li><a href="../../entities/threads/">Threads</a></li></ul><p class="h">Source</p><ul><li><a href="https://github.com/GhostPawJS/email/blob/main/docs/CONCEPT.md">Design concept</a></li><li><a href="https://github.com/GhostPawJS/email#readme">README</a></li><li><a href="https://github.com/GhostPawJS/email/blob/main/CHANGELOG.md">Changelog</a></li></ul></nav>
+<main id="doc"><article><span class="ver">@ghostpaw/email 0.4.0</span>
+<h1 id="attachments">Attachments</h1>
+<p>An attachment is a locally cached MIME part with binary data.</p>
+<p>Like bodies, attachments are not fetched during initial sync. Attachment
+metadata (filename, MIME type, size) is derived from the <code>body_structure</code>
+column on the message and stored without requiring the content bytes. The
+binary data is fetched separately on demand.</p>
+<h2 id="schema">Schema</h2>
+<p>Stored in the <code>attachments</code> table:</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td>Primary key</td>
+</tr>
+<tr>
+<td><code>message_id</code></td>
+<td>INTEGER</td>
+<td>Foreign key → <code>messages.id</code></td>
+</tr>
+<tr>
+<td><code>filename</code></td>
+<td>TEXT</td>
+<td>Decoded filename from <code>Content-Disposition</code> or <code>Content-Type name</code></td>
+</tr>
+<tr>
+<td><code>mime_type</code></td>
+<td>TEXT</td>
+<td>Full MIME type (<code>image/png</code>, <code>application/pdf</code>, etc.)</td>
+</tr>
+<tr>
+<td><code>size</code></td>
+<td>INTEGER</td>
+<td>Decoded size in bytes (from BODYSTRUCTURE)</td>
+</tr>
+<tr>
+<td><code>content_id</code></td>
+<td>TEXT</td>
+<td><code>Content-ID:</code> value for inline embedded images</td>
+</tr>
+<tr>
+<td><code>part_path</code></td>
+<td>TEXT</td>
+<td>IMAP BODYSTRUCTURE part path (e.g. <code>1</code>, <code>2</code>, <code>1.2</code>)</td>
+</tr>
+<tr>
+<td><code>inline_flag</code></td>
+<td>INTEGER</td>
+<td><code>1</code> for <code>Content-Disposition: inline</code> parts, <code>0</code> for <code>attachment</code></td>
+</tr>
+<tr>
+<td><code>data</code></td>
+<td>BLOB</td>
+<td>Decoded binary content (null until fetched)</td>
+</tr>
+</tbody></table>
+<h2 id="part-path">Part Path</h2>
+<p>The <code>part_path</code> value is the IMAP BODYSTRUCTURE section number used to fetch
+this specific part:</p>
+<ul>
+<li><code>1</code>: first top-level part</li>
+<li><code>2</code>: second top-level part</li>
+<li><code>1.2</code>: second part inside the first multipart part</li>
+</ul>
+<p>This path is passed directly to the <code>FETCH</code> command as the section specifier.</p>
+<h2 id="metadata-without-content">Metadata Without Content</h2>
+<p>Attachment metadata (all columns except <code>data</code>) is populated during sync from
+the decoded BODYSTRUCTURE. This means:</p>
+<ul>
+<li><code>mailbox.read.listAttachments(folder, uid)</code> works without any body fetch</li>
+<li><code>has_attachments</code> on the message row is set during sync, not during body fetch</li>
+<li>Content bytes are only pulled when <code>mailbox.read.getAttachment()</code> is called</li>
+</ul>
+<h2 id="local-store-operations">Local Store Operations</h2>
+<p>Store functions are accessible through the <code>store</code> namespace:</p>
+<pre><code class="language-ts">import { store } from &#39;@ghostpaw/email&#39;;
+
+// Insert metadata (no data yet).
+const meta = store.insertAttachment(db, {
+  messageId: message.id,
+  partPath: &#39;2&#39;,
+  filename: &#39;contract.pdf&#39;,
+  mimeType: &#39;application/pdf&#39;,
+  size: 142500,
+  inline: false,
+  contentId: null,
+});
+
+// List all attachment metadata for a message (fast, no network needed).
+const metas = store.listAttachments(db, message.id);
+
+// Get one attachment&#39;s data by message and part path.
+const data = store.getAttachmentData(db, message.id, &#39;2&#39;);
+
+// Update attachment data after fetching from server.
+store.updateAttachmentData(db, message.id, &#39;2&#39;, buffer);
+</code></pre>
+<p>Fetch content through the read surface (triggers IMAP FETCH if needed):</p>
+<pre><code class="language-ts">const withData = await mailbox.read.getAttachment(&#39;INBOX&#39;, uid, &#39;2&#39;);
+// withData.data is a Buffer with the decoded bytes.
+</code></pre>
+<h2 id="inline-attachments">Inline Attachments</h2>
+<p><code>inline_flag: 1</code> indicates a <code>Content-Disposition: inline</code> part, typically an
+embedded image in an HTML email. These parts have a <code>content_id</code> value that
+matches a <code>cid:</code> URI in the HTML body.</p>
+<p>When rendering HTML with embedded images, replace <code>cid:&lt;contentId&gt;</code> URIs with
+data URIs or served URLs derived from the fetched attachment bytes.</p>
+<h2 id="invariants">Invariants</h2>
+<ul>
+<li>Multiple attachment rows can exist per <code>messages.id</code> (one per MIME part)</li>
+<li><code>part_path</code> should be unique per message (enforced at the application level)</li>
+<li><code>data</code> is null until the binary bytes have been fetched from the server</li>
+<li>All attachment rows for a message are deleted when the parent message is deleted (ON DELETE CASCADE)</li>
+<li><code>size</code> reflects the decoded (not encoded) byte count, as reported by BODYSTRUCTURE</li>
+</ul>
+</article></main>
+</div>
+<footer><div class="bar"><span>Rendered from <a href="https://github.com/GhostPawJS/email/tree/main/docs">docs/</a> in the repository, MIT licensed.</span><nav aria-label="Legal"><a href="https://ghostpaw.dev/">All GhostPaw libraries</a><a href="https://lab.anonyfox.com/impressum/">Impressum</a><a href="https://lab.anonyfox.com/datenschutz/">Datenschutz</a></nav></div></footer>
+</body>
+</html>

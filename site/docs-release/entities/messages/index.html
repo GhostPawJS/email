@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Messages · @ghostpaw/email docs</title>
+<meta name="description" content="A message is a locally cached email header record tied to one folder and one UID.">
+<link rel="canonical" href="https://email.ghostpaw.dev/docs/entities/messages/">
+<link rel="icon" href="../../../favicon.png" type="image/png">
+<link rel="preload" href="../../tektur-var.woff2" as="font" type="font/woff2" crossorigin>
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="GhostPaw">
+<meta property="og:title" content="Messages · @ghostpaw/email docs">
+<meta property="og:description" content="A message is a locally cached email header record tied to one folder and one UID.">
+<meta property="og:url" content="https://email.ghostpaw.dev/docs/entities/messages/">
+<meta property="og:image" content="https://email.ghostpaw.dev/docs/share.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Wireframe envelopes in cyan light streaming into a hexagonal vault with a ghost paw on its lid, beside the line: Your agent can read the inbox. Sending is a separate tool.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#04070b">
+<style>@font-face{font-family:"Tektur";src:url("../../tektur-var.woff2") format("woff2");font-weight:500 900;font-stretch:75% 100%;font-display:swap}
+:root{color-scheme:dark;--void:#04070b;--panel:#0a1119;--rule:#1d2c3c;--ghost:#e3edf5;--haze:#93a5b9;--spectral:#62e6f2;--wraith:#b39dff;--display:"Tektur",Bahnschrift,"Arial Narrow",sans-serif;--body:system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--mono:ui-monospace,"Cascadia Mono",Consolas,monospace}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}body{margin:0;background:var(--void);color:var(--ghost);font:400 1rem/1.65 var(--body)}
+a{color:var(--spectral);text-underline-offset:.18em}a:focus-visible{outline:2px solid var(--spectral);outline-offset:2px}
+.skip{position:absolute;left:-999px}.skip:focus{left:1rem;top:1rem;background:var(--panel);padding:.5rem 1rem;z-index:9}
+header{border-bottom:1px solid var(--rule)}.bar{max-width:76rem;margin:0 auto;padding:1rem 1.25rem;display:flex;gap:1.25rem;align-items:center;flex-wrap:wrap}
+.brand{font:700 1.05rem var(--display);color:var(--ghost);text-decoration:none}.brand span{color:var(--spectral)}
+.bar nav{margin-left:auto;display:flex;gap:1.1rem;flex-wrap:wrap}.bar nav a{color:var(--haze);text-decoration:none}.bar nav a:hover{color:var(--ghost)}
+.wrap{max-width:76rem;margin:0 auto;padding:2rem 1.25rem 4rem;display:grid;gap:2.5rem;grid-template-columns:minmax(0,1fr)}
+@media (min-width:60rem){.wrap{grid-template-columns:14rem minmax(0,1fr)}}
+.side .h{font:600 .8rem var(--display);letter-spacing:.06em;text-transform:uppercase;color:var(--haze);margin:1.25rem 0 .4rem}.side .h:first-child{margin-top:0}
+.side ul{list-style:none;margin:0;padding:0}.side li{margin:.15rem 0}.side a{color:var(--haze);text-decoration:none}.side a[aria-current]{color:var(--spectral)}.side a:hover{color:var(--ghost)}
+.ver{display:inline-block;font:500 .85rem var(--mono);color:var(--haze);margin-bottom:.75rem}
+article{min-width:0;max-width:48rem}article h1,article h2,article h3{font-family:var(--display);line-height:1.2;font-weight:700}
+article h1{font-size:clamp(1.9rem,4vw,2.6rem);margin:0 0 1rem}article h2{font-size:1.45rem;margin:2.4rem 0 .75rem;padding-top:1.2rem;border-top:1px solid var(--rule)}article h3{font-size:1.12rem;margin:1.8rem 0 .5rem}
+article code{font:400 .9em var(--mono);color:var(--spectral);overflow-wrap:anywhere}article pre{background:var(--panel);border:1px solid var(--rule);border-left:2px solid var(--wraith);padding:1rem;overflow-x:auto;line-height:1.5}article pre code{color:var(--ghost);overflow-wrap:normal}
+article table{border-collapse:collapse;width:100%;display:block;overflow-x:auto;font-size:.95rem}article th,article td{border:1px solid var(--rule);padding:.45rem .6rem;text-align:left;vertical-align:top}article th{background:var(--panel)}
+article blockquote{margin:1rem 0;padding:.25rem 1rem;border-left:2px solid var(--spectral);color:var(--haze)}
+footer{border-top:1px solid var(--rule)}footer .bar{color:var(--haze);font-size:.9rem}footer .bar nav a{color:var(--haze)}</style>
+</head>
+<body>
+<a class="skip" href="#doc">Skip to the documentation</a>
+<header><div class="bar"><a class="brand" href="https://ghostpaw.dev/">GhostPaw<span>/</span>email</a><nav aria-label="Site"><a href="https://email.ghostpaw.dev/">email</a><a href="../../">Docs</a><a href="https://github.com/GhostPawJS/email">GitHub</a><a href="https://www.npmjs.com/package/@ghostpaw/email">npm</a></nav></div></header>
+<div class="wrap">
+<nav class="side" aria-label="Documentation"><p class="h">Guides</p><ul><li><a href="../../">Overview</a></li><li><a href="../../human/">Using the API</a></li><li><a href="../../llm/">Agent tools and skills</a></li></ul><p class="h">Concepts</p><ul><li><a href="../../entities/accounts/">Accounts</a></li><li><a href="../../entities/attachments/">Attachments</a></li><li><a href="../../entities/bodies/">Bodies</a></li><li><a href="../../entities/folders/">Folders</a></li><li><a href="../../entities/messages/" aria-current="page">Messages</a></li><li><a href="../../entities/sync/">Sync</a></li><li><a href="../../entities/threads/">Threads</a></li></ul><p class="h">Source</p><ul><li><a href="https://github.com/GhostPawJS/email/blob/main/docs/CONCEPT.md">Design concept</a></li><li><a href="https://github.com/GhostPawJS/email#readme">README</a></li><li><a href="https://github.com/GhostPawJS/email/blob/main/CHANGELOG.md">Changelog</a></li></ul></nav>
+<main id="doc"><article><span class="ver">@ghostpaw/email 0.4.0</span>
+<h1 id="messages">Messages</h1>
+<p>A message is a locally cached email header record tied to one folder and one UID.</p>
+<p>The message row stores all RFC 2822 and IMAP envelope fields. Body content
+lives in a separate <code>bodies</code> row and is fetched on demand.</p>
+<h2 id="schema">Schema</h2>
+<p>Stored in the <code>messages</code> table:</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td>Primary key</td>
+</tr>
+<tr>
+<td><code>folder_id</code></td>
+<td>INTEGER</td>
+<td>Foreign key → <code>folders.id</code></td>
+</tr>
+<tr>
+<td><code>uid</code></td>
+<td>INTEGER</td>
+<td>IMAP UID for this message in this folder</td>
+</tr>
+<tr>
+<td><code>message_id</code></td>
+<td>TEXT</td>
+<td>RFC 2822 <code>Message-ID:</code> header</td>
+</tr>
+<tr>
+<td><code>in_reply_to</code></td>
+<td>TEXT</td>
+<td>RFC 2822 <code>In-Reply-To:</code> header</td>
+</tr>
+<tr>
+<td><code>references</code></td>
+<td>TEXT</td>
+<td>JSON-encoded <code>string[]</code> of <code>References:</code> header values</td>
+</tr>
+<tr>
+<td><code>thread_id</code></td>
+<td>TEXT</td>
+<td>Computed JWZ thread identifier</td>
+</tr>
+<tr>
+<td><code>subject</code></td>
+<td>TEXT</td>
+<td>Decoded subject line</td>
+</tr>
+<tr>
+<td><code>from</code></td>
+<td>TEXT</td>
+<td>JSON-encoded <code>Address</code> (<code>{ name?, address }</code>)</td>
+</tr>
+<tr>
+<td><code>to</code></td>
+<td>TEXT</td>
+<td>JSON-encoded <code>Address[]</code></td>
+</tr>
+<tr>
+<td><code>cc</code></td>
+<td>TEXT</td>
+<td>JSON-encoded <code>Address[]</code></td>
+</tr>
+<tr>
+<td><code>bcc</code></td>
+<td>TEXT</td>
+<td>JSON-encoded <code>Address[]</code></td>
+</tr>
+<tr>
+<td><code>reply_to</code></td>
+<td>TEXT</td>
+<td>JSON-encoded <code>Address</code></td>
+</tr>
+<tr>
+<td><code>envelope_from</code></td>
+<td>TEXT</td>
+<td>JSON-encoded <code>Address</code> (SMTP envelope sender)</td>
+</tr>
+<tr>
+<td><code>envelope_to</code></td>
+<td>TEXT</td>
+<td>JSON-encoded <code>Address[]</code> (SMTP envelope recipients)</td>
+</tr>
+<tr>
+<td><code>date</code></td>
+<td>TEXT</td>
+<td>ISO string from RFC 2822 <code>Date:</code> header</td>
+</tr>
+<tr>
+<td><code>received_at</code></td>
+<td>TEXT</td>
+<td>Local ingest timestamp</td>
+</tr>
+<tr>
+<td><code>flags</code></td>
+<td>TEXT</td>
+<td>JSON-encoded <code>string[]</code> of IMAP flags, default <code>&#39;[]&#39;</code></td>
+</tr>
+<tr>
+<td><code>labels</code></td>
+<td>TEXT</td>
+<td>JSON-encoded <code>string[]</code> of IMAP keywords (Gmail labels), default <code>&#39;[]&#39;</code></td>
+</tr>
+<tr>
+<td><code>size</code></td>
+<td>INTEGER</td>
+<td>Message size in bytes (IMAP RFC822.SIZE)</td>
+</tr>
+<tr>
+<td><code>body_structure</code></td>
+<td>TEXT</td>
+<td>JSON-encoded <code>BodyPart</code> MIME tree</td>
+</tr>
+<tr>
+<td><code>has_attachments</code></td>
+<td>INTEGER</td>
+<td><code>1</code> if any attachment part is present, default <code>0</code></td>
+</tr>
+<tr>
+<td><code>mod_seq</code></td>
+<td>INTEGER</td>
+<td>HIGHESTMODSEQ at last flag sync (CONDSTORE)</td>
+</tr>
+</tbody></table>
+<h2 id="flags">Flags</h2>
+<p>IMAP system flags follow RFC 3501 semantics:</p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>\Seen</code></td>
+<td>Read by at least one client</td>
+</tr>
+<tr>
+<td><code>\Flagged</code></td>
+<td>Starred / important</td>
+</tr>
+<tr>
+<td><code>\Answered</code></td>
+<td>A reply was sent</td>
+</tr>
+<tr>
+<td><code>\Deleted</code></td>
+<td>Marked for expunge (not yet removed)</td>
+</tr>
+<tr>
+<td><code>\Draft</code></td>
+<td>A draft message</td>
+</tr>
+</tbody></table>
+<p>User keywords (Gmail labels, custom tags) are stored in <code>labels</code> separately
+from system flags.</p>
+<h2 id="thread-id">Thread ID</h2>
+<p><code>thread_id</code> is computed by the sync engine using the JWZ algorithm applied to
+the <code>references</code> and <code>in_reply_to</code> headers. It is a stable string identifier
+for the conversation tree. Messages with the same <code>thread_id</code> belong to the
+same thread.</p>
+<p>Thread IDs are re-computed during sync. They are not stored in a separate
+table, they are columns on the message row, used for grouping at read time.</p>
+<h2 id="fts5-index">FTS5 Index</h2>
+<p>The <code>messages_fts</code> table is a standalone FTS5 virtual table populated during
+sync. It indexes <code>subject</code>, <code>from_address</code>, <code>preview_text</code>, and <code>body_text</code>
+(from the body row when available). It supports:</p>
+<ul>
+<li>Boolean operators (<code>AND</code>, <code>OR</code>, <code>NOT</code>)</li>
+<li>Phrase queries (<code>&quot;exact phrase&quot;</code>)</li>
+<li>Prefix queries (<code>subject*</code>)</li>
+<li>Column-scoped queries (<code>subject:report</code>)</li>
+</ul>
+<p>The FTS index is managed by the sync engine. It is not kept in sync by
+triggers, it is populated and updated during <code>network.sync()</code> passes.</p>
+<h2 id="local-store-operations">Local Store Operations</h2>
+<p>Store functions are accessible through the <code>store</code> namespace:</p>
+<pre><code class="language-ts">import { store } from &#39;@ghostpaw/email&#39;;
+
+const message = store.insertMessage(db, { folderId, uid, subject, from, to, flags, ... });
+const byId = store.getMessageById(db, message.id);
+const byUid = store.getMessage(db, folderId, uid);
+const all = store.listMessages(db, folderId, { limit: 50, sort: &#39;date&#39;, order: &#39;desc&#39; });
+
+store.updateMessageFlags(db, message.id, [&#39;\\Seen&#39;, &#39;\\Flagged&#39;]);
+
+const results = store.searchMessages(db, &#39;quarterly report&#39;);
+store.deleteMessages(db, [message.id]);
+</code></pre>
+<p>Batch insertion for sync (with <code>INSERT OR IGNORE</code> semantics for idempotency):</p>
+<pre><code class="language-ts">store.insertMessagesBatch(db, [input1, input2, input3]);
+</code></pre>
+<p>Flag changes through the write surface also send IMAP STORE commands and
+update <code>mod_seq</code>:</p>
+<pre><code class="language-ts">await mailbox.write.markRead(&#39;INBOX&#39;, [uid]);
+await mailbox.write.star(&#39;INBOX&#39;, [uid]);
+await mailbox.write.markAnswered(&#39;INBOX&#39;, [uid]);
+</code></pre>
+<h2 id="invariants">Invariants</h2>
+<ul>
+<li>One <code>messages</code> row per <code>(folder_id, uid)</code> combination</li>
+<li>Deleting a message cascades to its body and attachments</li>
+<li><code>thread_id</code> is derived, not user-supplied; it is always assigned by the sync engine</li>
+<li><code>body_structure</code> is a decoded BodyPart tree (from IMAP BODYSTRUCTURE response), not the raw IMAP list</li>
+<li>All JSON-encoded columns (<code>references</code>, <code>flags</code>, <code>labels</code>, etc.) are always valid JSON arrays or objects; null means the value is unknown or absent</li>
+</ul>
+</article></main>
+</div>
+<footer><div class="bar"><span>Rendered from <a href="https://github.com/GhostPawJS/email/tree/main/docs">docs/</a> in the repository, MIT licensed.</span><nav aria-label="Legal"><a href="https://ghostpaw.dev/">All GhostPaw libraries</a><a href="https://lab.anonyfox.com/impressum/">Impressum</a><a href="https://lab.anonyfox.com/datenschutz/">Datenschutz</a></nav></div></footer>
+</body>
+</html>

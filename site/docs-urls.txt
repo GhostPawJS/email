@@ -1,0 +1,10 @@
+https://email.ghostpaw.dev/docs/
+https://email.ghostpaw.dev/docs/human/
+https://email.ghostpaw.dev/docs/llm/
+https://email.ghostpaw.dev/docs/entities/accounts/
+https://email.ghostpaw.dev/docs/entities/attachments/
+https://email.ghostpaw.dev/docs/entities/bodies/
+https://email.ghostpaw.dev/docs/entities/folders/
+https://email.ghostpaw.dev/docs/entities/messages/
+https://email.ghostpaw.dev/docs/entities/sync/
+https://email.ghostpaw.dev/docs/entities/threads/

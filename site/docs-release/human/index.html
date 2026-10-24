@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Human Usage · @ghostpaw/email docs</title>
+<meta name="description" content="This document is for developers using @ghostpaw/email directly in code.">
+<link rel="canonical" href="https://email.ghostpaw.dev/docs/human/">
+<link rel="icon" href="../../favicon.png" type="image/png">
+<link rel="preload" href="../tektur-var.woff2" as="font" type="font/woff2" crossorigin>
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="GhostPaw">
+<meta property="og:title" content="Human Usage · @ghostpaw/email docs">
+<meta property="og:description" content="This document is for developers using @ghostpaw/email directly in code.">
+<meta property="og:url" content="https://email.ghostpaw.dev/docs/human/">
+<meta property="og:image" content="https://email.ghostpaw.dev/docs/share.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Wireframe envelopes in cyan light streaming into a hexagonal vault with a ghost paw on its lid, beside the line: Your agent can read the inbox. Sending is a separate tool.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#04070b">
+<style>@font-face{font-family:"Tektur";src:url("../tektur-var.woff2") format("woff2");font-weight:500 900;font-stretch:75% 100%;font-display:swap}
+:root{color-scheme:dark;--void:#04070b;--panel:#0a1119;--rule:#1d2c3c;--ghost:#e3edf5;--haze:#93a5b9;--spectral:#62e6f2;--wraith:#b39dff;--display:"Tektur",Bahnschrift,"Arial Narrow",sans-serif;--body:system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--mono:ui-monospace,"Cascadia Mono",Consolas,monospace}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}body{margin:0;background:var(--void);color:var(--ghost);font:400 1rem/1.65 var(--body)}
+a{color:var(--spectral);text-underline-offset:.18em}a:focus-visible{outline:2px solid var(--spectral);outline-offset:2px}
+.skip{position:absolute;left:-999px}.skip:focus{left:1rem;top:1rem;background:var(--panel);padding:.5rem 1rem;z-index:9}
+header{border-bottom:1px solid var(--rule)}.bar{max-width:76rem;margin:0 auto;padding:1rem 1.25rem;display:flex;gap:1.25rem;align-items:center;flex-wrap:wrap}
+.brand{font:700 1.05rem var(--display);color:var(--ghost);text-decoration:none}.brand span{color:var(--spectral)}
+.bar nav{margin-left:auto;display:flex;gap:1.1rem;flex-wrap:wrap}.bar nav a{color:var(--haze);text-decoration:none}.bar nav a:hover{color:var(--ghost)}
+.wrap{max-width:76rem;margin:0 auto;padding:2rem 1.25rem 4rem;display:grid;gap:2.5rem;grid-template-columns:minmax(0,1fr)}
+@media (min-width:60rem){.wrap{grid-template-columns:14rem minmax(0,1fr)}}
+.side .h{font:600 .8rem var(--display);letter-spacing:.06em;text-transform:uppercase;color:var(--haze);margin:1.25rem 0 .4rem}.side .h:first-child{margin-top:0}
+.side ul{list-style:none;margin:0;padding:0}.side li{margin:.15rem 0}.side a{color:var(--haze);text-decoration:none}.side a[aria-current]{color:var(--spectral)}.side a:hover{color:var(--ghost)}
+.ver{display:inline-block;font:500 .85rem var(--mono);color:var(--haze);margin-bottom:.75rem}
+article{min-width:0;max-width:48rem}article h1,article h2,article h3{font-family:var(--display);line-height:1.2;font-weight:700}
+article h1{font-size:clamp(1.9rem,4vw,2.6rem);margin:0 0 1rem}article h2{font-size:1.45rem;margin:2.4rem 0 .75rem;padding-top:1.2rem;border-top:1px solid var(--rule)}article h3{font-size:1.12rem;margin:1.8rem 0 .5rem}
+article code{font:400 .9em var(--mono);color:var(--spectral);overflow-wrap:anywhere}article pre{background:var(--panel);border:1px solid var(--rule);border-left:2px solid var(--wraith);padding:1rem;overflow-x:auto;line-height:1.5}article pre code{color:var(--ghost);overflow-wrap:normal}
+article table{border-collapse:collapse;width:100%;display:block;overflow-x:auto;font-size:.95rem}article th,article td{border:1px solid var(--rule);padding:.45rem .6rem;text-align:left;vertical-align:top}article th{background:var(--panel)}
+article blockquote{margin:1rem 0;padding:.25rem 1rem;border-left:2px solid var(--spectral);color:var(--haze)}
+footer{border-top:1px solid var(--rule)}footer .bar{color:var(--haze);font-size:.9rem}footer .bar nav a{color:var(--haze)}</style>
+</head>
+<body>
+<a class="skip" href="#doc">Skip to the documentation</a>
+<header><div class="bar"><a class="brand" href="https://ghostpaw.dev/">GhostPaw<span>/</span>email</a><nav aria-label="Site"><a href="https://email.ghostpaw.dev/">email</a><a href="../">Docs</a><a href="https://github.com/GhostPawJS/email">GitHub</a><a href="https://www.npmjs.com/package/@ghostpaw/email">npm</a></nav></div></header>
+<div class="wrap">
+<nav class="side" aria-label="Documentation"><p class="h">Guides</p><ul><li><a href="../">Overview</a></li><li><a href="../human/" aria-current="page">Using the API</a></li><li><a href="../llm/">Agent tools and skills</a></li></ul><p class="h">Concepts</p><ul><li><a href="../entities/accounts/">Accounts</a></li><li><a href="../entities/attachments/">Attachments</a></li><li><a href="../entities/bodies/">Bodies</a></li><li><a href="../entities/folders/">Folders</a></li><li><a href="../entities/messages/">Messages</a></li><li><a href="../entities/sync/">Sync</a></li><li><a href="../entities/threads/">Threads</a></li></ul><p class="h">Source</p><ul><li><a href="https://github.com/GhostPawJS/email/blob/main/docs/CONCEPT.md">Design concept</a></li><li><a href="https://github.com/GhostPawJS/email#readme">README</a></li><li><a href="https://github.com/GhostPawJS/email/blob/main/CHANGELOG.md">Changelog</a></li></ul></nav>
+<main id="doc"><article><span class="ver">@ghostpaw/email 0.4.0</span>
+<h1 id="human-usage">Human Usage</h1>
+<p>This document is for developers using <code>@ghostpaw/email</code> directly in code.</p>
+<p>It assumes a human developer or operator is working with the <code>Mailbox</code> class
+and the typed surfaces it exposes: <code>read</code>, <code>write</code>, and <code>network</code>.</p>
+<p>If you are wiring this package into an agent or LLM harness, read <code>LLM.md</code>
+instead. That document covers the soul, tools, and skills layers.</p>
+<h2 id="what-this-surface-is-for">What This Surface Is For</h2>
+<p><code>@ghostpaw/email</code> is strongest when used as a complete mailbox engine, not as
+a thin IMAP wrapper.</p>
+<p>A complete human usage pattern looks like:</p>
+<ul>
+<li>construct a <code>Mailbox</code> with account config</li>
+<li>connect (initialises the local schema, upserts the account, opens the IMAP session)</li>
+<li>sync to materialise the local cache</li>
+<li>read from the cache for fast, offline-capable access</li>
+<li>write flag changes and composed messages back through the protocol</li>
+<li>watch for new messages via IDLE when staying connected</li>
+<li>disconnect when done</li>
+</ul>
+<h2 id="setup">Setup</h2>
+<pre><code class="language-ts">import { Mailbox } from &#39;@ghostpaw/email&#39;;
+import type { EmailConfig } from &#39;@ghostpaw/email&#39;;
+
+const config: EmailConfig = {
+  imap: { host: &#39;imap.example.com&#39;, port: 993, tls: true },
+  smtp: { host: &#39;smtp.example.com&#39;, port: 465, tls: true },
+  auth: { user: &#39;user@example.com&#39;, pass: &#39;secret&#39; },
+  storage: &#39;mail.db&#39;,
+};
+
+const mailbox = new Mailbox(config);
+await mailbox.connect();
+</code></pre>
+<p><code>connect()</code> opens the SQLite database at the <code>storage</code> path (or <code>:memory:</code> if
+omitted), runs <code>initSchema</code>, upserts the account row, and authenticates the
+IMAP session, all in one call.</p>
+<p>For OAuth2 providers (Gmail, Outlook), use an access-token auth config with a
+<code>refreshFn</code> callback:</p>
+<pre><code class="language-ts">const config: EmailConfig = {
+  imap: { host: &#39;imap.gmail.com&#39;, port: 993, tls: true },
+  smtp: { host: &#39;smtp.gmail.com&#39;, port: 465, tls: true },
+  auth: {
+    user: &#39;user@gmail.com&#39;,
+    accessToken: currentToken,
+    refreshFn: async () =&gt; refreshedToken,
+  },
+  storage: &#39;gmail.db&#39;,
+};
+</code></pre>
+<p>For SASL mechanisms, use the generic mechanism form:</p>
+<pre><code class="language-ts">const config: EmailConfig = {
+  imap: { host: &#39;imap.provider.com&#39;, port: 993, tls: true },
+  smtp: { host: &#39;smtp.provider.com&#39;, port: 465, tls: true },
+  auth: {
+    mechanism: &#39;XOAUTH2&#39;,
+    credentials: { user: &#39;user@provider.com&#39;, token: bearerToken },
+  },
+};
+</code></pre>
+<h2 id="connection-lifecycle">Connection Lifecycle</h2>
+<pre><code class="language-ts">// Connect: opens DB, initialises schema, upserts account, authenticates IMAP.
+await mailbox.connect();
+
+// Sync all subscribed folders (incremental by default).
+const result = await mailbox.network.sync();
+console.log(`${result.totalNew} new, ${result.totalExpunged} expunged`);
+
+// Refresh the folder list from the server (detects new folders, role changes).
+const folders = await mailbox.network.refreshFolders();
+
+// Disconnect gracefully (closes IMAP session and SQLite database).
+await mailbox.disconnect();
+</code></pre>
+<p>After disconnecting, a new <code>Mailbox</code> instance must be created to reconnect.
+Within an active session, use <code>mailbox.network.reconnect()</code> for transient
+failures (exponential back-off, up to 5 attempts).</p>
+<h2 id="reading-local-state">Reading Local State</h2>
+<p>All <code>read.*</code> calls are synchronous and operate against the local cache. No
+network is required.</p>
+<h3 id="folders">Folders</h3>
+<pre><code class="language-ts">const folders = mailbox.read.folders();
+// [{ id, accountId, path, role, uidValidity, uidNext, unseenCount, ... }]
+
+const status = mailbox.read.folderStatus(&#39;INBOX&#39;);
+// { messages, unseen, uidNext, uidValidity, highestModSeq }
+</code></pre>
+<h3 id="messages">Messages</h3>
+<pre><code class="language-ts">const messages = mailbox.read.messages(&#39;INBOX&#39;, {
+  limit: 50,
+  sort: &#39;date&#39;,
+  order: &#39;desc&#39;,
+});
+// Returns Message[] — header-only, no body content.
+</code></pre>
+<h3 id="message-detail-with-body">Message Detail (with body)</h3>
+<p><code>getMessage</code> is async because it fetches the body on demand if not cached:</p>
+<pre><code class="language-ts">const detail = await mailbox.read.getMessage(&#39;INBOX&#39;, uid);
+// Returns MessageDetail — includes textPlain, textHtml, attachments[].
+</code></pre>
+<h3 id="threads">Threads</h3>
+<pre><code class="language-ts">const threads = mailbox.read.threads(&#39;INBOX&#39;, { limit: 20 });
+// Returns Thread[] — each thread has messages[] sorted by date.
+
+const thread = mailbox.read.getThread(&#39;thread-id-string&#39;);
+// Returns one Thread with full ThreadMessage[] (includes depth for nesting).
+</code></pre>
+<h3 id="attachments">Attachments</h3>
+<pre><code class="language-ts">const metas = mailbox.read.listAttachments(&#39;INBOX&#39;, uid);
+// Returns AttachmentMeta[] — filename, mimeType, size, partPath, inline.
+
+// Fetch binary bytes (async — triggers IMAP FETCH if not cached).
+const att = await mailbox.read.getAttachment(&#39;INBOX&#39;, uid, &#39;2&#39;);
+// Returns Attachment — AttachmentMeta + data: Buffer.
+</code></pre>
+<h3 id="search">Search</h3>
+<pre><code class="language-ts">const results = mailbox.read.search(&#39;quarterly report&#39;, {
+  folder: &#39;INBOX&#39;,
+  since: new Date(&#39;2026-01-01&#39;),
+  unreadOnly: true,
+  limit: 25,
+});
+// Returns Message[] matching FTS5 query.
+</code></pre>
+<h3 id="stats">Stats</h3>
+<pre><code class="language-ts">const stats = mailbox.read.stats();
+// { folders: [{ path, role, total, unread }], totalMessages, totalUnread,
+//   lastSyncedAt, storageUsed }
+</code></pre>
+<h2 id="remote-operations">Remote Operations</h2>
+<p>Some read operations require a live IMAP session:</p>
+<pre><code class="language-ts">// Fetch a message body from the server (useful when local cache is stale).
+const body = await mailbox.network.fetchBody(&#39;INBOX&#39;, uid);
+
+// Fetch a specific MIME attachment part.
+const att = await mailbox.network.fetchAttachment(&#39;INBOX&#39;, uid, &#39;1.2&#39;);
+
+// Run IMAP SEARCH on the server (returns UIDs).
+const uids = await mailbox.network.searchRemote(&#39;INBOX&#39;, {
+  unseen: true,
+  since: new Date(&#39;2026-01-01&#39;),
+});
+</code></pre>
+<h2 id="writing-flag-changes">Writing Flag Changes</h2>
+<p>All <code>write.*</code> calls are async. Flag operations send IMAP STORE commands and
+update the local cache on success.</p>
+<pre><code class="language-ts">// Mark as read / unread.
+await mailbox.write.markRead(&#39;INBOX&#39;, [42, 43]);
+await mailbox.write.markUnread(&#39;INBOX&#39;, [42]);
+
+// Star / unstar (sets/clears \Flagged).
+await mailbox.write.star(&#39;INBOX&#39;, [42]);
+await mailbox.write.unstar(&#39;INBOX&#39;, [42]);
+
+// Mark as answered (sets \Answered flag).
+await mailbox.write.markAnswered(&#39;INBOX&#39;, [42]);
+</code></pre>
+<h2 id="organizing-messages">Organizing Messages</h2>
+<pre><code class="language-ts">// Copy to another folder (leaves original in place).
+await mailbox.write.copyTo(&#39;INBOX&#39;, [42], &#39;Archive/2026&#39;);
+
+// Move (COPY + STORE \Deleted + EXPUNGE).
+await mailbox.write.moveTo(&#39;INBOX&#39;, [42], &#39;Archive/2026&#39;);
+
+// Archive to server-detected Archive folder.
+await mailbox.write.archive(&#39;INBOX&#39;, [42]);
+
+// Trash to server-detected Trash folder.
+await mailbox.write.trash(&#39;INBOX&#39;, [42]);
+
+// Move to Junk.
+await mailbox.write.moveToJunk(&#39;INBOX&#39;, [42]);
+
+// Mark as not junk and restore.
+await mailbox.write.markNotJunk(&#39;Junk&#39;, [42], &#39;INBOX&#39;);
+</code></pre>
+<h3 id="labels-gmail-and-compatible">Labels (Gmail and compatible)</h3>
+<pre><code class="language-ts">await mailbox.write.addLabels(&#39;INBOX&#39;, [42], [&#39;receipts&#39;, &#39;finance&#39;]);
+await mailbox.write.removeLabels(&#39;INBOX&#39;, [42], [&#39;receipts&#39;]);
+await mailbox.write.setLabels(&#39;INBOX&#39;, [42], [&#39;finance&#39;]); // replaces all
+</code></pre>
+<h2 id="composing-and-sending">Composing And Sending</h2>
+<h3 id="direct-send">Direct send</h3>
+<pre><code class="language-ts">const { messageId } = await mailbox.write.send({
+  to: [{ address: &#39;bob@example.com&#39; }],
+  subject: &#39;Project update&#39;,
+  text: &#39;Here is the latest status.&#39;,
+  attachments: [
+    { filename: &#39;status.pdf&#39;, mimeType: &#39;application/pdf&#39;, content: pdfBuffer },
+  ],
+});
+</code></pre>
+<p>The <code>from</code> field is optional. When omitted, the sender address is derived from
+the <code>identities</code> array in <code>EmailConfig</code>, or from the IMAP auth credentials.</p>
+<h3 id="reply-preserves-threading-headers">Reply (preserves threading headers)</h3>
+<pre><code class="language-ts">const { messageId } = await mailbox.write.reply(&#39;INBOX&#39;, uid, {
+  text: &#39;Thanks, the timeline works for me.&#39;,
+});
+// Automatically sets In-Reply-To, References, and prepends attribution + quoted body.
+</code></pre>
+<h3 id="forward">Forward</h3>
+<pre><code class="language-ts">// Inline forward (prepends forwarded-message header block + original body).
+const { messageId } = await mailbox.write.forward(&#39;INBOX&#39;, uid, {
+  to: [{ address: &#39;carol@example.com&#39; }],
+  mode: &#39;inline&#39;,
+  text: &#39;FYI — see below.&#39;,
+});
+
+// Attachment forward (wraps original as .eml attachment).
+await mailbox.write.forward(&#39;INBOX&#39;, uid, {
+  to: [{ address: &#39;carol@example.com&#39; }],
+  mode: &#39;attachment&#39;,
+});
+</code></pre>
+<h3 id="draft-lifecycle">Draft lifecycle</h3>
+<pre><code class="language-ts">// Save a draft to the Drafts folder.
+const { uid: draftUid } = await mailbox.write.saveDraft({
+  to: [{ address: &#39;bob@example.com&#39; }],
+  subject: &#39;Work in progress&#39;,
+  text: &#39;Draft body.&#39;,
+});
+
+// Update the draft.
+const { uid: newUid } = await mailbox.write.updateDraft(draftUid, {
+  subject: &#39;Work in progress&#39;,
+  to: [{ address: &#39;bob@example.com&#39; }],
+  text: &#39;Revised body.&#39;,
+});
+
+// Send the draft (SMTP send + append to Sent + expunge from Drafts).
+const { messageId } = await mailbox.write.sendDraft(newUid);
+</code></pre>
+<h3 id="export-and-import">Export and import</h3>
+<pre><code class="language-ts">// Export a message as raw RFC 2822 bytes.
+const eml: Buffer = await mailbox.write.exportEml(&#39;INBOX&#39;, uid);
+
+// Import a .eml file into a folder.
+const { uid: importedUid } = await mailbox.write.importEml(&#39;Archive&#39;, eml, [&#39;\\Seen&#39;]);
+</code></pre>
+<h2 id="folder-management">Folder Management</h2>
+<pre><code class="language-ts">await mailbox.write.createFolder(&#39;Archive/2026&#39;);
+await mailbox.write.renameFolder(&#39;Archive/2026&#39;, &#39;Archive/2026-Q1&#39;);
+await mailbox.write.deleteFolder(&#39;Archive/2026-Q1&#39;);
+await mailbox.write.subscribeFolder(&#39;Updates&#39;);
+await mailbox.write.unsubscribeFolder(&#39;Updates&#39;);
+</code></pre>
+<p>Always call <code>mailbox.network.refreshFolders()</code> after structural folder changes
+to update the local folder cache.</p>
+<h2 id="watch-idle">Watch (IDLE)</h2>
+<p><code>watch</code> is an async generator. It yields <code>WatchEvent</code> values as the server
+pushes new EXISTS, EXPUNGE, or FLAGS notifications:</p>
+<pre><code class="language-ts">const controller = new AbortController();
+
+for await (const event of mailbox.network.watch({ signal: controller.signal })) {
+  if (event.type === &#39;new&#39;) {
+    console.log(`${event.messages.length} new messages in ${event.folder}`);
+  }
+  if (event.type === &#39;flags&#39;) {
+    console.log(`Flags changed for uid ${event.uid} in ${event.folder}`);
+  }
+  if (event.type === &#39;expunge&#39;) {
+    console.log(`Message ${event.uid} expunged from ${event.folder}`);
+  }
+}
+
+// Stop watching.
+controller.abort();
+</code></pre>
+<h2 id="sync-options">Sync Options</h2>
+<pre><code class="language-ts">// Incremental sync of all subscribed folders (QRESYNC when available).
+await mailbox.network.sync();
+
+// Sync only specific folders.
+await mailbox.network.sync({ folders: [&#39;INBOX&#39;, &#39;Sent&#39;] });
+
+// Fetch missing bodies during sync.
+await mailbox.network.sync({ bodies: &#39;missing&#39; });
+
+// Fetch all bodies (use sparingly — can be slow on large mailboxes).
+await mailbox.network.sync({ bodies: &#39;all&#39; });
+</code></pre>
+<h2 id="error-handling">Error Handling</h2>
+<p>The engine raises typed errors:</p>
+<ul>
+<li><code>EmailAuthError</code>: authentication failure: fix credentials, do not retry blindly</li>
+<li><code>EmailConnectionError</code>: network / TLS failure: retry with <code>reconnect()</code></li>
+<li><code>EmailProtocolError</code>: server-side NO or BAD response to a command</li>
+<li><code>EmailNotFoundError</code>: requested message or folder does not exist locally</li>
+<li><code>EmailUnsupportedError</code>: server does not support the requested extension</li>
+</ul>
+<pre><code class="language-ts">import { EmailAuthError, EmailConnectionError } from &#39;@ghostpaw/email&#39;;
+
+try {
+  await mailbox.connect();
+} catch (err) {
+  if (err instanceof EmailAuthError) {
+    // Credential problem — do not retry.
+    console.error(&#39;Authentication failed:&#39;, err.message);
+  } else if (err instanceof EmailConnectionError) {
+    // Network problem — create a new Mailbox and try again.
+    console.error(&#39;Connection failed:&#39;, err.message);
+  }
+}
+</code></pre>
+<h2 id="the-human-operating-loop">The Human Operating Loop</h2>
+<p>A disciplined human developer drives the mailbox through derived views, not
+through memory or ad-hoc queries:</p>
+<ol>
+<li>Construct a <code>Mailbox</code> with <code>EmailConfig</code> and call <code>connect()</code> on startup.</li>
+<li>Use <code>network.sync()</code> to materialise the local cache.</li>
+<li>Use <code>read.folders()</code> and <code>read.messages()</code> to build views from local state.</li>
+<li>Use <code>read.getMessage()</code> on demand when body content is needed.</li>
+<li>Use <code>write.*</code> for intentional mutations: flag changes, sends, organise.</li>
+<li>Use <code>network.watch()</code> for real-time updates when staying connected.</li>
+<li>Use <code>network.sync()</code> periodically to pull state changes when IDLE is not in use.</li>
+<li>Call <code>disconnect()</code> to close the session and database when done.</li>
+</ol>
+<p>Local reads are always fast. Network operations are always explicit.</p>
+</article></main>
+</div>
+<footer><div class="bar"><span>Rendered from <a href="https://github.com/GhostPawJS/email/tree/main/docs">docs/</a> in the repository, MIT licensed.</span><nav aria-label="Legal"><a href="https://ghostpaw.dev/">All GhostPaw libraries</a><a href="https://lab.anonyfox.com/impressum/">Impressum</a><a href="https://lab.anonyfox.com/datenschutz/">Datenschutz</a></nav></div></footer>
+</body>
+</html>

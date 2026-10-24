@@ -8,7 +8,7 @@
     "url": "https://github.com/GhostPawJS/email.git",
     "source": "github"
   },
-  "websiteUrl": "https://github.com/GhostPawJS/email",
+  "websiteUrl": "https://email.ghostpaw.dev/",
   "packages": [
     {
       "registryType": "npm",
