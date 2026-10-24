@@ -43,7 +43,11 @@
     "mcp-server",
     "model-context-protocol",
     "agent-skills",
-    "cli"
+    "cli",
+    "ghostpaw",
+    "ai-agents",
+    "llm-tools",
+    "node-sqlite"
   ],
   "server": {
     "type": "node",
