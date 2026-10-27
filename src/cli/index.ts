@@ -9,7 +9,7 @@ import { syncCommand } from './commands/sync.ts';
 
 const main = defineCommand({
 	meta: {
-		name: 'email',
+		name: 'ghostpaw-email',
 		version: emailVersion,
 		description: 'Local-first email CLI powered by @ghostpaw/email.',
 	},
@@ -39,6 +39,12 @@ const main = defineCommand({
 // All errors from command run() functions are caught by safeRun() inside each
 // command, so they never reach runMain's own error handler.
 export async function runEmailCli(args = process.argv.slice(2)): Promise<void> {
+	for (const stream of [process.stdout, process.stderr]) {
+		stream.on('error', (error: NodeJS.ErrnoException) => {
+			if (error.code === 'EPIPE') process.exit(0);
+			throw error;
+		});
+	}
 	let index = 0;
 	while (index < args.length) {
 		const token = args[index];

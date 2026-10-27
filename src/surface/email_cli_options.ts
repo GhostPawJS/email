@@ -10,7 +10,16 @@ export const emailCliOptions: ToolCliOptions<EmailDb> = {
 	openContext: async (options) => {
 		const { openEmailDb } = await import('./open_email_db.ts');
 		const { resolveEmailDbPath } = await import('./resolve_email_db_path.ts');
-		return openEmailDb(resolveEmailDbPath(options.db === undefined ? {} : { flag: options.db }));
+		let path = options.db ?? process.env.GHOSTPAW_EMAIL_DB;
+		if (path === undefined) {
+			const { resolveAccount, buildEmailConfig } = await import('../cli/account.ts');
+			try {
+				path = buildEmailConfig(resolveAccount()).storage;
+			} catch {
+				// No configured account: keep the default database path.
+			}
+		}
+		return openEmailDb(resolveEmailDbPath(path === undefined ? {} : { flag: path }));
 	},
 	closeContext: (db) => db.close(),
 	commands: {

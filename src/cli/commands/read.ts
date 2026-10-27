@@ -171,7 +171,12 @@ export const readCommand = defineCommand({
 					);
 			}
 
-			const result = await withMailbox(account, (ctx) => readTool.handler(ctx, toolInput));
+			const result = await withMailbox(account, async (ctx) => {
+				const result = await readTool.handler(ctx, toolInput);
+				return opts.json && toolInput.view === 'message' && result.outcome === 'success'
+					? { ...result, data: await ctx.read.getMessage(toolInput.folder, toolInput.uid) }
+					: result;
+			});
 			renderResult(result, opts);
 		}); // end safeRun
 	},
@@ -185,7 +190,7 @@ function requireFlag(
 	if (!value) {
 		throw new CliError(
 			'missing_required_flag',
-			`${flag} is required for view: ${view}\nUsage: email read ${view} ${flag} <value>`,
+			`${flag} is required for view: ${view}\nUsage: ghostpaw-email read ${view} ${flag} <value>`,
 		);
 	}
 }

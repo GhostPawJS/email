@@ -69,7 +69,7 @@ export function handleCliError(err: unknown): ErrorResult {
 		return {
 			exitCode: 3,
 			message: `Authentication failed: ${err.message}`,
-			hint: 'Check your credentials with `email account show`.',
+			hint: 'Check your credentials with `ghostpaw-email account show`.',
 		};
 	}
 

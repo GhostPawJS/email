@@ -22,7 +22,7 @@ export const accountCommand = defineCommand({
 				await safeRun({}, async () => {
 					const file = loadAccounts();
 					if (!file || file.accounts.length === 0) {
-						print('No accounts configured. Run `email account add` to get started.');
+						print('No accounts configured. Run `ghostpaw-email account add` to get started.');
 						return;
 					}
 					print('');
@@ -52,14 +52,14 @@ export const accountCommand = defineCommand({
 				'imap-port': { type: 'string', description: 'IMAP port (default: 993)', default: '993' },
 				'imap-tls': {
 					type: 'boolean',
-					description: 'Use TLS for IMAP (default: true)',
+					description: 'Disable TLS for IMAP (TLS is on by default)',
 					default: true,
 				},
 				'smtp-host': { type: 'string', description: 'SMTP hostname', required: true },
 				'smtp-port': { type: 'string', description: 'SMTP port (default: 587)', default: '587' },
 				'smtp-tls': {
 					type: 'boolean',
-					description: 'Use TLS for SMTP (default: true)',
+					description: 'Disable TLS for SMTP (TLS is on by default)',
 					default: true,
 				},
 				user: { type: 'string', description: 'Auth username / email address', required: true },
@@ -136,7 +136,7 @@ export const accountCommand = defineCommand({
 					if (existing?.accounts.some((a) => a.name === name)) {
 						throw new CliError(
 							'account_invalid',
-							`Account "${name}" already exists. Use \`email account remove --name ${name}\` first.`,
+							`Account "${name}" already exists. Use \`ghostpaw-email account remove --name ${name}\` first.`,
 						);
 					}
 

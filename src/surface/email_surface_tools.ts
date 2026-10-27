@@ -59,7 +59,7 @@ export const emailMcpTools: readonly SurfaceTool<EmailDb>[] = emailTools.map((to
 					{
 						kind: 'use_tool',
 						message:
-							'Configure an account with email account add --name work --imap-host imap.example.com --smtp-host smtp.example.com --user you@example.com --pass yourpassword.',
+							'Configure an account with ghostpaw-email account add --name work --imap-host imap.example.com --smtp-host smtp.example.com --user you@example.com --pass yourpassword.',
 					},
 				],
 				data: { entities: [] },

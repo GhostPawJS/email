@@ -43,7 +43,7 @@ export const searchCommand = defineCommand({
 			if (!query)
 				throw new CliError(
 					'missing_required_flag',
-					'<query> is required.\nUsage: email search <query>',
+					'<query> is required.\nUsage: ghostpaw-email search <query>',
 				);
 
 			const mode = args.mode ?? 'local';

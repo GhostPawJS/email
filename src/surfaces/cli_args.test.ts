@@ -62,3 +62,13 @@ test('generic parser reports typed usage errors and renders schema help', () => 
 		{ ids: [1, 2] },
 	);
 });
+
+test('flag values accept double hyphens and front matter but reject following named flags', () => {
+	const spec = { command: 'test', flags: [{ name: 'body', type: 'string' as const }] };
+	for (const body of ['--', '---', '---\ntitle: Draft\n---', '--123']) {
+		assert.deepEqual(parseCliArgs(['--body', body], spec), { body });
+	}
+	for (const flag of ['--body', '--Body']) {
+		assert.throws(() => parseCliArgs(['--body', flag], spec), /Missing value: --body/);
+	}
+});

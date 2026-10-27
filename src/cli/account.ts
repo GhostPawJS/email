@@ -32,13 +32,13 @@ export function resolveAccount(name?: string): AccountEntry {
 				'No accounts configured yet.',
 				'',
 				'To get started:',
-				'  email account add --name work \\',
+				'  ghostpaw-email account add --name work \\',
 				'    --imap-host imap.example.com --imap-port 993 \\',
 				'    --smtp-host smtp.example.com --smtp-port 587 \\',
 				'    --user you@example.com --pass yourpassword',
 				'',
 				'Or set environment variables for one-off use:',
-				'  EMAIL_IMAP_HOST=... EMAIL_SMTP_HOST=... EMAIL_USER=... EMAIL_PASS=... email sync connect',
+				'  EMAIL_IMAP_HOST=... EMAIL_SMTP_HOST=... EMAIL_USER=... EMAIL_PASS=... ghostpaw-email sync connect',
 			].join('\n'),
 		);
 	}
@@ -48,7 +48,7 @@ export function resolveAccount(name?: string): AccountEntry {
 	if (!targetSlug) {
 		throw new CliError(
 			'no_default_account',
-			'No default account set. Use --account <name> or run `email account set-default --name <name>`.',
+			'No default account set. Use --account <name> or run `ghostpaw-email account set-default --name <name>`.',
 		);
 	}
 
@@ -56,7 +56,7 @@ export function resolveAccount(name?: string): AccountEntry {
 	if (!account) {
 		throw new CliError(
 			'account_not_found',
-			`Account "${targetSlug}" not found. Use \`email account list\` to see configured accounts.`,
+			`Account "${targetSlug}" not found. Use \`ghostpaw-email account list\` to see configured accounts.`,
 		);
 	}
 
