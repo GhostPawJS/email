@@ -96,8 +96,9 @@ Read without send. The page leads with the separation the voices trust (V059 V05
 3. Explainer: the five tools and what each may do. V021 V023
 4. Worry: dependencies, credentials, what needs a server. V050 V042
 5. Numbers: 0 deps, Node 24+, 553 tests, 94.0% lines, 47.5 KB gzip, about 11.1 ms import, 5 tools.
-6. Start: install, quick start, GitHub, README, home and siblings.
-7. Footer: Impressum, Datenschutz.
+6. Binaries: since 0.5.0 the CLI ships as one executable per platform with Node.js inside; install lines (install.sh, install.ps1, mise, ubi, eget, npx), targets and archive sizes from the v0.5.1 release assets, SHA256SUMS and attestation check, unsigned note, and a real terminal session (account add and show, compose send, sync, read queue, search, organize star, read eml, all against a local test server).
+7. Start: install, quick start, GitHub, README, home and siblings.
+8. Footer: Impressum, Datenschutz.
 
 ## Palette
 | Role | Color | Source |
@@ -127,6 +128,7 @@ Shared panes with chamfer and lit top bar; the mailbox pane lists messages, thre
 | --- | --- | --- | --- |
 | hero vault | protagonist | wireframe envelopes in cyan light streaming into a hexagonal vault with a ghost paw on its lid, one envelope violet; no text V037 V052 | generated |
 | thread | explanation | a diagonal chain of envelopes branching like a conversation, one reply violet; a thread from headers V030 | generated |
+| terminal session | evidence | real output of the 0.5.1 linux-x64 binary against a fresh database, recorded with vhs in the void/spectral palette; never retouched | recorded |
 | share card | share preview | the hero art with the headline at 1200×630 | generated art, rendered from HTML |
 
 ## Motion
@@ -143,6 +145,7 @@ Reduced motion: no sweep or flash.
 - Never present voices as customers. V048
 
 ## Changelog
+- 2026-10-27: email ships standalone binaries since 0.5.0; the section shows 0.5.1. New spine item 6, Binaries: install lines, targets and archive sizes from the v0.5.1 release assets, SHA256SUMS and attestation check, unsigned note, and the terminal session screenshot (new Imagery row). Kicker and JSON-LD version 0.5.1. Other sections unchanged.
 - 2026-10-24: first concept from the 2026-10-24 research batch (64 voices, 12 peers); split tools chosen; replay of a real email 0.4.0 run without network. Body search left off the page: in 0.4.0 the FTS update trigger clears body text when a message row changes.
 - 2026-10-24: depth pass (10 more voices, now 74); replay re-run against the current release; import time re-measured; comparison section added; page moved to https://email.ghostpaw.dev/.
 - 2026-10-24: email 0.4.1 released (bracketed threading headers, body text kept in the search index, contiguous MIME headers, refused connections reported). Replay re-run against 0.4.1: search now finds body-only words ("harness", "discount") after threading rewrote the rows; the page shows them and the old caveat became a release note. Tests 563, line coverage 94.2%, 47.8 KB gzip.

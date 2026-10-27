@@ -224,3 +224,15 @@ h2 code { font-size: 0.8em; }
 .foot-libs { display: flex; flex-wrap: wrap; gap: 0.4rem 1.25rem; margin-bottom: 1rem; font: 600 1rem var(--display); }
 .foot-libs a { color: var(--ghost); text-decoration: none; display: inline-block; padding: 0.2rem 0; }
 .foot-libs a:hover, .foot-libs a[aria-current] { color: var(--spectral); }
+
+/* Binaries section */
+.binaries code { color: var(--spectral); }
+.bin-cmds { margin: 1.5rem 0 2rem; max-width: 60rem; }
+.bin-cmds .cmd { max-width: none; }
+.bin-cmds > div + div { margin-top: 1rem; }
+.bin-trust { max-width: 46rem; margin: 1.5rem 0 0; padding-left: 1.2rem; }
+.bin-trust li { margin-top: 0.5rem; }
+.shot { margin: 2rem 0 0; }
+.shot img { display: block; width: 100%; max-width: 72rem; height: auto; border: var(--edge); }
+.shot a { display: block; }
+.shot figcaption { color: var(--haze); font-size: 0.9rem; margin-top: 0.6rem; }
