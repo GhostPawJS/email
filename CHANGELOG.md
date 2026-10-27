@@ -4,6 +4,8 @@ All notable changes are documented here using [Keep a Changelog 1.1.0](https://k
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-27
+
 ### Added
 
 - 33 noun-verb CLI commands: `mail read|search`, `mail send|reply|forward|draft|update-draft|send-draft`, `mail mark-read|mark-unread|star|unstar|mark-answered`, `mail copy|move|archive|trash|junk|not-junk`, `mail set-labels|add-labels|remove-labels`, `mail create-folder|rename-folder|delete-folder|subscribe-folder|unsubscribe-folder`, and `mail connect|disconnect|reconnect|sync|refresh-folders|watch`.
@@ -91,7 +93,8 @@ All notable changes are documented here using [Keep a Changelog 1.1.0](https://k
 - Preserve SQLite built-in imports in bundled output and handle IMAP responses split across TCP chunks.
 - Refine envelope decoding.
 
-[Unreleased]: https://github.com/GhostPawJS/email/compare/v0.4.1...HEAD
+[Unreleased]: https://github.com/GhostPawJS/email/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/GhostPawJS/email/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/GhostPawJS/email/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/GhostPawJS/email/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/GhostPawJS/email/compare/v0.2.3...v0.3.0
