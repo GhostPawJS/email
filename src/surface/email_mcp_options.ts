@@ -2,7 +2,7 @@ import type { EmailDb } from '../database.ts';
 import type { McpServerOptions } from '../surfaces/mcp_server.ts';
 import { emailVersion } from '../version.ts';
 import { emailMcpInstructions } from './email_mcp_instructions.ts';
-import { emailSurfaceTools } from './email_surface_tools.ts';
+import { emailMcpTools } from './email_surface_tools.ts';
 
 export function emailMcpOptions(
 	context: () => EmailDb | Promise<EmailDb>,
@@ -12,7 +12,7 @@ export function emailMcpOptions(
 		version: emailVersion,
 		title: 'Email',
 		instructions: emailMcpInstructions,
-		tools: emailSurfaceTools,
+		tools: emailMcpTools,
 		context,
 		annotations: (tool) => ({
 			readOnlyHint: tool.readOnly ?? false,

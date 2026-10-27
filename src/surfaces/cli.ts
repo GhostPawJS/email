@@ -1,4 +1,5 @@
 import type { Readable, Writable } from 'node:stream';
+import { runCliCommand } from './cli_commands.ts';
 import { isErrorResult, type JsonSchema, type SurfaceTool } from './surface_types.ts';
 import { validateInput } from './validate_input.ts';
 
@@ -21,6 +22,8 @@ export async function runToolCli<TCtx>(
 	argv: string[],
 	options: ToolCliOptions<TCtx>,
 ): Promise<number> {
+	const modern = await runCliCommand(argv, options);
+	if (modern !== undefined) return modern;
 	const stdout = options.stdout ?? process.stdout;
 	const stderr = options.stderr ?? process.stderr;
 	const stdin = options.stdin ?? process.stdin;
@@ -60,7 +63,7 @@ export async function runToolCli<TCtx>(
 		stdout.write(
 			args.includes('--json')
 				? `${JSON.stringify(
-						options.tools.map(({ handler: _handler, ...tool }) => tool),
+						options.tools.map(({ handler: _handler, cli: _cli, ...tool }) => tool),
 						null,
 						2,
 					)}\n`

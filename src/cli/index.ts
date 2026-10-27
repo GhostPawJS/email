@@ -38,18 +38,37 @@ const main = defineCommand({
 // runMain handles --help, --version, and subcommand routing.
 // All errors from command run() functions are caught by safeRun() inside each
 // command, so they never reach runMain's own error handler.
-const args = process.argv.slice(2);
-let index = 0;
-while (args[index] === '--db' || args[index] === '--compact') {
-	index += args[index] === '--db' ? 2 : 1;
-}
-const command = args[index];
-if (
-	command &&
-	(['mcp', 'tools', 'call', 'skill', 'describe', '--version', '-v'].includes(command) ||
-		command.startsWith('mail_'))
-) {
-	await import('../surface_cli.ts');
-} else {
-	runMain(main);
+export async function runEmailCli(args = process.argv.slice(2)): Promise<void> {
+	let index = 0;
+	while (index < args.length) {
+		const token = args[index];
+		if (token === '--db') {
+			index += 2;
+			continue;
+		}
+		if (
+			token === '--compact' ||
+			token === '--json' ||
+			token === '--quiet' ||
+			token === '--no-color' ||
+			token?.startsWith('--db=')
+		) {
+			index++;
+			continue;
+		}
+		break;
+	}
+	const command = args[index];
+	if (
+		command &&
+		(['mcp', 'tools', 'call', 'skill', 'describe', '--version', '-v'].includes(command) ||
+			command.startsWith('mail_') ||
+			['mail', 'help', 'completions', 'version', '-V'].includes(command))
+	) {
+		const { runToolCli } = await import('../surfaces/cli.ts');
+		const { emailCliOptions } = await import('../surface/email_cli_options.ts');
+		process.exitCode = await runToolCli(args, emailCliOptions);
+	} else {
+		runMain(main);
+	}
 }
