@@ -4,6 +4,8 @@ All notable changes are documented here using [Keep a Changelog 1.1.0](https://k
 
 ## [Unreleased]
 
+## [0.5.5] - 2026-10-27
+
 ### Added
 
 - Explicit installer targets, installation variants in human version output, and embedded CLI workflow guides.
@@ -130,7 +132,8 @@ Same code as 0.5.3. The 0.5.3 release job published to npm but timed out waiting
 - Preserve SQLite built-in imports in bundled output and handle IMAP responses split across TCP chunks.
 - Refine envelope decoding.
 
-[Unreleased]: https://github.com/GhostPawJS/email/compare/v0.5.4...HEAD
+[Unreleased]: https://github.com/GhostPawJS/email/compare/v0.5.5...HEAD
+[0.5.5]: https://github.com/GhostPawJS/email/compare/v0.5.4...v0.5.5
 [0.5.4]: https://github.com/GhostPawJS/email/compare/v0.5.3...v0.5.4
 [0.5.3]: https://github.com/GhostPawJS/email/compare/v0.5.1...v0.5.3
 [0.5.1]: https://github.com/GhostPawJS/email/compare/v0.5.0...v0.5.1
