@@ -4,6 +4,17 @@ All notable changes are documented here using [Keep a Changelog 1.1.0](https://k
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-10-27
+
+### Fixed
+
+- Closing stdout early, for example by piping into `head`, exits quietly instead of printing an EPIPE stack trace.
+- `read message --json` includes the message headers and `textPlain`/`textHtml` bodies in `data`.
+- `call mail_read` and the other tool calls use the configured account's database, so they see what `sync` stored instead of reporting `Folder not found: INBOX`.
+- The `--no-imap-tls` and `--no-smtp-tls` help text says that they disable TLS.
+- Help, usage lines and hints name the installed `ghostpaw-email` command instead of `email`.
+- Flag values that start with dashes are accepted; only a following `--name` token counts as the next flag.
+
 ## [0.5.1] - 2026-10-27
 
 ### Fixed
@@ -100,7 +111,8 @@ All notable changes are documented here using [Keep a Changelog 1.1.0](https://k
 - Preserve SQLite built-in imports in bundled output and handle IMAP responses split across TCP chunks.
 - Refine envelope decoding.
 
-[Unreleased]: https://github.com/GhostPawJS/email/compare/v0.5.1...HEAD
+[Unreleased]: https://github.com/GhostPawJS/email/compare/v0.5.2...HEAD
+[0.5.2]: https://github.com/GhostPawJS/email/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/GhostPawJS/email/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/GhostPawJS/email/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/GhostPawJS/email/compare/v0.4.0...v0.4.1
