@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { cliGuide } from '../../src/skills/cli-guide.ts';
 import { emailSkills } from '../../src/skills/email_skills.ts';
 import { emailSkillSpec } from '../../src/surface/email_skill_spec.ts';
 import { emailSurfaceTools } from '../../src/surface/email_surface_tools.ts';
@@ -7,17 +8,7 @@ const pkg = JSON.parse(readFileSync(new URL('../../package.json', import.meta.ur
 export const config = {
 	slug: 'email',
 	skill: emailSkillSpec,
-	workflows: [
-		...emailSkills,
-		{
-			name: 'cli',
-			description: 'Complete existing email CLI guide.',
-			content: readFileSync(
-				new URL('../../skills/email/references/cli.md', import.meta.url),
-				'utf8',
-			),
-		},
-	],
+	workflows: [...emailSkills, cliGuide],
 	manifest: {
 		name: 'ghostpaw-email',
 		version: pkg.version,

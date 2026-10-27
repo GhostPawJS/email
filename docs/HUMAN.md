@@ -36,7 +36,7 @@ Global flags for the new commands: `--db <path>`, `--json`, `--quiet`,
 `--compact`, `--help`/`-h`, `--version`/`-V`/`-v`, `--no-color`.
 Output is JSON when piped or when `--json` is set. `--quiet` suppresses stdout.
 `completions bash|zsh|fish` prints shell completion setup; `version` prints
-the package version. The existing `tools [--json]`, `describe <tool>`,
+the version and installation variant (for example, `email 0.5.5 (binary, linux-x64)`). The existing `tools [--json]`, `describe <tool>`,
 `call <tool> [JSON|-]`, flat `mail_<tool> --parameter value`, `mcp` and `skill`
 forms remain available.
 

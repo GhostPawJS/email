@@ -6,7 +6,8 @@ export const emailSkillSpec = {
 	description:
 		'Read, search, compose, organize and synchronize email with a local SQLite cache. Use when managing email or searching cached messages.',
 	license: 'MIT',
-	compatibility: 'Node.js 24 or newer. MCP stdio or email CLI.',
+	compatibility:
+		'Release binary ghostpaw-email (no runtime needed); MCP stdio via ghostpaw-email mcp.',
 	bin: 'ghostpaw-email',
 	packageName: '@ghostpaw/email',
 	server: 'ghostpaw-email',

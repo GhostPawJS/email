@@ -7,7 +7,7 @@
 **Agent email: IMAP and SMTP in-process, cached in SQLite, with reading and sending as separate tools.**
 
 ```bash
-npm install @ghostpaw/email
+curl -fsSL https://raw.githubusercontent.com/GhostPawJS/email/main/install.sh | sh
 ```
 
 A standalone email engine for Node.js, built on SQLite.
@@ -22,14 +22,15 @@ without writing any wiring code.
 
 ## MCP server
 
-Every client below starts the same stdio server: `npx -y @ghostpaw/email mcp`.
+Every client below starts the same stdio server: `ghostpaw-email mcp`.
+For npm-based environments, use `npx -y @ghostpaw/email mcp` instead.
 Cached messages live in `~/.ghostpaw/email.db` unless the `GHOSTPAW_EMAIL_DB`
 environment variable (absolute path) or `--db <path>` says otherwise.
 
 **Claude Code**
 
 ```bash
-claude mcp add ghostpaw-email -- npx -y @ghostpaw/email mcp
+claude mcp add ghostpaw-email -- ghostpaw-email mcp
 ```
 
 or as a plugin, which also installs the skill:
@@ -43,8 +44,8 @@ or as a plugin, which also installs the skill:
 
 ```toml
 [mcp_servers.ghostpaw-email]
-command = "npx"
-args = ["-y", "@ghostpaw/email", "mcp"]
+command = "ghostpaw-email"
+args = ["mcp"]
 ```
 
 **Cursor** (`.cursor/mcp.json`), **Claude Desktop** (`claude_desktop_config.json`)
@@ -54,8 +55,8 @@ or a project `.mcp.json`:
 {
   "mcpServers": {
     "ghostpaw-email": {
-      "command": "npx",
-      "args": ["-y", "@ghostpaw/email", "mcp"]
+      "command": "ghostpaw-email",
+      "args": ["mcp"]
     }
   }
 }
@@ -104,7 +105,7 @@ Global flags for the new commands: `--db <path>`, `--json`, `--quiet`,
 `--compact`, `--help`/`-h`, `--version`/`-V`/`-v`, `--no-color`.
 Output is JSON when piped or when `--json` is set. `--quiet` suppresses stdout.
 `completions bash|zsh|fish` prints shell completion setup; `version` prints
-the package version. The existing `tools [--json]`, `describe <tool>`,
+the version and installation variant. The existing `tools [--json]`, `describe <tool>`,
 `call <tool> [JSON|-]`, flat `mail_<tool> --parameter value`, `mcp` and `skill`
 forms remain available.
 
@@ -136,9 +137,9 @@ credentials. Network operations use `email account add` configuration or
 ## Tool CLI
 
 ```bash
-npx -y @ghostpaw/email tools
-npx -y @ghostpaw/email call mail_read '{"view":"folders"}' --db :memory:
-npx -y @ghostpaw/email call mail_search '{"query":"invoice"}'
+ghostpaw-email tools
+ghostpaw-email call mail_read '{"view":"folders"}' --db :memory:
+ghostpaw-email call mail_search '{"query":"invoice"}'
 ```
 
 Both `email` and `ghostpaw-email` run the same CLI. Existing account, read,
@@ -146,27 +147,48 @@ search, compose, organize and sync commands remain available. The full guide
 is preserved in [skills/email/references/cli.md](skills/email/references/cli.md).
 
 Agent Skill: `SKILL.md` and `skills/email/` ship in the package; print the skill
-with `npx -y @ghostpaw/email skill`.
+with `ghostpaw-email skill`. List guides with `ghostpaw-email skill --list`
+and print one with `ghostpaw-email skill compose-and-send`.
 
 ## Install
 
-```bash
-npm install @ghostpaw/email        # as a library
-npm install -g @ghostpaw/email     # as a global CLI
-npx @ghostpaw/email --help         # one-off, no install needed
-```
+### Release binary (default)
 
-Requires **Node.js 24+** (uses the built-in `node:sqlite` module).
+Each line downloads the latest release asset, checks it against the release's SHA256SUMS and installs it on the PATH (~/.local/bin on Linux/macOS; the Windows script adds its folder to the user PATH).
 
-Standalone binaries are available from [GitHub Releases](https://github.com/GhostPawJS/email/releases)
-for linux-x64, linux-arm64, darwin-arm64, darwin-x64 and windows-x64.
+linux-x64:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/GhostPawJS/email/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/GhostPawJS/email/main/install.sh | sh -s -- --target linux-x64 && export PATH="$HOME/.local/bin:$PATH"
 ```
+
+linux-arm64:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/GhostPawJS/email/main/install.sh | sh -s -- --target linux-arm64 && export PATH="$HOME/.local/bin:$PATH"
+```
+
+darwin-arm64:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/GhostPawJS/email/main/install.sh | sh -s -- --target darwin-arm64 && export PATH="$HOME/.local/bin:$PATH"
+```
+
+darwin-x64:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/GhostPawJS/email/main/install.sh | sh -s -- --target darwin-x64 && export PATH="$HOME/.local/bin:$PATH"
+```
+
+windows-x64 (PowerShell):
 
 ```powershell
 irm https://raw.githubusercontent.com/GhostPawJS/email/main/install.ps1 | iex
+```
+
+```text
+$ ghostpaw-email --version
+email 0.5.5 (binary, linux-x64)
 ```
 
 A session with the 0.5.1 linux-x64 binary against a local GreenMail test server on 127.0.0.1 (throwaway user, no real account) and a fresh database (output piped through `jq` to keep it short):
@@ -238,9 +260,30 @@ Sizes for 0.5.1 (Node 26.12.1 inside each binary):
 | darwin-x64 | 46.4 MB tar.gz | 149.8 MB |
 | windows-x64 | 38.5 MB zip | 105.8 MB |
 
-The npm package is 1711 KB unpacked and needs Node 24+.
-
 Release installation is checked on ubuntu-24.04, macos-15 and windows-2025.
+
+### npx / npm (for npm-based environments)
+
+Requires **Node 24+** (uses the built-in `node:sqlite` module).
+The npm package is 1711 KB unpacked.
+
+```sh
+npm install @ghostpaw/email        # as a library
+npm install -g @ghostpaw/email     # as a global CLI
+npx @ghostpaw/email --help         # one-off, no install needed
+```
+
+### Library (for harnesses embedding it in code)
+
+```sh
+npm install @ghostpaw/email
+```
+
+```ts
+import { Mailbox } from '@ghostpaw/email';
+```
+
+See [library usage](#quick-start).
 
 ## Quick Start
 

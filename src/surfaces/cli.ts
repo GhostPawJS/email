@@ -1,4 +1,5 @@
 import type { Readable, Writable } from 'node:stream';
+import { cliVersion } from '../cli_version.ts';
 import { runCliCommand } from './cli_commands.ts';
 import { isErrorResult, type JsonSchema, type SurfaceTool } from './surface_types.ts';
 import { validateInput } from './validate_input.ts';
@@ -12,7 +13,7 @@ export interface ToolCliOptions<TCtx> {
 	closeContext?: (ctx: TCtx) => void | Promise<void>;
 	commands?: {
 		mcp?: (opts: { db?: string }) => unknown | Promise<unknown>;
-		skill?: () => string | Promise<string>;
+		skill?: (args?: string[]) => string | Promise<string>;
 	};
 	stdin?: Readable & { isTTY?: boolean };
 	stdout?: Writable;
@@ -56,7 +57,7 @@ export async function runToolCli<TCtx>(
 		return 0;
 	}
 	if (['--version', '-v'].includes(command)) {
-		stdout.write(`${options.version}\n`);
+		stdout.write(`${cliVersion(options.version)}\n`);
 		return 0;
 	}
 	if (command === 'tools') {
@@ -73,7 +74,11 @@ export async function runToolCli<TCtx>(
 	}
 	if (command === 'skill') {
 		if (!options.commands?.skill) return fail('skill command unavailable');
-		stdout.write(await options.commands.skill());
+		try {
+			stdout.write(await options.commands.skill(args));
+		} catch (error) {
+			return fail(error instanceof Error ? error.message : String(error), 1);
+		}
 		return 0;
 	}
 	if (command === 'mcp') {

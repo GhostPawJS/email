@@ -6,7 +6,10 @@ import { emailSurfaceTools } from './email_surface_tools.ts';
 const inputs: Record<string, Record<string, unknown>> = {
 	mail_read: { view: 'folders' },
 	mail_search: { query: 'tea' },
-	mail_compose: { action: 'send', input: { to: [{ address: 'you@example.com' }], text: 'Hello' } },
+	mail_compose: {
+		action: 'send',
+		input: { to: [{ address: 'you@example.com' }], subject: 'Hello', text: 'Hello' },
+	},
 	mail_organize: { action: 'trash', folder: 'INBOX', uids: [1] },
 	mail_sync: { action: 'sync' },
 };

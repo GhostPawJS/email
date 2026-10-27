@@ -1,4 +1,6 @@
+import { validateInput } from '../surfaces/validate_input.ts';
 import type { ComposeInput, ForwardInput, ReplyInput } from '../types/compose.ts';
+import { emailInputSchema } from './input_schema.ts';
 import type { EmailToolDefinition } from './tool_metadata.ts';
 
 // ─── Input types ─────────────────────────────────────────────────────────────
@@ -837,3 +839,20 @@ export const emailTools = [
 		},
 	},
 ] satisfies readonly EmailToolDefinition[];
+
+// Validate before touching application surfaces, including direct facade calls.
+for (const tool of emailTools as EmailToolDefinition[]) {
+	Object.assign(tool.inputSchema, emailInputSchema(tool.name, tool.inputSchema));
+	const handler = tool.handler;
+	tool.handler = async (ctx, input) => {
+		const errors = validateInput(tool.inputSchema, input);
+		if (errors.length)
+			return {
+				outcome: 'error',
+				summary: errors.join('; '),
+				entities: [],
+				nextSteps: errors,
+			};
+		return handler(ctx, input);
+	};
+}

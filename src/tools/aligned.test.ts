@@ -7,7 +7,7 @@ import type { EmailToolContext } from './tool_metadata.ts';
 const inputs = [
 	{ view: 'folders' },
 	{ query: 'hello' },
-	{ action: 'send', input: {} },
+	{ action: 'send', input: { to: [{ address: 'reader@example.com' }], subject: 'Hello' } },
 	{ action: 'mark_read', folder: 'INBOX', uids: [1] },
 	{ action: 'connect' },
 ];

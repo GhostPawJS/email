@@ -434,7 +434,7 @@ test('mail_compose: forward delegates to write.forward', async () => {
 test('mail_compose: save_draft returns uid and next step', async () => {
 	const result = (await getTool('mail_compose').handler(makeContext(), {
 		action: 'save_draft',
-		input: { subject: 'Draft', textPlain: 'wip' },
+		input: { to: [{ address: 'reader@example.com' }], subject: 'Draft', textPlain: 'wip' },
 	})) as EmailToolResult;
 	assert.equal(result.outcome, 'success');
 	assert.match(result.summary, /10/);
@@ -445,7 +445,7 @@ test('mail_compose: update_draft returns new uid', async () => {
 	const result = (await getTool('mail_compose').handler(makeContext(), {
 		action: 'update_draft',
 		uid: 10,
-		input: { subject: 'Updated', textPlain: 'updated' },
+		input: { to: [{ address: 'reader@example.com' }], subject: 'Updated', textPlain: 'updated' },
 	})) as EmailToolResult;
 	assert.equal(result.outcome, 'success');
 	assert.match(result.summary, /11/);

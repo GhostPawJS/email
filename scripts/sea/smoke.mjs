@@ -37,7 +37,8 @@ const run = (args, input = '') => {
 };
 
 const version = run(['--version']).trim();
-if (version !== pkg.version) fail(`--version printed ${version}, expected ${pkg.version}`);
+const expectedVersion = `email ${pkg.version} (binary, ${process.platform === 'win32' ? 'windows' : process.platform}-${process.arch})`;
+if (version !== expectedVersion) fail(`--version printed ${version}, expected ${expectedVersion}`);
 run(['--help']);
 // Email writes require credentials; search exercises local SQLite offline.
 const read = JSON.parse(run(['mail', 'search', 'smoke', '--db', db, '--json']));

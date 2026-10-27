@@ -59,3 +59,37 @@ test('reference base changes only workflow link targets', () => {
 		),
 	);
 });
+
+test('nested object alternatives inline fields and mark requirements within their parent', () => {
+	const first = spec.tools[0];
+	assert.ok(first);
+	const markdown = renderSkillMarkdown({
+		...spec,
+		tools: [
+			{
+				...first,
+				inputSchema: {
+					type: 'object',
+					properties: {
+						parent: {
+							oneOf: [
+								{
+									type: 'object',
+									required: ['title'],
+									properties: { title: { type: 'string', description: 'Record title.' } },
+								},
+								{
+									type: 'object',
+									properties: { mode: { type: 'string', enum: ['fast', 'slow'] } },
+								},
+							],
+						},
+					},
+				},
+			},
+		],
+	});
+	assert.match(markdown, /\| parent.title \| string \| yes \| Record title/);
+	assert.match(markdown, /\| parent.mode \| string \| no \| fast, slow/);
+	assert.match(markdown, /\| parent \| object \/ object \| no/);
+});

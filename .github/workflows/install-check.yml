@@ -36,7 +36,7 @@ jobs:
           export PATH="$GHOSTPAW_INSTALL_DIR:$PATH"
           if [ "$RUNNER_OS" = Linux ]; then export GHOSTPAW_VERIFY=attestation; fi
           curl -fsSL https://raw.githubusercontent.com/GhostPawJS/email/main/install.sh | sh -s -- --version "$version"
-          test "$(ghostpaw-email --version)" = "$version"
+          test "$(ghostpaw-email --version)" = "email $version (binary, ${{ matrix.os == 'ubuntu-24.04' && 'linux-x64' || 'darwin-arm64' }})"
           echo "Version: $version verified on $RUNNER_OS" >> "$GITHUB_STEP_SUMMARY"
           # Writes need account credentials; local search succeeds on an empty cache.
           ghostpaw-email --help
@@ -67,7 +67,7 @@ jobs:
           $env:GHOSTPAW_VERSION = $version
           $env:GHOSTPAW_INSTALL_DIR = Join-Path $env:RUNNER_TEMP 'email-bin'
           irm https://raw.githubusercontent.com/GhostPawJS/email/main/install.ps1 | iex
-          if ((ghostpaw-email --version) -ne $version) { throw 'Version mismatch' }
+          if ((ghostpaw-email --version) -ne "email $version (binary, windows-x64)") { throw 'Version mismatch' }
           "Version: $version verified on Windows" >> $env:GITHUB_STEP_SUMMARY
           ghostpaw-email --help
           $tools = @(ghostpaw-email tools --json | ConvertFrom-Json)

@@ -2,7 +2,8 @@
 # Install the ghostpaw-email binary from GitHub Releases.
 #
 #   curl -fsSL https://raw.githubusercontent.com/GhostPawJS/email/main/install.sh | sh
-#   curl -fsSL .../install.sh | sh -s -- --version 0.4.0 --dir /usr/local/bin
+#   curl -fsSL .../install.sh | sh -s -- --target linux-x64 --version 0.4.0 --dir /usr/local/bin
+#   Targets: linux-x64, linux-arm64, darwin-arm64, darwin-x64.
 #
 # Checks the archive against the release's SHA256SUMS before installing.
 # With the GitHub CLI installed and GHOSTPAW_VERIFY=attestation set, it also
@@ -13,6 +14,7 @@ set -eu
 LIB=email
 REPO="GhostPawJS/$LIB"
 BIN="ghostpaw-$LIB"
+TARGET=""
 VERSION="${GHOSTPAW_VERSION:-}"
 DIR="${GHOSTPAW_INSTALL_DIR:-$HOME/.local/bin}"
 
@@ -20,7 +22,8 @@ while [ $# -gt 0 ]; do
 	case "$1" in
 	--version) VERSION="${2#v}"; shift 2 ;;
 	--dir) DIR="$2"; shift 2 ;;
-	-h | --help) sed -n '2,11p' "$0" 2>/dev/null || true; exit 0 ;;
+	--target) { [ $# -ge 2 ] && [ -n "$2" ]; } || { echo "install.sh: --target requires linux-x64, linux-arm64, darwin-arm64, darwin-x64" >&2; exit 2; }; TARGET="$2"; shift 2 ;;
+	-h | --help) sed -n '2,12p' "$0" 2>/dev/null || true; exit 0 ;;
 	*) echo "install.sh: unknown option $1" >&2; exit 2 ;;
 	esac
 done
@@ -42,6 +45,18 @@ x86_64 | amd64) ARCH=x64 ;;
 aarch64 | arm64) ARCH=arm64 ;;
 *) die "unsupported CPU $(uname -m)" ;;
 esac
+DETECTED="$OS-$ARCH"
+if [ -n "$TARGET" ]; then
+	case "$TARGET" in
+	linux-x64 | linux-arm64 | darwin-arm64 | darwin-x64) ;;
+	*) die "unknown target $TARGET; expected linux-x64, linux-arm64, darwin-arm64, darwin-x64" ;;
+	esac
+	if [ "$TARGET" != "$DETECTED" ] && ! { [ "$TARGET" = darwin-x64 ] && [ "$DETECTED" = darwin-arm64 ]; }; then
+		die "this machine is $DETECTED; use the $DETECTED install line"
+	fi
+	OS="${TARGET%-*}"
+	ARCH="${TARGET#*-}"
+fi
 if [ "$OS" = linux ] && [ -e /etc/alpine-release ]; then
 	die "Alpine/musl is not supported: the binary needs glibc 2.28+. Use 'npx @ghostpaw/$LIB' instead."
 fi

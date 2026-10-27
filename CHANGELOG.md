@@ -4,6 +4,19 @@ All notable changes are documented here using [Keep a Changelog 1.1.0](https://k
 
 ## [Unreleased]
 
+### Added
+
+- Explicit installer targets, installation variants in human version output, and embedded CLI workflow guides.
+- Nested tool parameter tables and validated call examples in the generated skill.
+
+### Changed
+
+- Make the release binary the default installation path in the README and generated skill.
+
+### Fixed
+
+- Validate action-specific and nested tool inputs before handlers run, with recovery shapes for incomplete input.
+
 ## [0.5.4] - 2026-10-27
 
 Same code as 0.5.3. The 0.5.3 release job published to npm but timed out waiting for the registry, so it created no GitHub Release, MCP Bundle, MCP Registry entry or binaries. 0.5.4 ships all of them. The fixes are listed under 0.5.3.
