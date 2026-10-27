@@ -6,6 +6,7 @@ import { EmailUnsupportedError } from './errors.ts';
 import type { ImapSession } from './imap/session.ts';
 import { createNetworkSurface } from './network.ts';
 import { initSchema } from './schema/index.ts';
+import { listFolders } from './store/list_folders.ts';
 import { upsertAccount } from './store/upsert_account.ts';
 
 describe('createNetworkSurface', () => {
@@ -177,6 +178,30 @@ it('refreshes folders, searches and streams cached message events', async () => 
 		}))
 			missingEvents.push(event);
 		assert.equal(missingEvents.length, 3);
+	} finally {
+		db.close();
+	}
+});
+
+it('sync lists folders from the server when the local cache has none', async () => {
+	const db = new DatabaseSync(':memory:') as EmailDb;
+	try {
+		initSchema(db);
+		const account = upsertAccount(db, { host: 'h', port: 143, username: 'u' });
+		let listed = 0;
+		const session = {
+			async listFolders() {
+				listed++;
+				return [{ path: 'INBOX', delimiter: '/', role: 'inbox' }];
+			},
+		} as unknown as ImapSession;
+		const network = createNetworkSurface(db, { accountId: account.id, session });
+		const result = await network.sync({ folders: ['Elsewhere'] });
+		assert.equal(listed, 1);
+		assert.deepEqual(result.folders, []);
+		assert.equal(listFolders(db, account.id)[0]?.path, 'INBOX');
+		await network.sync({ folders: ['Elsewhere'] });
+		assert.equal(listed, 1);
 	} finally {
 		db.close();
 	}

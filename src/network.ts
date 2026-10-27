@@ -34,6 +34,16 @@ export function createNetworkSurface(
 		return session;
 	}
 
+	async function pullFolders(s: ImapSession): Promise<Folder[]> {
+		const result: Folder[] = [];
+		for (const f of await s.listFolders()) {
+			result.push(
+				store.upsertFolder(db, { accountId, path: f.path, delimiter: f.delimiter, role: f.role }),
+			);
+		}
+		return result;
+	}
+
 	return {
 		connect: async () => {
 			await requireSession().connect();
@@ -65,7 +75,8 @@ export function createNetworkSurface(
 		},
 		sync: async (syncOptions?: SyncOptions) => {
 			const s = requireSession();
-			const folders = store.listFolders(db, accountId);
+			let folders = store.listFolders(db, accountId);
+			if (!folders.length) folders = await pullFolders(s);
 			const results: ReturnType<typeof syncFolder> extends Promise<infer R> ? R[] : never[] = [];
 			let totalNew = 0;
 			let totalExpunged = 0;
@@ -107,21 +118,7 @@ export function createNetworkSurface(
 				}
 			}
 		},
-		refreshFolders: async () => {
-			const s = requireSession();
-			const imapFolders = await s.listFolders();
-			const result: Folder[] = [];
-			for (const f of imapFolders) {
-				const upserted = store.upsertFolder(db, {
-					accountId,
-					path: f.path,
-					delimiter: f.delimiter,
-					role: f.role,
-				});
-				result.push(upserted);
-			}
-			return result;
-		},
+		refreshFolders: async () => pullFolders(requireSession()),
 		searchRemote: async (folder: string, query: SearchQuery) => {
 			const s = requireSession();
 			if (s.selectedFolder !== folder) {

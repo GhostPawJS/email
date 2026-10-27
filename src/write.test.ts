@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createServer } from 'node:net';
 import { DatabaseSync } from 'node:sqlite';
 import test from 'node:test';
 
@@ -269,5 +270,65 @@ test('write operations select folders and send the expected IMAP mutations', asy
 		await assert.rejects(write.forward('inbox', 1, { to: [] }), /not found/);
 	} finally {
 		db.close();
+	}
+});
+
+test('send() uses a bare account address as the SMTP envelope sender', async () => {
+	const commands: string[] = [];
+	const server = createServer((socket) => {
+		let buffer = '';
+		let inData = false;
+		socket.write('220 test ready\r\n');
+		socket.on('data', (chunk) => {
+			buffer += chunk.toString('utf8');
+			let index = buffer.indexOf('\r\n');
+			while (index !== -1) {
+				const line = buffer.slice(0, index);
+				buffer = buffer.slice(index + 2);
+				index = buffer.indexOf('\r\n');
+				if (inData) {
+					if (line === '.') {
+						inData = false;
+						socket.write('250 queued\r\n');
+					}
+					continue;
+				}
+				commands.push(line);
+				if (line.startsWith('EHLO')) socket.write('250-test\r\n250 AUTH PLAIN\r\n');
+				else if (line.startsWith('AUTH')) socket.write('235 ok\r\n');
+				else if (line === 'DATA') {
+					inData = true;
+					socket.write('354 go\r\n');
+				} else if (line === 'QUIT') socket.end('221 bye\r\n');
+				else socket.write('250 ok\r\n');
+			}
+		});
+	});
+	await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+	const address = server.address();
+	const port = typeof address === 'object' && address ? address.port : 0;
+	const db = new DatabaseSync(':memory:') as EmailDb;
+	try {
+		initSchema(db);
+		const account = upsertAccount(db, {
+			host: '127.0.0.1',
+			port: 143,
+			username: 'max@example.test',
+		});
+		const write = createWriteSurface(db, {
+			config: {
+				imap: { host: '127.0.0.1', port: 143, tls: false },
+				smtp: { host: '127.0.0.1', port, tls: false },
+				auth: { user: 'max@example.test', pass: 'p' },
+			},
+			accountId: account.id,
+			session: {} as never,
+		});
+		await write.send({ to: [{ address: 'sam@example.test' }], subject: 'Test', text: 'hi' });
+		assert.ok(commands.includes('MAIL FROM:<max@example.test>'), commands.join(' | '));
+		assert.ok(commands.includes('RCPT TO:<sam@example.test>'), commands.join(' | '));
+	} finally {
+		db.close();
+		server.close();
 	}
 });

@@ -65,7 +65,8 @@ export function createWriteSurface(
 	async function sendComposed(composed: Buffer): Promise<{ messageId: string }> {
 		const raw = composed.toString('utf8');
 		const fromMatch = raw.match(/^From:\s*(.+?)$/m);
-		const fromAddr = fromMatch?.[1]?.match(/<(.+?)>|(\S+@\S+)/)?.[1] ?? '';
+		const fromParts = fromMatch?.[1]?.match(/<(.+?)>|(\S+@\S+)/);
+		const fromAddr = fromParts?.[1] ?? fromParts?.[2] ?? '';
 		const toMatch = [...raw.matchAll(/^(?:To|Cc|Bcc):\s*(.+?)$/gm)];
 		const toAddrs = toMatch.flatMap((m) =>
 			(m[1] ?? '').split(',').map((a) => (a.match(/<(.+?)>|(\S+@\S+)/)?.[1] ?? a).trim()),
