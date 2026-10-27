@@ -156,6 +156,8 @@ and print one with `ghostpaw-email skill compose-and-send`.
 
 Each line downloads the latest release asset, checks it against the release's SHA256SUMS and installs it on the PATH (~/.local/bin on Linux/macOS; the Windows script adds its folder to the user PATH).
 
+These lines never edit ~/.profile or other shell startup files: `export PATH` applies to the current shell only. To keep it, add `export PATH="$HOME/.local/bin:$PATH"` to your shell profile yourself.
+
 linux-x64:
 
 ```sh
@@ -180,16 +182,30 @@ darwin-x64:
 curl -fsSL https://raw.githubusercontent.com/GhostPawJS/email/main/install.sh | sh -s -- --target darwin-x64 && export PATH="$HOME/.local/bin:$PATH"
 ```
 
-windows-x64 (PowerShell):
+windows-x64 (PowerShell; persistently adds its folder to the user PATH by default):
 
 ```powershell
 irm https://raw.githubusercontent.com/GhostPawJS/email/main/install.ps1 | iex
 ```
 
+Pinned to a release:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/GhostPawJS/email/main/install.sh | sh -s -- --target linux-x64 --version 0.5.6 && export PATH="$HOME/.local/bin:$PATH"
+```
+
+To skip the persistent user PATH edit (the installer still installs and prints the folder to add):
+
+```powershell
+$env:GHOSTPAW_NO_MODIFY_PATH=1; irm https://raw.githubusercontent.com/GhostPawJS/email/main/install.ps1 | iex
+```
+
 ```text
 $ ghostpaw-email --version
-email 0.5.5 (binary, linux-x64)
+email 0.5.6 (binary, linux-x64)
 ```
+
+Scripts that compare versions should use `--version --short` or `--version --json`.
 
 A session with the 0.5.1 linux-x64 binary against a local GreenMail test server on 127.0.0.1 (throwaway user, no real account) and a fresh database (output piped through `jq` to keep it short):
 

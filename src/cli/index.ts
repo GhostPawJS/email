@@ -1,4 +1,5 @@
 import { defineCommand, runMain } from 'citty';
+import { cliVersion } from '../cli_version.ts';
 import { emailVersion } from '../version.ts';
 import { accountCommand } from './commands/account.ts';
 import { composeCommand } from './commands/compose.ts';
@@ -11,7 +12,8 @@ const main = defineCommand({
 	meta: {
 		name: 'ghostpaw-email',
 		version: emailVersion,
-		description: 'Local-first email CLI powered by @ghostpaw/email.',
+		description:
+			'Local-first email CLI powered by @ghostpaw/email.\nVersion output: --version --short or --version --json',
 	},
 	subCommands: {
 		mcp: defineCommand({
@@ -44,6 +46,11 @@ export async function runEmailCli(args = process.argv.slice(2)): Promise<void> {
 			if (error.code === 'EPIPE') process.exit(0);
 			throw error;
 		});
+	}
+	if (args.some((arg) => ['--version', '-V', '-v'].includes(arg))) {
+		process.stdout.write(`${cliVersion(emailVersion, { args })}\n`);
+		process.exitCode = 0;
+		return;
 	}
 	let index = 0;
 	while (index < args.length) {

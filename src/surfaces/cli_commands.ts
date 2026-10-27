@@ -83,13 +83,13 @@ export async function runCliCommand<T>(
 			else if (flag === '--compact') compact = true;
 			else if (flag === '--help' || flag === '-h') help = true;
 			else if (['--version', '-V', '-v'].includes(flag ?? '')) {
-				if (!quiet) stdout.write(`${cliVersion(options.version)}\n`);
+				if (!quiet) stdout.write(`${cliVersion(options.version, { args: argv })}\n`);
 				return 0;
 			} else if (flag !== '--no-color') continue;
 			args.splice(i--, 1);
 		}
 		if (args[0] === 'version') {
-			if (!quiet) stdout.write(`${cliVersion(options.version)}\n`);
+			if (!quiet) stdout.write(`${cliVersion(options.version, { args: argv })}\n`);
 			return 0;
 		}
 		if (args[0] === 'help') {
@@ -141,7 +141,7 @@ export async function runCliCommand<T>(
 				stdout.write(
 					entry
 						? renderCliHelp(specFor(entry))
-						: `${options.bin} ${options.version}\n${options.description}\n\nCommands:\n${matches.map((command) => `  ${command.path}`).join('\n')}\n  mcp, skill, tools [--json], describe <tool>, call <tool> [JSON|-], completions <bash|zsh|fish>, version\nGlobal flags: --db <path>, --json, --quiet, --compact, --help/-h, --version/-V/-v, --no-color\n`,
+						: `${options.bin} ${options.version}\n${options.description}\n\nCommands:\n${matches.map((command) => `  ${command.path}`).join('\n')}\n  mcp, skill, tools [--json], describe <tool>, call <tool> [JSON|-], completions <bash|zsh|fish>, version\nVersion output: --version --short or --version --json\nGlobal flags: --db <path>, --json, --quiet, --compact, --help/-h, --version/-V/-v, --no-color\n`,
 				);
 			return 0;
 		}

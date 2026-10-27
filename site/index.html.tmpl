@@ -217,7 +217,7 @@ rs.search('discount');</code></pre>
 
   <section id="binaries" class="sec binaries" aria-labelledby="binaries-title">
     <h2 id="binaries-title">Install the release binary</h2>
-    <p class="intro">The default way to run <code>ghostpaw-email</code>: one executable per platform with Node.js inside, with the same commands and the same MCP server as the npm package. Each line downloads the latest release, checks it against the release&#39;s SHA256SUMS and puts the binary on the PATH (<code>~/.local/bin</code>; the Windows script adds its folder to the user PATH).</p>
+    <p class="intro">The default way to run <code>ghostpaw-email</code>: one executable per platform with Node.js inside, with the same commands and the same MCP server as the npm package. Each line downloads the latest release, checks it against the release&#39;s SHA256SUMS and puts the binary on the PATH (<code>~/.local/bin</code>; the Windows script adds its folder to the user PATH). The lines never edit <code>~/.profile</code>: <code>export PATH</code> lasts for the current shell only. Pin a release with <code>--version &lt;x.y.z&gt;</code>; set <code>GHOSTPAW_NO_MODIFY_PATH=1</code> to keep the Windows script from changing the user PATH.</p>
     <div class="bin-cmds">
         <div><p class="cmd-label" id="bin-linux-x64-label">linux-x64</p>
         <div class="cmd"><textarea id="bin-linux-x64" readonly rows="2" aria-labelledby="bin-linux-x64-label" spellcheck="false">curl -fsSL https://raw.githubusercontent.com/GhostPawJS/email/main/install.sh | sh -s -- --target linux-x64 &amp;&amp; export PATH=&quot;$HOME/.local/bin:$PATH&quot;</textarea><button type="button" class="copy" data-copy="bin-linux-x64">Copy</button></div></div>

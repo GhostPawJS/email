@@ -3,6 +3,7 @@
 #   irm https://raw.githubusercontent.com/GhostPawJS/email/main/install.ps1 | iex
 #
 # Checks the zip against the release's SHA256SUMS before installing.
+# Env: GHOSTPAW_NO_MODIFY_PATH=1 skips persistent user PATH changes.
 # Env: GHOSTPAW_INSTALL_DIR (default %LOCALAPPDATA%\Programs\ghostpaw\bin), GHOSTPAW_VERSION.
 $ErrorActionPreference = 'Stop'
 $Lib = 'email'
@@ -36,10 +37,14 @@ try {
 } finally {
 	Remove-Item $Tmp -Recurse -Force -ErrorAction SilentlyContinue
 }
-$UserPath = [Environment]::GetEnvironmentVariable('Path', 'User')
-if (-not ($UserPath -split ';' | Where-Object { $_ -eq $Dir })) {
-	[Environment]::SetEnvironmentVariable('Path', "$UserPath;$Dir", 'User')
-	Write-Host "Added $Dir to your user PATH (open a new terminal)"
+if ($env:GHOSTPAW_NO_MODIFY_PATH -eq '1') {
+	Write-Host "Add $Dir to your PATH to run $Bin"
+} else {
+	$UserPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+	if (-not ($UserPath -split ';' | Where-Object { $_ -eq $Dir })) {
+		[Environment]::SetEnvironmentVariable('Path', "$UserPath;$Dir", 'User')
+		Write-Host "Added $Dir to your user PATH (open a new terminal)"
+	}
 }
 $env:PATH = "$Dir;$env:PATH"
 Write-Host "Installed $(Join-Path $Dir "$Bin.exe") $(& (Join-Path $Dir "$Bin.exe") --version)"
