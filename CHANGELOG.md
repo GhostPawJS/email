@@ -4,6 +4,13 @@ All notable changes are documented here using [Keep a Changelog 1.1.0](https://k
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-10-27
+
+### Fixed
+
+- Sending from an account whose From address has no display name, the default for accounts added with `account add`, no longer uses an empty SMTP envelope sender (`MAIL FROM:<>`).
+- `sync sync` on a fresh cache lists the server folders first instead of reporting 0 folders.
+
 ## [0.5.0] - 2026-10-27
 
 ### Added
@@ -93,7 +100,8 @@ All notable changes are documented here using [Keep a Changelog 1.1.0](https://k
 - Preserve SQLite built-in imports in bundled output and handle IMAP responses split across TCP chunks.
 - Refine envelope decoding.
 
-[Unreleased]: https://github.com/GhostPawJS/email/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/GhostPawJS/email/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/GhostPawJS/email/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/GhostPawJS/email/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/GhostPawJS/email/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/GhostPawJS/email/compare/v0.3.0...v0.4.0
