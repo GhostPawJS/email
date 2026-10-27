@@ -4,6 +4,10 @@ All notable changes are documented here using [Keep a Changelog 1.1.0](https://k
 
 ## [Unreleased]
 
+## [0.5.4] - 2026-10-27
+
+Same code as 0.5.3. The 0.5.3 release job published to npm but timed out waiting for the registry, so it created no GitHub Release, MCP Bundle, MCP Registry entry or binaries. 0.5.4 ships all of them. The fixes are listed under 0.5.3.
+
 ## [0.5.3] - 2026-10-27
 
 0.5.2 was tagged but not published: a new help test failed in CI because CI renders help with backticks. 0.5.3 is the first published release with these fixes.
@@ -113,7 +117,8 @@ All notable changes are documented here using [Keep a Changelog 1.1.0](https://k
 - Preserve SQLite built-in imports in bundled output and handle IMAP responses split across TCP chunks.
 - Refine envelope decoding.
 
-[Unreleased]: https://github.com/GhostPawJS/email/compare/v0.5.3...HEAD
+[Unreleased]: https://github.com/GhostPawJS/email/compare/v0.5.4...HEAD
+[0.5.4]: https://github.com/GhostPawJS/email/compare/v0.5.3...v0.5.4
 [0.5.3]: https://github.com/GhostPawJS/email/compare/v0.5.1...v0.5.3
 [0.5.1]: https://github.com/GhostPawJS/email/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/GhostPawJS/email/compare/v0.4.1...v0.5.0
