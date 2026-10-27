@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "ghostpaw-email",
   "display_name": "GhostPaw Email",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "Email tools with a local SQLite cache and IMAP/SMTP account configuration.",
   "long_description": "Read, search and manage email with a local SQLite cache. Configure network accounts using email account add.",
   "author": {
