@@ -4,6 +4,10 @@ All notable changes are documented here using [Keep a Changelog 1.1.0](https://k
 
 ## [Unreleased]
 
+### Changed
+
+- README and site add a labelled install line that also adds ~/.local/bin to ~/.profile, and a pinned line on the site.
+
 ## [0.5.6] - 2026-10-28
 
 ### Added

@@ -156,7 +156,7 @@ and print one with `ghostpaw-email skill compose-and-send`.
 
 Each line downloads the latest release asset, checks it against the release's SHA256SUMS and installs it on the PATH (~/.local/bin on Linux/macOS; the Windows script adds its folder to the user PATH).
 
-These lines never edit ~/.profile or other shell startup files: `export PATH` applies to the current shell only. To keep it, add `export PATH="$HOME/.local/bin:$PATH"` to your shell profile yourself.
+These lines never edit ~/.profile or other shell startup files: `export PATH` applies to the current shell only. To keep it in new shells, use the `~/.profile` line below.
 
 linux-x64:
 
@@ -192,6 +192,12 @@ Pinned to a release:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/GhostPawJS/email/main/install.sh | sh -s -- --target linux-x64 --version 0.5.6 && export PATH="$HOME/.local/bin:$PATH"
+```
+
+Also adding ~/.local/bin to ~/.profile (edits ~/.profile once; skipped if it already mentions ~/.local/bin; zsh login shells read ~/.zprofile instead, so use that file name there):
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/GhostPawJS/email/main/install.sh | sh -s -- --target linux-x64 && { grep -qs '.local/bin' ~/.profile || echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.profile; } && export PATH="$HOME/.local/bin:$PATH"
 ```
 
 To skip the persistent user PATH edit (the installer still installs and prints the folder to add):
