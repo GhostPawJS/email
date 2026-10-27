@@ -169,6 +169,12 @@ curl -fsSL https://raw.githubusercontent.com/GhostPawJS/email/main/install.sh | 
 irm https://raw.githubusercontent.com/GhostPawJS/email/main/install.ps1 | iex
 ```
 
+A session with the 0.5.1 linux-x64 binary against a local GreenMail test server on 127.0.0.1 (throwaway user, no real account) and a fresh database (output piped through `jq` to keep it short):
+
+![ghostpaw-email 0.5.1 against a local test server: version, account add and show, compose send, sync, read queue, search, organize star and the raw message](https://raw.githubusercontent.com/GhostPawJS/email/main/docs/assets/cli.png)
+
+The same session as an [animated GIF](https://raw.githubusercontent.com/GhostPawJS/email/main/docs/assets/cli.gif).
+
 Other release installers:
 
 ```sh
@@ -222,7 +228,7 @@ download on macOS, remove quarantine with
 Linux binaries require glibc 2.28+; use npx on Alpine.
 See the [binary build workflow](.github/workflows/release-binaries.yml).
 
-Sizes for 0.5.0 (Node 26.12.1 inside each binary):
+Sizes for 0.5.1 (Node 26.12.1 inside each binary):
 
 | Target | Archive | Binary |
 |---|---|---|
