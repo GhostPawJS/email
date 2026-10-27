@@ -131,6 +131,31 @@ await mailbox.disconnect();
 `connect()` opens the SQLite database, initialises the schema, upserts the
 account, and authenticates the IMAP session — one call does everything.
 
+## Docs
+
+Read the manual for usage guides and the stored email model.
+
+- [Overview](https://email.ghostpaw.dev/docs/): what the manual covers and where to start
+- [Human usage](https://email.ghostpaw.dev/docs/human/): using the library directly in code
+- [LLM building blocks](https://email.ghostpaw.dev/docs/llm/): tools, skills and the soul prompt for agents
+- [Accounts](https://email.ghostpaw.dev/docs/entities/accounts/): one email identity and its connection
+- [Folders](https://email.ghostpaw.dev/docs/entities/folders/): cached IMAP mailboxes
+- [Messages](https://email.ghostpaw.dev/docs/entities/messages/): header records per folder and UID
+- [Bodies](https://email.ghostpaw.dev/docs/entities/bodies/): decoded message content
+- [Threads](https://email.ghostpaw.dev/docs/entities/threads/): JWZ conversation trees
+- [Attachments](https://email.ghostpaw.dev/docs/entities/attachments/): cached MIME parts
+- [Sync](https://email.ghostpaw.dev/docs/entities/sync/): the log of each sync pass
+
+Repository references:
+
+| Document | Audience |
+|---|---|
+| [SKILL.md](SKILL.md) | Agent operators and Claude Code users running `email` as a bash tool |
+| [HUMAN.md](docs/HUMAN.md) | Human developers using the `Mailbox` API with `read` / `write` / `network` |
+| [LLM.md](docs/LLM.md) | Agent builders wiring `soul`, `tools`, and `skills` into LLM systems |
+| [docs/README.md](docs/README.md) | Architecture overview: model, invariants, protocol boundaries, source layout |
+| [docs/entities/](docs/entities/) | Per-entity manuals with schema, operations, and invariants |
+
 ## The Model
 
 Seven stored concepts and three derived ones:
@@ -335,16 +360,6 @@ import type {
   WatchEvent,
 } from '@ghostpaw/email';
 ```
-
-## Documentation
-
-| Document | Audience |
-|---|---|
-| [SKILL.md](SKILL.md) | Agent operators and Claude Code users running `email` as a bash tool |
-| [HUMAN.md](docs/HUMAN.md) | Human developers using the `Mailbox` API with `read` / `write` / `network` |
-| [LLM.md](docs/LLM.md) | Agent builders wiring `soul`, `tools`, and `skills` into LLM systems |
-| [docs/README.md](docs/README.md) | Architecture overview: model, invariants, protocol boundaries, source layout |
-| [docs/entities/](docs/entities/) | Per-entity manuals with schema, operations, and invariants |
 
 ## Development
 

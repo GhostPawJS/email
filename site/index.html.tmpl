@@ -234,6 +234,14 @@ const messages = mailbox.read.messages('INBOX', { limit: 20 });
 await mailbox.disconnect();</code></pre>
     <p>To run it as an MCP server, add <code>npx -y @ghostpaw/email mcp</code> to your client.</p>
     <p class="links"><a class="more" href="{{.urls.readme}}">Read the README</a><a href="{{.urls.docs}}">Read the docs</a><a href="{{.urls.npm}}">email on npm</a></p>
+    <nav class="docs-map" aria-labelledby="docs-map-title">
+      <h3 id="docs-map-title">{{.data.docs.heading}}</h3>
+      <ul>
+        {{range .data.docs.pages}}
+        <li><a href="{{index $.urls .key}}">{{.label}}</a><span>{{.note}}</span></li>
+        {{end}}
+      </ul>
+    </nav>
   </section>
 </main>
 <footer class="foot">

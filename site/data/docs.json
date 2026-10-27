@@ -1,0 +1,55 @@
+{
+  "heading": "Read the docs",
+  "pages": [
+    {
+      "key": "docs",
+      "label": "Overview",
+      "note": "what the manual covers and where to start"
+    },
+    {
+      "key": "docsHuman",
+      "label": "Human usage",
+      "note": "using the library directly in code"
+    },
+    {
+      "key": "docsLlm",
+      "label": "LLM building blocks",
+      "note": "tools, skills and the soul prompt for agents"
+    },
+    {
+      "key": "docsEntitiesAccounts",
+      "label": "Accounts",
+      "note": "one email identity and its connection"
+    },
+    {
+      "key": "docsEntitiesFolders",
+      "label": "Folders",
+      "note": "cached IMAP mailboxes"
+    },
+    {
+      "key": "docsEntitiesMessages",
+      "label": "Messages",
+      "note": "header records per folder and UID"
+    },
+    {
+      "key": "docsEntitiesBodies",
+      "label": "Bodies",
+      "note": "decoded message content"
+    },
+    {
+      "key": "docsEntitiesThreads",
+      "label": "Threads",
+      "note": "JWZ conversation trees"
+    },
+    {
+      "key": "docsEntitiesAttachments",
+      "label": "Attachments",
+      "note": "cached MIME parts"
+    },
+    {
+      "key": "docsEntitiesSync",
+      "label": "Sync",
+      "note": "the log of each sync pass"
+    }
+  ]
+}
