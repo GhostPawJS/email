@@ -34,7 +34,10 @@ async function help(...command: string[]): Promise<string> {
 			stdio: ['ignore', fd, fd],
 		});
 		const [code] = await once(child, 'close');
-		const output = readFileSync(path, 'utf8');
+		// Strip colors and the backticks some terminals get, so CI and local runs compare the same text.
+		const output = readFileSync(path, 'utf8')
+			.replace(new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g'), '')
+			.replaceAll('`', '');
 		assert.equal(code, 0, output);
 		return output;
 	} finally {
