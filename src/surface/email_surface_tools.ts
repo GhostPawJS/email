@@ -5,7 +5,7 @@ import type { SurfaceTool } from '../surfaces/surface_types.ts';
 import { emailTools } from '../tools/aligned.ts';
 import type { EmailToolContext } from '../tools/tool_metadata.ts';
 
-export const emailSurfaceTools: readonly SurfaceTool<EmailDb>[] = emailTools.map((tool) => ({
+export const emailMcpTools: readonly SurfaceTool<EmailDb>[] = emailTools.map((tool) => ({
 	...tool,
 	inputSchema: { ...tool.inputSchema, type: 'object' },
 	async handler(db, input) {
@@ -67,3 +67,27 @@ export const emailSurfaceTools: readonly SurfaceTool<EmailDb>[] = emailTools.map
 		}
 	},
 }));
+
+export const emailSurfaceTools: readonly SurfaceTool<EmailDb>[] = /* @__PURE__ */ emailMcpTools.map(
+	(tool) => ({
+		...tool,
+		cli: {
+			noun: 'mail',
+			verb: tool.name.slice(5),
+			...(tool.name === 'mail_search' ? { positionals: ['query'] } : {}),
+			...(tool.inputSchema.properties?.action?.enum
+				? {
+						action: {
+							property: 'action',
+							verbs: Object.fromEntries(
+								tool.inputSchema.properties.action.enum.map((value) => [
+									String(value),
+									value === 'save_draft' ? 'draft' : String(value).replaceAll('_', '-'),
+								]),
+							),
+						},
+					}
+				: {}),
+		},
+	}),
+);

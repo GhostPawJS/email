@@ -76,6 +76,63 @@ The surface database defaults to `~/.ghostpaw/email.db`; point `--db` at an
 existing account cache to read it. Each network call opens and closes its IMAP
 session. Connection commands do not retain a session between calls.
 
+## Noun-verb CLI
+
+Both `email` and `ghostpaw-email` accept this additive command tree. Existing
+`account`, `read`, `search`, `compose`, `organize` and `sync` commands retain
+their flags, output and exit codes. Use `mail --help` for the new tree and
+`mail <verb> --help` for parameters.
+
+```text
+mail read | search
+mail send | reply | forward | draft | update-draft | send-draft
+mail mark-read | mark-unread | star | unstar | mark-answered
+mail copy | move | archive | trash | junk | not-junk
+mail set-labels | add-labels | remove-labels
+mail create-folder | rename-folder | delete-folder | subscribe-folder | unsubscribe-folder
+mail connect | disconnect | reconnect | sync | refresh-folders | watch
+```
+
+These 33 paths map to the 5 aligned tools. Action verbs set the tool's action;
+`draft` sets `save_draft`. Search accepts its query as a positional argument.
+Other fields use kebab-case flags, such as `--folder INBOX --uids 1 --uids 2`
+and `--input @message.json` for a compose payload. Arrays accept repeated
+flags or JSON; objects accept JSON or `@file`. A single `-` reads stdin JSON;
+explicit flags override stdin fields. `--` ends option parsing.
+
+Global flags for the new commands: `--db <path>`, `--json`, `--quiet`,
+`--compact`, `--help`/`-h`, `--version`/`-V`/`-v`, `--no-color`.
+Output is JSON when piped or when `--json` is set. `--quiet` suppresses stdout.
+`completions bash|zsh|fish` prints shell completion setup; `version` prints
+the package version. The existing `tools [--json]`, `describe <tool>`,
+`call <tool> [JSON|-]`, flat `mail_<tool> --parameter value`, `mcp` and `skill`
+forms remain available.
+
+| New command exit code | Meaning |
+|---|---|
+| 0 | Success or no-op |
+| 1 | Tool error |
+| 2 | Usage or schema error |
+| 3 | Clarification needed or not found |
+| 4 | Conflict or version mismatch |
+| 70 | Unexpected internal error |
+
+Offline examples, run against an empty cache:
+
+```sh
+ghostpaw-email mail search invoice --db /tmp/email-port-example.db --json
+ghostpaw-email mail read --view folders --db /tmp/email-port-example.db --json
+ghostpaw-email mail --help
+```
+
+Search returns 0 matches and folder reads return 0 folders in an empty cache.
+`GHOSTPAW_EMAIL_DB` sets the default cache path, otherwise
+`~/.ghostpaw/email.db` is used. Local search and cached reads need no
+credentials. Network operations use `email account add` configuration or
+`EMAIL_IMAP_HOST`, `EMAIL_SMTP_HOST`, `EMAIL_USER` and `EMAIL_PASS` (or
+`EMAIL_ACCESS_TOKEN`). Each invocation closes its network session;
+`mail connect` does not retain a session for later commands.
+
 ## Tool CLI
 
 ```bash
@@ -100,6 +157,74 @@ npx @ghostpaw/email --help         # one-off, no install needed
 ```
 
 Requires **Node.js 24+** (uses the built-in `node:sqlite` module).
+
+Standalone binaries are available from [GitHub Releases](https://github.com/GhostPawJS/email/releases)
+for linux-x64, linux-arm64, darwin-arm64, darwin-x64 and windows-x64.
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/GhostPawJS/email/main/install.sh | sh
+```
+
+```powershell
+irm https://raw.githubusercontent.com/GhostPawJS/email/main/install.ps1 | iex
+```
+
+Other release installers:
+
+```sh
+mise use -g github:GhostPawJS/email
+ubi --project GhostPawJS/email --exe ghostpaw-email --in ~/.local/bin
+eget GhostPawJS/email
+```
+
+For [aqua](https://aquaproj.github.io/docs/reference/registry-config/), define a
+`github_release` package in `aqua.yaml`:
+
+```yaml
+registries:
+  - name: email
+    type: local
+    path: email-registry.yaml
+packages:
+  - name: GhostPawJS/email@v<VERSION>
+    registry: email
+```
+
+`email-registry.yaml`:
+
+```yaml
+packages:
+  - type: github_release
+    repo_owner: GhostPawJS
+    repo_name: email
+    asset: ghostpaw-email-{{trimV .Version}}-{{.OS}}-{{.Arch}}.tar.gz
+    format: tar.gz
+    replacements: { amd64: x64 }
+    overrides:
+      - goos: windows
+        asset: ghostpaw-email-{{trimV .Version}}-windows-{{.Arch}}.zip
+        format: zip
+    files:
+      - name: ghostpaw-email
+```
+
+Install scripts verify SHA256SUMS. To verify a downloaded archive's
+[build attestation](https://cli.github.com/manual/gh_attestation_verify):
+
+```sh
+gh attestation verify <archive> -R GhostPawJS/email
+```
+
+Set `GHOSTPAW_VERIFY=attestation` for attestation verification in `install.sh`.
+Binaries are unsigned; macOS binaries carry an ad-hoc signature. For a browser
+download on macOS, remove quarantine with
+`xattr -d com.apple.quarantine /path/to/ghostpaw-email`.
+Linux binaries require glibc 2.28+; use npx on Alpine.
+See the [binary build workflow](.github/workflows/release-binaries.yml).
+
+<!-- sizes -->
+
+Release installation is checked on ubuntu-24.04, macos-15 and windows-2025.
 
 ## Quick Start
 

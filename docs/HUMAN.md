@@ -8,6 +8,63 @@ and the typed surfaces it exposes: `read`, `write`, and `network`.
 If you are wiring this package into an agent or LLM harness, read `LLM.md`
 instead. That document covers the soul, tools, and skills layers.
 
+## Noun-verb CLI
+
+Both `email` and `ghostpaw-email` accept this additive command tree. Existing
+`account`, `read`, `search`, `compose`, `organize` and `sync` commands retain
+their flags, output and exit codes. Use `mail --help` for the new tree and
+`mail <verb> --help` for parameters.
+
+```text
+mail read | search
+mail send | reply | forward | draft | update-draft | send-draft
+mail mark-read | mark-unread | star | unstar | mark-answered
+mail copy | move | archive | trash | junk | not-junk
+mail set-labels | add-labels | remove-labels
+mail create-folder | rename-folder | delete-folder | subscribe-folder | unsubscribe-folder
+mail connect | disconnect | reconnect | sync | refresh-folders | watch
+```
+
+These 33 paths map to the 5 aligned tools. Action verbs set the tool's action;
+`draft` sets `save_draft`. Search accepts its query as a positional argument.
+Other fields use kebab-case flags, such as `--folder INBOX --uids 1 --uids 2`
+and `--input @message.json` for a compose payload. Arrays accept repeated
+flags or JSON; objects accept JSON or `@file`. A single `-` reads stdin JSON;
+explicit flags override stdin fields. `--` ends option parsing.
+
+Global flags for the new commands: `--db <path>`, `--json`, `--quiet`,
+`--compact`, `--help`/`-h`, `--version`/`-V`/`-v`, `--no-color`.
+Output is JSON when piped or when `--json` is set. `--quiet` suppresses stdout.
+`completions bash|zsh|fish` prints shell completion setup; `version` prints
+the package version. The existing `tools [--json]`, `describe <tool>`,
+`call <tool> [JSON|-]`, flat `mail_<tool> --parameter value`, `mcp` and `skill`
+forms remain available.
+
+| New command exit code | Meaning |
+|---|---|
+| 0 | Success or no-op |
+| 1 | Tool error |
+| 2 | Usage or schema error |
+| 3 | Clarification needed or not found |
+| 4 | Conflict or version mismatch |
+| 70 | Unexpected internal error |
+
+Offline examples, run against an empty cache:
+
+```sh
+ghostpaw-email mail search invoice --db /tmp/email-port-example.db --json
+ghostpaw-email mail read --view folders --db /tmp/email-port-example.db --json
+ghostpaw-email mail --help
+```
+
+Search returns 0 matches and folder reads return 0 folders in an empty cache.
+`GHOSTPAW_EMAIL_DB` sets the default cache path, otherwise
+`~/.ghostpaw/email.db` is used. Local search and cached reads need no
+credentials. Network operations use `email account add` configuration or
+`EMAIL_IMAP_HOST`, `EMAIL_SMTP_HOST`, `EMAIL_USER` and `EMAIL_PASS` (or
+`EMAIL_ACCESS_TOKEN`). Each invocation closes its network session;
+`mail connect` does not retain a session for later commands.
+
 ## What This Surface Is For
 
 `@ghostpaw/email` is strongest when used as a complete mailbox engine, not as

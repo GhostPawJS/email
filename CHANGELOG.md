@@ -4,6 +4,19 @@ All notable changes are documented here using [Keep a Changelog 1.1.0](https://k
 
 ## [Unreleased]
 
+### Added
+
+- 33 noun-verb CLI commands: `mail read|search`, `mail send|reply|forward|draft|update-draft|send-draft`, `mail mark-read|mark-unread|star|unstar|mark-answered`, `mail copy|move|archive|trash|junk|not-junk`, `mail set-labels|add-labels|remove-labels`, `mail create-folder|rename-folder|delete-folder|subscribe-folder|unsubscribe-folder`, and `mail connect|disconnect|reconnect|sync|refresh-folders|watch`.
+- Schema-based kebab-case flags, stdin JSON, `@file` values, command help, JSON and quiet output, shell completions and exit codes 0/1/2/3/4/70 for the new commands. Existing CLI commands and both npm bins retain their behavior.
+- Standalone binary build and release workflow for linux-x64, linux-arm64, darwin-arm64, darwin-x64 and windows-x64, with SHA256SUMS and provenance attestations. Binaries are unsigned; macOS uses an ad-hoc signature.
+- `install.sh` and `install.ps1` refuse checksum mismatches. Release install checks cover ubuntu-24.04, macos-15 and windows-2025 with offline local search, help, tool discovery, MCP initialize and tools/list, and a public TLS handshake. Writes and network mail commands require account credentials; npm tests and binary smoke tests use no public network.
+- Optional `cli` metadata on `SurfaceTool`, preserving MCP and legacy tool discovery output.
+
+### Changed
+
+- Share CLI options between the npm CLI and standalone binary; retain the existing account and protocol commands in both distributions.
+
+
 ## [0.4.1] - 2026-10-24
 
 ### Changed
