@@ -482,6 +482,19 @@ email read queue --json | jq '.entities[].title'
 echo "body text" | email compose send --to bob@example.com --subject "Hi"
 ```
 
+`--attach` (on `compose send` and `compose reply`) takes one or more file
+paths, comma-separated:
+
+```bash
+email compose send --to bob@example.com --subject "Report" --body "Attached" \
+  --attach ./report.pdf,./data.csv
+```
+
+Each path must be a regular file. Symlinks are followed to their target;
+directories, devices, FIFOs and sockets are rejected with exit code 1
+(`invalid_flag_value`) before anything is sent. The MIME type comes from the
+file extension (unknown extensions are sent without an explicit type).
+
 All commands return the same `{ outcome, summary, entities, nextSteps }`
 shape as the tool layer, with consistent exit codes (0 success, 1 user error,
 2 config, 3 auth, 4 network, 5 tool error).

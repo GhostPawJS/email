@@ -1,10 +1,9 @@
-import { readFileSync } from 'node:fs';
-import { basename, extname } from 'node:path';
 import { defineCommand } from 'citty';
 import { getEmailToolByName } from '../../tools/index.ts';
 import type { Address } from '../../types/address.ts';
 import type { ComposeInput, ForwardInput, ReplyInput } from '../../types/compose.ts';
 import { resolveAccount } from '../account.ts';
+import { loadAttachments } from '../attachments.ts';
 import { CliError, safeRun } from '../errors.ts';
 import { withMailbox } from '../lifecycle.ts';
 import { renderResult } from '../render.ts';
@@ -44,7 +43,11 @@ export const composeCommand = defineCommand({
 				cc: { type: 'string', description: 'CC recipient(s), comma-separated' },
 				bcc: { type: 'string', description: 'BCC recipient(s), comma-separated' },
 				from: { type: 'string', description: 'From address (overrides account identity)' },
-				attach: { type: 'string', description: 'File path(s) to attach, comma-separated' },
+				attach: {
+					type: 'string',
+					description:
+						'Regular file path(s) to attach, comma-separated (directories and special files are rejected)',
+				},
 			},
 			async run({ args: _args }) {
 				type Args = {
@@ -96,7 +99,11 @@ export const composeCommand = defineCommand({
 				to: { type: 'string', description: 'Override recipient(s)' },
 				cc: { type: 'string', description: 'CC recipient(s)' },
 				'reply-all': { type: 'boolean', description: 'Reply to all recipients', default: false },
-				attach: { type: 'string', description: 'File path(s) to attach, comma-separated' },
+				attach: {
+					type: 'string',
+					description:
+						'Regular file path(s) to attach, comma-separated (directories and special files are rejected)',
+				},
 			},
 			async run({ args: _args }) {
 				type Args = {
@@ -322,39 +329,4 @@ function parseUid(raw: string | undefined): number {
 		throw new CliError('invalid_flag_value', `--uid must be a positive integer. Got: "${raw}"`);
 	}
 	return n;
-}
-
-function loadAttachments(
-	paths: string,
-): Array<{ filename: string; content: Buffer; mimeType?: string }> {
-	return paths.split(',').map((p) => {
-		const filePath = p.trim();
-		const content = readFileSync(filePath);
-		const filename = basename(filePath);
-		const mimeType = extensionToMime(extname(filename).toLowerCase());
-		return mimeType ? { filename, content, mimeType } : { filename, content };
-	});
-}
-
-const MIME_MAP: Record<string, string> = {
-	'.pdf': 'application/pdf',
-	'.png': 'image/png',
-	'.jpg': 'image/jpeg',
-	'.jpeg': 'image/jpeg',
-	'.gif': 'image/gif',
-	'.txt': 'text/plain',
-	'.html': 'text/html',
-	'.htm': 'text/html',
-	'.csv': 'text/csv',
-	'.json': 'application/json',
-	'.zip': 'application/zip',
-	'.xml': 'application/xml',
-	'.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-	'.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-	'.mp4': 'video/mp4',
-	'.mp3': 'audio/mpeg',
-};
-
-function extensionToMime(ext: string): string | undefined {
-	return MIME_MAP[ext];
 }

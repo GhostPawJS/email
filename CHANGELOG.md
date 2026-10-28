@@ -4,6 +4,11 @@ All notable changes are documented here using [Keep a Changelog 1.1.0](https://k
 
 ## [Unreleased]
 
+### Security
+
+- `compose send|reply --attach` accepts only regular files (symlinks are followed). Directories, devices, FIFOs and sockets are rejected with `invalid_flag_value` before anything is read or sent, so a path like `/dev/zero` can no longer hang the command.
+- `--attach` is documented in the README, the CLI guide and `--help`.
+
 ### Changed
 
 - README and site add a labelled install line that also adds ~/.local/bin to ~/.profile, and a pinned line on the site.

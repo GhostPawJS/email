@@ -159,6 +159,8 @@ email compose forward --folder INBOX --uid 1921 --to bob@example.com --body "FYI
 # Attach files (comma-separated paths)
 email compose send --to a@b.com --subject "Report" --body "See attached" \\
   --attach /path/to/report.pdf,/path/to/data.csv --json
+# --attach paths must be regular files (symlinks are followed); directories,
+# devices, FIFOs and sockets fail with invalid_flag_value before sending.
 
 # Drafts
 email compose draft --save --to a@b.com --subject "Draft" --body "WIP" --json
