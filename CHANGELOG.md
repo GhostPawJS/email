@@ -4,6 +4,10 @@ All notable changes are documented here using [Keep a Changelog 1.1.0](https://k
 
 ## [Unreleased]
 
+### Changed
+
+- `skill --short` opens with the release binary install lines (Linux/macOS and Windows); npm is listed after them.
+
 ## [0.5.8] - 2026-10-28
 
 ### Added

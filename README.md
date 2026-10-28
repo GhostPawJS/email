@@ -195,7 +195,7 @@ irm https://raw.githubusercontent.com/GhostPawJS/email/main/install.ps1 | iex
 Pinned to a release:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/GhostPawJS/email/main/install.sh | sh -s -- --target linux-x64 --version 0.5.8 && export PATH="$HOME/.local/bin:$PATH"
+curl -fsSL https://raw.githubusercontent.com/GhostPawJS/email/main/install.sh | sh -s -- --target linux-x64 --version 0.5.9 && export PATH="$HOME/.local/bin:$PATH"
 ```
 
 Also adding ~/.local/bin to ~/.profile (edits ~/.profile once; skipped if it already mentions ~/.local/bin; zsh login shells read ~/.zprofile instead, so use that file name there):
@@ -212,7 +212,7 @@ $env:GHOSTPAW_NO_MODIFY_PATH=1; irm https://raw.githubusercontent.com/GhostPawJS
 
 ```text
 $ ghostpaw-email --version
-email 0.5.8 (binary, linux-x64)
+email 0.5.9 (binary, linux-x64)
 ```
 
 Scripts that compare versions should use `--version --short` or `--version --json`.
