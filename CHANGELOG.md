@@ -4,6 +4,8 @@ All notable changes are documented here using [Keep a Changelog 1.1.0](https://k
 
 ## [Unreleased]
 
+## [0.5.9] - 2026-10-28
+
 ### Changed
 
 - `skill --short` opens with the release binary install lines (Linux/macOS and Windows); npm is listed after them.
@@ -168,7 +170,8 @@ Same code as 0.5.3. The 0.5.3 release job published to npm but timed out waiting
 - Preserve SQLite built-in imports in bundled output and handle IMAP responses split across TCP chunks.
 - Refine envelope decoding.
 
-[Unreleased]: https://github.com/GhostPawJS/email/compare/v0.5.8...HEAD
+[Unreleased]: https://github.com/GhostPawJS/email/compare/v0.5.9...HEAD
+[0.5.9]: https://github.com/GhostPawJS/email/compare/v0.5.8...v0.5.9
 [0.5.8]: https://github.com/GhostPawJS/email/compare/v0.5.7...v0.5.8
 [0.5.7]: https://github.com/GhostPawJS/email/compare/v0.5.6...v0.5.7
 [0.5.6]: https://github.com/GhostPawJS/email/compare/v0.5.5...v0.5.6
