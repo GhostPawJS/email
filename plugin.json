@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "ghostpaw-email",
-  "version": "0.5.8",
+  "version": "0.5.9",
   "description": "Email tools with a local SQLite cache and IMAP/SMTP account configuration.",
   "author": {
     "name": "Anonyfox",

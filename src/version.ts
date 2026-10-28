@@ -1,1 +1,1 @@
-export const emailVersion = '0.5.8';
+export const emailVersion = '0.5.9';

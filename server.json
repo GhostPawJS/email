@@ -3,7 +3,7 @@
   "name": "io.github.GhostPawJS/email",
   "description": "Email tools with a local SQLite cache and IMAP/SMTP account configuration.",
   "title": "GhostPaw Email",
-  "version": "0.5.8",
+  "version": "0.5.9",
   "repository": {
     "url": "https://github.com/GhostPawJS/email.git",
     "source": "github"
@@ -14,7 +14,7 @@
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "@ghostpaw/email",
-      "version": "0.5.8",
+      "version": "0.5.9",
       "transport": {
         "type": "stdio"
       },
