@@ -3,6 +3,7 @@ import { cliGuide } from '../skills/cli-guide.ts';
 import { emailSkills } from '../skills/email_skills.ts';
 import type { ToolCliOptions } from '../surfaces/cli.ts';
 import { emailVersion } from '../version.ts';
+import { emailSkillShort } from './email_skill_short.ts';
 import { emailSurfaceTools } from './email_surface_tools.ts';
 export const emailCliOptions: ToolCliOptions<EmailDb> = {
 	bin: 'ghostpaw-email',
@@ -31,8 +32,9 @@ export const emailCliOptions: ToolCliOptions<EmailDb> = {
 		},
 		skill: async (args = []) => {
 			const guides = [...emailSkills, cliGuide];
+			if (args.length === 1 && args[0] === '--short') return emailSkillShort;
 			if (args[0] === '--help' || args[0] === '-h')
-				return 'Usage: ghostpaw-email skill\n       ghostpaw-email skill --list\n       ghostpaw-email skill <guide>\n';
+				return 'Usage: ghostpaw-email skill\n       ghostpaw-email skill --short (compact cheat sheet)\n       ghostpaw-email skill --list\n       ghostpaw-email skill <guide>\n';
 			if (args[0] === '--list')
 				return `${guides.map((guide) => `${guide.name}  ${guide.description.replace(/\s+/g, ' ')}`).join('\n')}\n`;
 			if (args.length) {

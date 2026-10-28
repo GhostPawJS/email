@@ -43,3 +43,29 @@ test('every generated call example validates against its tool input schema', () 
 	const body = markdown.split('## Without the binary')[0] ?? '';
 	assert.doesNotMatch(body, /npx|npm|Node\.js 24/);
 });
+
+test('skill output uses runnable guides, complete descriptions and a compact cheat sheet', async () => {
+	const skill = emailCliOptions.commands?.skill;
+	assert.ok(skill);
+	const full = await skill([]);
+	assert.doesNotMatch(full, /references\//);
+	for (const guide of [...emailSkills, cliGuide])
+		assert.ok(full.includes(`ghostpaw-email skill ${guide.name}`));
+	for (const line of full
+		.split('\n')
+		.filter((line) => line.startsWith('| ') && !line.startsWith('| ---')))
+		assert.ok(line.split('|').at(-2)?.trim(), line);
+	const short = await skill(['--short']);
+	assert.ok(short.trim().split('\n').length >= 30);
+	assert.ok(short.trim().split('\n').length < 45);
+	for (const expected of [
+		'--version',
+		'skill --short',
+		'skill --list',
+		'npm install',
+		'describe',
+		'call',
+	])
+		assert.ok(short.includes(expected), expected);
+	assert.match(await skill(['--help']), /--short/);
+});

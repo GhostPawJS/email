@@ -1,6 +1,5 @@
-import { mkdirSync } from 'node:fs';
-import { dirname } from 'node:path';
 import type { EmailDb } from '../database.ts';
+import { preparePrivateStorage, withPrivateCreation } from '../private_storage.ts';
 import { initSchema } from '../schema/index.ts';
 
 export async function openEmailDb(path: string): Promise<EmailDb> {
@@ -25,15 +24,17 @@ export async function openEmailDb(path: string): Promise<EmailDb> {
 	} finally {
 		process.emitWarning = original;
 	}
-	if (path !== ':memory:') mkdirSync(dirname(path), { recursive: true });
-	const db = new sqlite.DatabaseSync(path);
-	try {
-		db.exec('PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;');
-		const context = db as unknown as EmailDb;
-		initSchema(context);
-		return context;
-	} catch (error) {
-		db.close();
-		throw error;
-	}
+	const secure = path !== ':memory:' ? preparePrivateStorage(path) : undefined;
+	return withPrivateCreation(() => {
+		const db = new sqlite.DatabaseSync(path);
+		try {
+			db.exec('PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;');
+			const context = db as unknown as EmailDb;
+			initSchema(context);
+			return context;
+		} catch (error) {
+			db.close();
+			throw error;
+		}
+	}, secure);
 }

@@ -1,5 +1,6 @@
+import { parameterRows } from './parameter_rows.ts';
 import { schemaExample } from './schema_example.ts';
-import type { JsonSchema, SurfaceTool } from './surface_types.ts';
+import type { SurfaceTool } from './surface_types.ts';
 
 export interface SkillMarkdownSpec<TCtx> {
 	name: string;
@@ -17,7 +18,7 @@ export interface SkillMarkdownSpec<TCtx> {
 }
 export function renderSkillMarkdown<TCtx>(
 	spec: SkillMarkdownSpec<TCtx>,
-	{ referencesBase = 'references' }: { referencesBase?: string } = {},
+	{ referencesBase: _referencesBase = 'references' }: { referencesBase?: string } = {},
 ): string {
 	if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(spec.name) || spec.name.length > 64)
 		throw new Error('Invalid skill name');
@@ -60,6 +61,8 @@ export function renderSkillMarkdown<TCtx>(
 		'',
 		spec.about,
 		'',
+		'For the compact cheat sheet, run `ghostpaw-email skill --short`.',
+		'',
 		'## Calling tools',
 		'',
 		`MCP: connect to ${spec.server}, then call a tool by name with its JSON arguments.`,
@@ -86,28 +89,7 @@ export function renderSkillMarkdown<TCtx>(
 			'| Parameter | Type | Required | Values / description |',
 			'| --- | --- | --- | --- |',
 		);
-		const row = (name: string, property: JsonSchema, required: boolean) =>
-			`| ${name} | ${property.type ?? property.oneOf?.map((branch) => branch.type).join(' / ') ?? 'any'} | ${required ? 'yes' : 'no'} | ${(property.enum ? `${property.enum.join(', ')}. ` : '') + (property.description ?? '').replaceAll('|', '\\|').replaceAll('\n', ' ')} |`;
-		const fields = (schema: JsonSchema, prefix = '') => {
-			const properties = Object.entries(schema.properties ?? {});
-			for (const [name, property] of properties) {
-				if (prefix && properties.length > 8 && !schema.required?.includes(name)) continue;
-				lines.push(row(`${prefix}${name}`, property, schema.required?.includes(name) ?? false));
-				const objects = [property, ...(property.oneOf ?? [])].filter((s) => s.properties);
-				if (!objects.length)
-					for (const branch of tool.inputSchema.oneOf ?? []) {
-						const nested = branch.properties?.[name];
-						if (nested?.properties) objects.push(nested);
-					}
-				const merged: JsonSchema = { properties: {}, required: [] };
-				for (const object of objects) {
-					Object.assign(merged.properties ?? {}, object.properties);
-					merged.required = [...new Set([...(merged.required ?? []), ...(object.required ?? [])])];
-				}
-				if (objects.length) fields(merged, `${prefix}${name}.`);
-			}
-		};
-		fields(tool.inputSchema);
+		lines.push(...parameterRows(tool.inputSchema));
 		lines.push('', 'Examples:', '', '```sh');
 		const actions = tool.inputSchema.properties?.action?.enum?.slice(0, 3) ?? [undefined];
 		for (const action of actions) {
@@ -121,8 +103,7 @@ export function renderSkillMarkdown<TCtx>(
 		'## Workflow guides',
 		'',
 		...spec.workflows.map(
-			(workflow) =>
-				`- \`${spec.bin} skill ${workflow.name}\` ([${workflow.name}](${referencesBase}/${workflow.name}.md)): ${workflow.description}`,
+			(workflow) => `- \`${spec.bin} skill ${workflow.name}\`: ${workflow.description}`,
 		),
 		'',
 		'## Principles',

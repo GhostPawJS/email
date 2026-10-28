@@ -26,7 +26,7 @@ const spec: SkillMarkdownSpec<null> = {
 	workflows: [{ name: 'search', description: 'Search well' }],
 	principles: ['Search first.'],
 };
-test('skill output has deterministic frontmatter, CLI, MCP and references', () => {
+test('skill output has deterministic frontmatter, CLI, MCP and guide commands', () => {
 	const result = renderSkillMarkdown({ ...spec, metadata: { version: '1' }, license: 'MIT' });
 	assert.equal(
 		result,
@@ -36,7 +36,7 @@ test('skill output has deterministic frontmatter, CLI, MCP and references', () =
 	for (const expected of [
 		'MCP:',
 		'example call <tool>',
-		'references/search.md',
+		'example skill search',
 		'Read-only.',
 		'| mode | string | yes | a, b.',
 		'Search first.',
@@ -50,7 +50,8 @@ test('reject invalid skill metadata', () => {
 		assert.throws(() => renderSkillMarkdown({ ...spec, description }));
 });
 
-test('reference base changes only workflow link targets', () => {
+test('legacy reference base option does not introduce file links', () => {
+	assert.doesNotMatch(renderSkillMarkdown(spec), /references\//);
 	assert.equal(
 		renderSkillMarkdown(spec, { referencesBase: 'skills/example/references' }),
 		renderSkillMarkdown(spec).replace(
@@ -92,4 +93,32 @@ test('nested object alternatives inline fields and mark requirements within thei
 	assert.match(markdown, /\| parent.title \| string \| yes \| Record title/);
 	assert.match(markdown, /\| parent.mode \| string \| no \| fast, slow/);
 	assert.match(markdown, /\| parent \| object \/ object \| no/);
+});
+
+test('array object fields and every optional nested property are described', () => {
+	const properties = Object.fromEntries(
+		Array.from({ length: 10 }, (_, i) => [
+			`field${i}`,
+			{ type: 'string', description: `Field ${i}.` },
+		]),
+	);
+	const first = spec.tools[0];
+	assert.ok(first);
+	const result = renderSkillMarkdown({
+		...spec,
+		tools: [
+			{
+				...first,
+				inputSchema: {
+					type: 'object',
+					properties: {
+						records: { type: 'array', items: { type: 'object', required: ['field0'], properties } },
+					},
+				},
+			},
+		],
+	});
+	assert.match(result, /records\[\].field9 \| string \| no \| Field 9/);
+	assert.match(result, /records\[\].field0 \| string \| yes/);
+	assert.doesNotMatch(result, /\|\s*\|\s*$/m);
 });

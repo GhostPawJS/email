@@ -31,7 +31,7 @@
 <main>
   <section class="hero" aria-labelledby="hero-title">
     <div class="hero-copy">
-      <p class="kicker"><code>@ghostpaw/email</code> <span class="ver">0.5.7</span></p>
+      <p class="kicker"><code>@ghostpaw/email</code> <span class="ver">0.5.8</span></p>
       <h1 id="hero-title">Your agent can read the inbox. Sending is a separate tool.</h1>
       <p class="lede">email speaks IMAP and SMTP from inside your Node.js process, caches mail in a SQLite file with threads and FTS5 search, and splits what an agent can do into five tools. Give an agent <code>mail_read</code> and <code>mail_search</code>, leave out <code>mail_compose</code>, and it can read and search but not send.</p>
       <div class="install">
@@ -230,8 +230,8 @@ rs.search('discount');</code></pre>
         <div class="cmd"><textarea id="bin-darwin-x64" readonly rows="2" aria-labelledby="bin-darwin-x64-label" spellcheck="false">curl -fsSL https://raw.githubusercontent.com/GhostPawJS/email/main/install.sh | sh -s -- --target darwin-x64 &amp;&amp; export PATH=&quot;$HOME/.local/bin:$PATH&quot;</textarea><button type="button" class="copy" data-copy="bin-darwin-x64">Copy</button></div></div>
         <div><p class="cmd-label" id="bin-windows-x64-label">windows-x64 (PowerShell)</p>
         <div class="cmd"><textarea id="bin-windows-x64" readonly rows="2" aria-labelledby="bin-windows-x64-label" spellcheck="false">irm https://raw.githubusercontent.com/GhostPawJS/email/main/install.ps1 | iex</textarea><button type="button" class="copy" data-copy="bin-windows-x64">Copy</button></div></div>
-        <div><p class="cmd-label" id="bin-pinned-label">linux-x64 pinned to 0.5.7</p>
-        <div class="cmd"><textarea id="bin-pinned" readonly rows="2" aria-labelledby="bin-pinned-label" spellcheck="false">curl -fsSL https://raw.githubusercontent.com/GhostPawJS/email/main/install.sh | sh -s -- --target linux-x64 --version 0.5.7 &amp;&amp; export PATH=&quot;$HOME/.local/bin:$PATH&quot;</textarea><button type="button" class="copy" data-copy="bin-pinned">Copy</button></div></div>
+        <div><p class="cmd-label" id="bin-pinned-label">linux-x64 pinned to 0.5.8</p>
+        <div class="cmd"><textarea id="bin-pinned" readonly rows="2" aria-labelledby="bin-pinned-label" spellcheck="false">curl -fsSL https://raw.githubusercontent.com/GhostPawJS/email/main/install.sh | sh -s -- --target linux-x64 --version 0.5.8 &amp;&amp; export PATH=&quot;$HOME/.local/bin:$PATH&quot;</textarea><button type="button" class="copy" data-copy="bin-pinned">Copy</button></div></div>
         <div><p class="cmd-label" id="bin-profile-label">linux-x64, also adding ~/.local/bin to ~/.profile (edits that file once)</p>
         <div class="cmd"><textarea id="bin-profile" readonly rows="2" aria-labelledby="bin-profile-label" spellcheck="false">curl -fsSL https://raw.githubusercontent.com/GhostPawJS/email/main/install.sh | sh -s -- --target linux-x64 &amp;&amp; { grep -qs &#x27;.local/bin&#x27; ~/.profile || echo &#x27;export PATH=&quot;$HOME/.local/bin:$PATH&quot;&#x27; &gt;&gt; ~/.profile; } &amp;&amp; export PATH=&quot;$HOME/.local/bin:$PATH&quot;</textarea><button type="button" class="copy" data-copy="bin-profile">Copy</button></div></div>
     </div>

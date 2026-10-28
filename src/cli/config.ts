@@ -1,4 +1,12 @@
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import {
+	closeSync,
+	fchmodSync,
+	ftruncateSync,
+	mkdirSync,
+	openSync,
+	readFileSync,
+	writeFileSync,
+} from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 
@@ -51,11 +59,11 @@ export function dbPathForAccount(slug: string): string {
 }
 
 export function ensureConfigDir(): void {
-	mkdirSync(getConfigDir(), { recursive: true });
+	mkdirSync(getConfigDir(), { recursive: true, mode: 0o700 });
 }
 
 export function ensureDataDir(): void {
-	mkdirSync(getDataDir(), { recursive: true });
+	mkdirSync(getDataDir(), { recursive: true, mode: 0o700 });
 }
 
 // ─── Load / save ─────────────────────────────────────────────────────────────
@@ -82,7 +90,14 @@ export function loadAccounts(): AccountsFile | null {
 
 export function saveAccounts(data: AccountsFile): void {
 	ensureConfigDir();
-	writeFileSync(accountsFilePath(), JSON.stringify(data, null, '\t') + '\n', 'utf-8');
+	const fd = openSync(accountsFilePath(), 'a', 0o600);
+	try {
+		if (process.platform !== 'win32') fchmodSync(fd, 0o600);
+		ftruncateSync(fd, 0);
+		writeFileSync(fd, JSON.stringify(data, null, '\t') + '\n', 'utf-8');
+	} finally {
+		closeSync(fd);
+	}
 }
 
 // ─── Validation ──────────────────────────────────────────────────────────────

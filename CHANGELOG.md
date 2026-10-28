@@ -4,6 +4,18 @@ All notable changes are documented here using [Keep a Changelog 1.1.0](https://k
 
 ## [Unreleased]
 
+### Added
+
+- Compact CLI cheat sheet via `skill --short`.
+
+### Fixed
+
+- Skill guides use runnable commands instead of packaged reference links. Skill and describe parameter tables include nested fields and nonempty descriptions.
+
+### Security
+
+- Create accounts and SQLite cache files privately on POSIX, with private storage directories; enforce mode 0600 when rewriting accounts.json.
+
 ## [0.5.7] - 2026-10-28
 
 ### Security

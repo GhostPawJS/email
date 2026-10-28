@@ -15,7 +15,10 @@ const tool: SurfaceTool<number> = {
 			someValue: { type: 'integer' },
 			enabled: { type: 'boolean' },
 			ids: { type: 'array', items: { type: 'integer' } },
-			config: { type: 'object' },
+			config: {
+				type: 'object',
+				properties: { title: { type: 'string', description: 'Configuration title.' } },
+			},
 		},
 		required: ['someValue'],
 	},
@@ -260,4 +263,11 @@ test('noun verb error results preserve JSON and conflict exit codes', async () =
 	}
 	assert.equal((await invoke(['tool', 'test', '--some-value=1', '-'], '{bad')).code, 2);
 	assert.equal((await invoke(['tool', 'test', '--some-value=2', '-'], '{"someValue":1}')).code, 0);
+});
+
+test('describe provides nonempty parameter descriptions', async () => {
+	const result = await invoke(['describe', 'test_tool']);
+	assert.match(result.out, /ids \| array \| no \| Array of integer/);
+	assert.match(result.out, /config.title \| string \| no \| Configuration title/);
+	assert.match(result.out, /config \| object \| no \| Object: title/);
 });

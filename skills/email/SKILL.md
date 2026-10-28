@@ -25,6 +25,8 @@ Run tools as `ghostpaw-email ...`; use `~/.local/bin/ghostpaw-email` if it is no
 
 Read and search cached email offline. Configure live accounts with email account add before network operations. Inspect messages before replying or changing folders. Confirm recipients and content before sending; trash and folder deletion can remove mail. Credentials use the existing email CLI account configuration or EMAIL_* environment variables.
 
+For the compact cheat sheet, run `ghostpaw-email skill --short`.
+
 ## Calling tools
 
 MCP: connect to ghostpaw-email, then call a tool by name with its JSON arguments.
@@ -47,7 +49,7 @@ Nested requirements apply within the parent for the selected action.
 
 | Parameter | Type | Required | Values / description |
 | --- | --- | --- | --- |
-| view | string | yes | folders, queue, thread, message, attachment, eml. What to read. |
+| view | string | yes | eml. What to read. |
 | folder | string | no | Folder path (required for queue/message/attachment/eml). |
 | uid | integer | no | Message UID (required for message/attachment/eml). |
 | threadId | string | no | Thread ID (required for thread view). |
@@ -105,12 +107,45 @@ Nested requirements apply within the parent for the selected action.
 
 | Parameter | Type | Required | Values / description |
 | --- | --- | --- | --- |
-| action | string | yes | send, reply, forward, save_draft, update_draft, send_draft.  |
+| action | string | yes | send_draft. string value. |
 | folder | string | no | Source folder (required for reply/forward). |
 | uid | integer | no | Source message UID (required for reply/forward/update_draft/send_draft). |
 | input | object | no | ComposeInput / ReplyInput / ForwardInput payload. |
+| input.from | object | no | Object: address (required), name. |
+| input.from.address | string | yes | Email address. |
+| input.from.name | string | no | Display name. |
+| input.sender | object | no | Object: address (required), name. |
+| input.sender.address | string | yes | Email address. |
+| input.sender.name | string | no | Display name. |
+| input.envelopeFrom | object | no | Object: address (required), name. |
+| input.envelopeFrom.address | string | yes | Email address. |
+| input.envelopeFrom.name | string | no | Display name. |
+| input.replyTo | object | no | Object: address (required), name. |
+| input.replyTo.address | string | yes | Email address. |
+| input.replyTo.name | string | no | Display name. |
 | input.to | array | yes | Recipient addresses. |
+| input.to[].address | string | yes | Email address. |
+| input.to[].name | string | no | Display name. |
+| input.cc | array | no | Recipient addresses. |
+| input.cc[].address | string | yes | Email address. |
+| input.cc[].name | string | no | Display name. |
+| input.bcc | array | no | Recipient addresses. |
+| input.bcc[].address | string | yes | Email address. |
+| input.bcc[].name | string | no | Display name. |
 | input.subject | string | yes | Message subject. |
+| input.text | string | no | Plain text body. |
+| input.html | string | no | HTML body. |
+| input.replyAll | boolean | no | Reply to all original recipients. |
+| input.mode | string | no | inline, attachment. string value. |
+| input.attachments | array | no | Message attachments. |
+| input.attachments[].filename | string | yes | string value. |
+| input.attachments[].content | any | yes | Attachment bytes (Buffer in library calls). |
+| input.attachments[].mimeType | string | no | string value. |
+| input.attachments[].inline | boolean | no | boolean value. |
+| input.attachments[].contentId | string | no | string value. |
+| input.inReplyTo | string | no | string value. |
+| input.references | array | no | Array of string. |
+| input.headers | object | no | object value. |
 
 Examples:
 
@@ -134,7 +169,7 @@ Nested requirements apply within the parent for the selected action.
 
 | Parameter | Type | Required | Values / description |
 | --- | --- | --- | --- |
-| action | string | yes | mark_read, mark_unread, star, unstar, mark_answered, copy, move, archive, trash, junk, not_junk, set_labels, add_labels, remove_labels, create_folder, rename_folder, delete_folder, subscribe_folder, unsubscribe_folder.  |
+| action | string | yes | unsubscribe_folder. string value. |
 | folder | string | no | Source folder (required for message actions). |
 | uids | array | no | Message UIDs to act on. |
 | destination | string | no | Destination folder (required for copy/move). |
@@ -165,7 +200,7 @@ Nested requirements apply within the parent for the selected action.
 
 | Parameter | Type | Required | Values / description |
 | --- | --- | --- | --- |
-| action | string | yes | connect, disconnect, reconnect, sync, refresh_folders, watch.  |
+| action | string | yes | connect, disconnect, reconnect, sync, refresh_folders, watch. string value. |
 | folders | array | no | Folders to sync or watch (optional — defaults to all subscribed folders). |
 | bodies | string | no | none, missing, all. Body fetch strategy for sync (default: missing). |
 
@@ -179,15 +214,15 @@ ghostpaw-email call mail_sync '{"action":"reconnect"}'
 
 ## Workflow guides
 
-- `ghostpaw-email skill triage-inbox` ([triage-inbox](references/triage-inbox.md)): Process a full inbox from scratch: sync to get latest state, read message queue, selectively fetch bodies for decisions, then bulk-organize by priority.
-- `ghostpaw-email skill read-and-reply` ([read-and-reply](references/read-and-reply.md)): Read a message with full thread context, then compose and send a properly-threaded reply with quoted attribution.
-- `ghostpaw-email skill connect-and-sync` ([connect-and-sync](references/connect-and-sync.md)): Establish or restore an IMAP connection, refresh the folder list, and pull new messages — handling first-run vs incremental scenarios.
-- `ghostpaw-email skill search-and-act` ([search-and-act](references/search-and-act.md)): Find messages matching criteria (local FTS first, remote IMAP SEARCH as fallback), verify targets, then act — organize, reply, or present.
-- `ghostpaw-email skill compose-and-send` ([compose-and-send](references/compose-and-send.md)): Full draft lifecycle — save, review, update, then send — plus direct send, reply, and forward with proper threading and forwarded-header blocks.
-- `ghostpaw-email skill organize-bulk` ([organize-bulk](references/organize-bulk.md)): Bulk organize messages across folders — flagging, moving, archiving, labelling — and manage the folder hierarchy as part of the flow.
-- `ghostpaw-email skill attachment-workflow` ([attachment-workflow](references/attachment-workflow.md)): Discover, inspect, and fetch email attachments on demand; embed attachments in outbound messages; and export or import full .eml files.
-- `ghostpaw-email skill recover-from-disruption` ([recover-from-disruption](references/recover-from-disruption.md)): Detect and recover from connection loss or IMAP/SMTP failures — reconnect with back-off, re-sync to reconcile state, and handle auth vs transient errors distinctly.
-- `ghostpaw-email skill cli` ([cli](references/cli.md)): Complete existing email CLI guide.
+- `ghostpaw-email skill triage-inbox`: Process a full inbox from scratch: sync to get latest state, read message queue, selectively fetch bodies for decisions, then bulk-organize by priority.
+- `ghostpaw-email skill read-and-reply`: Read a message with full thread context, then compose and send a properly-threaded reply with quoted attribution.
+- `ghostpaw-email skill connect-and-sync`: Establish or restore an IMAP connection, refresh the folder list, and pull new messages — handling first-run vs incremental scenarios.
+- `ghostpaw-email skill search-and-act`: Find messages matching criteria (local FTS first, remote IMAP SEARCH as fallback), verify targets, then act — organize, reply, or present.
+- `ghostpaw-email skill compose-and-send`: Full draft lifecycle — save, review, update, then send — plus direct send, reply, and forward with proper threading and forwarded-header blocks.
+- `ghostpaw-email skill organize-bulk`: Bulk organize messages across folders — flagging, moving, archiving, labelling — and manage the folder hierarchy as part of the flow.
+- `ghostpaw-email skill attachment-workflow`: Discover, inspect, and fetch email attachments on demand; embed attachments in outbound messages; and export or import full .eml files.
+- `ghostpaw-email skill recover-from-disruption`: Detect and recover from connection loss or IMAP/SMTP failures — reconnect with back-off, re-sync to reconcile state, and handle auth vs transient errors distinctly.
+- `ghostpaw-email skill cli`: Complete existing email CLI guide.
 
 ## Principles
 

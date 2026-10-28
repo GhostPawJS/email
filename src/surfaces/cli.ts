@@ -1,6 +1,7 @@
 import type { Readable, Writable } from 'node:stream';
 import { cliVersion } from '../cli_version.ts';
 import { runCliCommand } from './cli_commands.ts';
+import { parameterRows } from './parameter_rows.ts';
 import { isErrorResult, type JsonSchema, type SurfaceTool } from './surface_types.ts';
 import { validateInput } from './validate_input.ts';
 
@@ -91,14 +92,7 @@ export async function runToolCli<TCtx>(
 	if (!tool) return fail(`Unknown tool: ${name ?? ''}`);
 	if (command === 'describe') {
 		stdout.write(
-			`${tool.name}\n${tool.description}\nUse when: ${tool.whenToUse ?? ''}\nNot for: ${tool.whenNotToUse ?? ''}\nRead only: ${tool.readOnly ?? false}\n\nParameter | Type | Required | Description\n${Object.entries(
-				tool.inputSchema.properties ?? {},
-			)
-				.map(
-					([key, schema]) =>
-						`${key} | ${schema.type ?? 'oneOf'} | ${tool.inputSchema.required?.includes(key) ?? false} | ${schema.description ?? ''}`,
-				)
-				.join('\n')}\n\n${JSON.stringify(tool.inputSchema, null, 2)}\n`,
+			`${tool.name}\n${tool.description}\nUse when: ${tool.whenToUse ?? ''}\nNot for: ${tool.whenNotToUse ?? ''}\nRead only: ${tool.readOnly ?? false}\n\nParameter | Type | Required | Description\n${parameterRows(tool.inputSchema).join('\n')}\n\n${JSON.stringify(tool.inputSchema, null, 2)}\n`,
 		);
 		return 0;
 	}

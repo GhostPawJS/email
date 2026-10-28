@@ -77,6 +77,10 @@ The surface database defaults to `~/.ghostpaw/email.db`; point `--db` at an
 existing account cache to read it. Each network call opens and closes its IMAP
 session. Connection commands do not retain a session between calls.
 
+On POSIX, new accounts files and SQLite caches (including WAL/SHM sidecars) use mode `0600`, and newly created storage directories use `0700`. Existing permissions are preserved, except rewriting `accounts.json` sets it to `0600`.
+
+Use `ghostpaw-email skill --short` for a compact command cheat sheet, `ghostpaw-email skill` for the full reference, and `ghostpaw-email skill --list` to list guides.
+
 ## Noun-verb CLI
 
 Both `email` and `ghostpaw-email` accept this additive command tree. Existing
@@ -191,7 +195,7 @@ irm https://raw.githubusercontent.com/GhostPawJS/email/main/install.ps1 | iex
 Pinned to a release:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/GhostPawJS/email/main/install.sh | sh -s -- --target linux-x64 --version 0.5.7 && export PATH="$HOME/.local/bin:$PATH"
+curl -fsSL https://raw.githubusercontent.com/GhostPawJS/email/main/install.sh | sh -s -- --target linux-x64 --version 0.5.8 && export PATH="$HOME/.local/bin:$PATH"
 ```
 
 Also adding ~/.local/bin to ~/.profile (edits ~/.profile once; skipped if it already mentions ~/.local/bin; zsh login shells read ~/.zprofile instead, so use that file name there):
@@ -208,7 +212,7 @@ $env:GHOSTPAW_NO_MODIFY_PATH=1; irm https://raw.githubusercontent.com/GhostPawJS
 
 ```text
 $ ghostpaw-email --version
-email 0.5.7 (binary, linux-x64)
+email 0.5.8 (binary, linux-x64)
 ```
 
 Scripts that compare versions should use `--version --short` or `--version --json`.
