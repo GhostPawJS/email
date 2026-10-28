@@ -102,7 +102,11 @@ These 33 paths map to the 5 aligned tools. Action verbs set the tool's action;
 `draft` sets `save_draft`. Search accepts its query as a positional argument.
 Other fields use kebab-case flags, such as `--folder INBOX --uids 1 --uids 2`
 and `--input @message.json` for a compose payload. Arrays accept repeated
-flags or JSON; objects accept JSON or `@file`. A single `-` reads stdin JSON;
+flags or JSON; objects accept JSON. Values are literal, including a leading
+`@`. Two flags read files: `--input` on the `mail` compose verbs and `--body`
+on `compose send|reply|draft`. On those, `@path` reads the file, `@-` reads
+stdin and `@@text` passes `@text`; help marks them `(@file, @- stdin, @@ literal @)`. An
+empty or unreadable path exits 2. A single `-` reads stdin JSON;
 explicit flags override stdin fields. `--` ends option parsing.
 
 Global flags for the new commands: `--db <path>`, `--json`, `--quiet`,
@@ -195,7 +199,7 @@ irm https://raw.githubusercontent.com/GhostPawJS/email/main/install.ps1 | iex
 Pinned to a release:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/GhostPawJS/email/main/install.sh | sh -s -- --target linux-x64 --version 0.5.9 && export PATH="$HOME/.local/bin:$PATH"
+curl -fsSL https://raw.githubusercontent.com/GhostPawJS/email/main/install.sh | sh -s -- --target linux-x64 --version 0.5.10 && export PATH="$HOME/.local/bin:$PATH"
 ```
 
 Also adding ~/.local/bin to ~/.profile (edits ~/.profile once; skipped if it already mentions ~/.local/bin; zsh login shells read ~/.zprofile instead, so use that file name there):
@@ -212,7 +216,7 @@ $env:GHOSTPAW_NO_MODIFY_PATH=1; irm https://raw.githubusercontent.com/GhostPawJS
 
 ```text
 $ ghostpaw-email --version
-email 0.5.9 (binary, linux-x64)
+email 0.5.10 (binary, linux-x64)
 ```
 
 Scripts that compare versions should use `--version --short` or `--version --json`.

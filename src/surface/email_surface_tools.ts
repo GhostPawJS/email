@@ -75,6 +75,7 @@ export const emailSurfaceTools: readonly SurfaceTool<EmailDb>[] = /* @__PURE__ *
 			noun: 'mail',
 			verb: tool.name.slice(5),
 			...(tool.name === 'mail_search' ? { positionals: ['query'] } : {}),
+			...(tool.name === 'mail_compose' ? { fileArgs: ['input'] } : {}),
 			...(tool.inputSchema.properties?.action?.enum
 				? {
 						action: {

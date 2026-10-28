@@ -18,6 +18,7 @@ export type CliErrorCode =
 	| 'missing_required_flag'
 	| 'invalid_flag_value'
 	| 'body_required'
+	| 'invalid_file_value'
 	| 'unknown_subaction';
 
 const EXIT_CODES: Record<CliErrorCode, number> = {
@@ -34,6 +35,7 @@ const EXIT_CODES: Record<CliErrorCode, number> = {
 	missing_required_flag: 1,
 	invalid_flag_value: 1,
 	body_required: 1,
+	invalid_file_value: 2,
 	unknown_subaction: 1,
 };
 

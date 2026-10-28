@@ -13,6 +13,8 @@ export interface SurfaceTool<TCtx> {
 		noun?: string;
 		verb: string;
 		positionals?: string[];
+		/** Input properties whose CLI value may be `@path`, `@-` or `@@text`; every other value is literal. */
+		fileArgs?: readonly string[];
 		action?: {
 			property: string;
 			verbs?: Record<string, string>;

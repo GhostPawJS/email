@@ -4,6 +4,10 @@ All notable changes are documented here using [Keep a Changelog 1.1.0](https://k
 
 ## [Unreleased]
 
+### Security
+
+- CLI values are literal by default, including a leading `@`. Before this release any `mail …` flag value starting with `@` was read from a file. File-capable now: `--input` on the `mail` compose verbs and `--body` on `compose send|reply|draft` (the forward note stays literal). `@path` reads the file as UTF-8, `@-` reads stdin and `@@text` passes a literal `@text`. An empty path or an unreadable file exits 2 and names the path, without file contents or the OS error text. Help marks them `(@file, @- stdin, @@ literal @)`.
+
 ## [0.5.9] - 2026-10-28
 
 ### Changed

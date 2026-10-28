@@ -1,4 +1,5 @@
 import { defineCommand } from 'citty';
+import { CliUsageError, readFileValue } from '../../surfaces/cli_args.ts';
 import { getEmailToolByName } from '../../tools/index.ts';
 import type { Address } from '../../types/address.ts';
 import type { ComposeInput, ForwardInput, ReplyInput } from '../../types/compose.ts';
@@ -38,7 +39,10 @@ export const composeCommand = defineCommand({
 				...sharedArgs,
 				to: { type: 'string', description: 'Recipient(s), comma-separated', required: true },
 				subject: { type: 'string', description: 'Email subject', required: true },
-				body: { type: 'string', description: 'Email body text (or pipe via stdin)' },
+				body: {
+					type: 'string',
+					description: 'Email body text (or pipe via stdin) (@file, @- stdin, @@ literal @)',
+				},
 				html: { type: 'boolean', description: 'Treat body as HTML', default: false },
 				cc: { type: 'string', description: 'CC recipient(s), comma-separated' },
 				bcc: { type: 'string', description: 'BCC recipient(s), comma-separated' },
@@ -94,7 +98,10 @@ export const composeCommand = defineCommand({
 				...sharedArgs,
 				folder: { type: 'string', description: 'Source folder', required: true },
 				uid: { type: 'string', description: 'Source message UID', required: true },
-				body: { type: 'string', description: 'Reply body (or pipe via stdin)' },
+				body: {
+					type: 'string',
+					description: 'Reply body (or pipe via stdin) (@file, @- stdin, @@ literal @)',
+				},
 				html: { type: 'boolean', description: 'Treat body as HTML', default: false },
 				to: { type: 'string', description: 'Override recipient(s)' },
 				cc: { type: 'string', description: 'CC recipient(s)' },
@@ -177,7 +184,7 @@ export const composeCommand = defineCommand({
 				const args = _args as unknown as Args;
 				await safeRun(_args as Record<string, unknown>, async () => {
 					const uid = parseUid(args.uid);
-					const body = await resolveBody(args.body, false); // body is optional for forward
+					const body = await resolveBody(args.body, false, false); // forwarding note: optional, always literal
 
 					const mode = args.mode as 'inline' | 'attachment' | undefined;
 					if (mode !== undefined && mode !== 'inline' && mode !== 'attachment') {
@@ -214,7 +221,10 @@ export const composeCommand = defineCommand({
 				'update-draft': { type: 'string', description: 'UID of draft to update' },
 				to: { type: 'string', description: 'Recipient(s), comma-separated' },
 				subject: { type: 'string', description: 'Email subject' },
-				body: { type: 'string', description: 'Draft body (or pipe via stdin)' },
+				body: {
+					type: 'string',
+					description: 'Draft body (or pipe via stdin) (@file, @- stdin, @@ literal @)',
+				},
 				html: { type: 'boolean', description: 'Treat body as HTML', default: false },
 				cc: { type: 'string', description: 'CC recipient(s)' },
 				from: { type: 'string', description: 'From address' },
@@ -291,8 +301,22 @@ export const composeCommand = defineCommand({
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 /** Resolves body text: flag > stdin > error (unless optional). */
-async function resolveBody(flagValue: string | undefined, required = true): Promise<string> {
-	if (flagValue !== undefined) return flagValue;
+/** `--body` on send, reply and draft: `@path`, `@-` and `@@text` (see CliArgument.file). */
+function bodyValue(raw: string): string {
+	try {
+		return readFileValue(raw, 'body');
+	} catch (error) {
+		if (error instanceof CliUsageError) throw new CliError('invalid_file_value', error.message);
+		throw error;
+	}
+}
+
+async function resolveBody(
+	flagValue: string | undefined,
+	required = true,
+	fileCapable = true,
+): Promise<string> {
+	if (flagValue !== undefined) return fileCapable ? bodyValue(flagValue) : flagValue;
 	if (isStdinPiped()) return readStdin();
 	if (required) {
 		throw new CliError(

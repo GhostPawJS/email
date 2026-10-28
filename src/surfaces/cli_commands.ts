@@ -107,6 +107,11 @@ export async function runCliCommand<T>(
 					schema.type === 'object' || !schema.type ? 'json' : (schema.type as CliArgument['type']),
 				description: schema.description,
 				enum: schema.enum,
+				...(command.tool.cli?.fileArgs?.includes(
+					name.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase()),
+				)
+					? { file: true }
+					: {}),
 				...(schema.items?.type ? { itemType: schema.items.type as CliArgument['type'] } : {}),
 			});
 			const properties = command.tool.inputSchema.properties ?? {};
