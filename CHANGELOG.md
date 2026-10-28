@@ -4,6 +4,8 @@ All notable changes are documented here using [Keep a Changelog 1.1.0](https://k
 
 ## [Unreleased]
 
+## [0.5.7] - 2026-10-28
+
 ### Security
 
 - `compose send|reply --attach` accepts only regular files (symlinks are followed). Directories, devices, FIFOs and sockets are rejected with `invalid_flag_value` before anything is read or sent, so a path like `/dev/zero` can no longer hang the command.
@@ -148,7 +150,8 @@ Same code as 0.5.3. The 0.5.3 release job published to npm but timed out waiting
 - Preserve SQLite built-in imports in bundled output and handle IMAP responses split across TCP chunks.
 - Refine envelope decoding.
 
-[Unreleased]: https://github.com/GhostPawJS/email/compare/v0.5.6...HEAD
+[Unreleased]: https://github.com/GhostPawJS/email/compare/v0.5.7...HEAD
+[0.5.7]: https://github.com/GhostPawJS/email/compare/v0.5.6...v0.5.7
 [0.5.6]: https://github.com/GhostPawJS/email/compare/v0.5.5...v0.5.6
 [0.5.5]: https://github.com/GhostPawJS/email/compare/v0.5.4...v0.5.5
 [0.5.4]: https://github.com/GhostPawJS/email/compare/v0.5.3...v0.5.4
