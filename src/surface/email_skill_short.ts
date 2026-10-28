@@ -3,12 +3,10 @@ import { emailVersion } from '../version.ts';
 export const emailSkillShort = `# ghostpaw-email cheat sheet
 Version: ${emailVersion}
 
-Install (Linux/macOS, checks SHA256SUMS, installs to ~/.local/bin):
+Install the release binary (checks SHA256SUMS; Linux/macOS installs to ~/.local/bin):
   curl -fsSL https://raw.githubusercontent.com/GhostPawJS/email/main/install.sh | sh
-Install (Windows):
-  irm https://raw.githubusercontent.com/GhostPawJS/email/main/install.ps1 | iex
-Or with Node 24+:
-  npm install -g @ghostpaw/email
+  Windows: irm https://raw.githubusercontent.com/GhostPawJS/email/main/install.ps1 | iex
+  Node 24+: npm install -g @ghostpaw/email
 Check version:
   ghostpaw-email --version
 
