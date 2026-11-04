@@ -1,4 +1,5 @@
 import { EmailAuthError, EmailConnectionError, EmailTimeoutError } from '../errors.ts';
+import { CliUsageError } from '../surfaces/cli_args.ts';
 import { ConfigError } from './config.ts';
 import { printError } from './output.ts';
 
@@ -56,7 +57,7 @@ export class CliError extends Error {
 export type ErrorResult = { exitCode: number; message: string; hint?: string };
 
 export function handleCliError(err: unknown): ErrorResult {
-	if (err instanceof CliError) {
+	if (err instanceof CliError || err instanceof CliUsageError) {
 		return { exitCode: err.exitCode, message: err.message };
 	}
 

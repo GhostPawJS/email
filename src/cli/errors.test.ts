@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { EmailAuthError, EmailConnectionError, EmailTimeoutError } from '../errors.ts';
+import { CliUsageError } from '../surfaces/cli_args.ts';
 import { CliError, handleCliError } from './errors.ts';
 
 describe('CliError', () => {
@@ -41,6 +42,10 @@ describe('CliError', () => {
 });
 
 describe('handleCliError', () => {
+	it('maps database directory usage errors to exit 2', () => {
+		const message = 'Cannot create database directory /cache: permission denied';
+		assert.deepEqual(handleCliError(new CliUsageError(message)), { exitCode: 2, message });
+	});
 	it('maps CliError correctly', () => {
 		const err = new CliError('no_config', 'No config found');
 		const result = handleCliError(err);

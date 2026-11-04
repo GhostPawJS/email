@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { Readable, Writable } from 'node:stream';
@@ -18,25 +18,29 @@ test('email noun-verb search and folders work offline with a fresh file cache', 
 		]) {
 			let out = '';
 			let err = '';
-			const code = await runToolCli([...args, '--db', join(dir, 'email.db'), '--json'], {
-				...emailCliOptions,
-				stdin: Readable.from([]),
-				stdout: new Writable({
-					write(chunk, _encoding, cb) {
-						out += String(chunk);
-						cb();
-					},
-				}),
-				stderr: new Writable({
-					write(chunk, _encoding, cb) {
-						err += String(chunk);
-						cb();
-					},
-				}),
-			});
+			const code = await runToolCli(
+				[...args, '--db', join(dir, 'missing', 'nested', 'email.db'), '--json'],
+				{
+					...emailCliOptions,
+					stdin: Readable.from([]),
+					stdout: new Writable({
+						write(chunk, _encoding, cb) {
+							out += String(chunk);
+							cb();
+						},
+					}),
+					stderr: new Writable({
+						write(chunk, _encoding, cb) {
+							err += String(chunk);
+							cb();
+						},
+					}),
+				},
+			);
 			assert.equal(code, 0, err);
 			assert.equal(err, '');
 			assert.equal(JSON.parse(out).ok, true);
+			assert.ok(statSync(join(dir, 'missing', 'nested', 'email.db')).isFile());
 		}
 	} finally {
 		rmSync(dir, { recursive: true, force: true });
@@ -59,4 +63,42 @@ test('email command paths are unique and cover every tool action once', () => {
 		else assert.equal(entries.length, 1);
 	}
 	assert.ok(commands.some((c) => c.path === 'mail draft' && c.fixed.action === 'save_draft'));
+});
+
+test('CLI reports a database parent that traverses a regular file as bad input', async () => {
+	const dir = mkdtempSync(join(tmpdir(), 'email-cli-db-'));
+	try {
+		const file = join(dir, 'file');
+		writeFileSync(file, '');
+		for (const parent of [file, join(file, 'nested')]) {
+			for (const args of [
+				['mail', 'read', '--view', 'folders'],
+				['call', 'mail_read', '{"view":"folders"}'],
+			]) {
+				let err = '';
+				const code = await runToolCli([...args, '--db', join(parent, 'email.db')], {
+					...emailCliOptions,
+					stdin: Readable.from([]),
+					stdout: new Writable({
+						write(_chunk, _encoding, cb) {
+							cb();
+						},
+					}),
+					stderr: new Writable({
+						write(chunk, _encoding, cb) {
+							err += String(chunk);
+							cb();
+						},
+					}),
+				});
+				assert.equal(code, 2);
+				assert.equal(
+					err,
+					`Cannot create database directory ${parent}: a path component is not a directory\n`,
+				);
+			}
+		}
+	} finally {
+		rmSync(dir, { recursive: true, force: true });
+	}
 });

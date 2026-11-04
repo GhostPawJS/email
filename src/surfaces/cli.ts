@@ -1,5 +1,6 @@
 import type { Readable, Writable } from 'node:stream';
 import { cliVersion } from '../cli_version.ts';
+import { CliUsageError } from './cli_args.ts';
 import { runCliCommand } from './cli_commands.ts';
 import { parameterRows } from './parameter_rows.ts';
 import { isErrorResult, type JsonSchema, type SurfaceTool } from './surface_types.ts';
@@ -166,7 +167,10 @@ export async function runToolCli<TCtx>(
 	try {
 		context = await options.openContext(ctxOptions);
 	} catch (cause) {
-		return fail(String(cause), 1);
+		return fail(
+			cause instanceof CliUsageError ? cause.message : String(cause),
+			cause instanceof CliUsageError ? 2 : 1,
+		);
 	}
 	try {
 		const result = await tool.handler(context, input as Record<string, unknown>);

@@ -4,6 +4,10 @@ All notable changes are documented here using [Keep a Changelog 1.1.0](https://k
 
 ## [Unreleased]
 
+### Fixed
+
+- Report database directory creation failures clearly and exit 2 in the CLI.
+
 ### Changed
 
 - Remove the landing page and docs site sources and the automated site deployment workflow.

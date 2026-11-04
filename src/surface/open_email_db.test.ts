@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
@@ -24,4 +24,17 @@ test('opens nested paths, initializes schema and configures WAL and timeout', as
 	}
 	const db = await openEmailDb(':memory:');
 	db.close();
+});
+
+test('database callers receive a clear directory error', async () => {
+	const directory = mkdtempSync(join(tmpdir(), 'email-db-'));
+	try {
+		const file = join(directory, 'file');
+		writeFileSync(file, '');
+		await assert.rejects(openEmailDb(join(file, 'nested', 'email.db')), {
+			message: `Cannot create database directory ${join(file, 'nested')}: a path component is not a directory`,
+		});
+	} finally {
+		rmSync(directory, { recursive: true, force: true });
+	}
 });

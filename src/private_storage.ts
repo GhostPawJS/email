@@ -1,9 +1,24 @@
 import { chmodSync, closeSync, mkdirSync, openSync } from 'node:fs';
 import { dirname } from 'node:path';
+import { CliUsageError } from './surfaces/cli_args.ts';
 
 /** Create private storage without changing existing files or directories. */
 export function preparePrivateStorage(path: string): () => void {
-	mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
+	const directory = dirname(path);
+	try {
+		mkdirSync(directory, { recursive: true, mode: 0o700 });
+	} catch (error) {
+		const code = (error as NodeJS.ErrnoException).code;
+		const reason =
+			code === 'ENOTDIR' || code === 'EEXIST'
+				? 'a path component is not a directory'
+				: code === 'EACCES' || code === 'EPERM'
+					? 'permission denied'
+					: code === 'EROFS'
+						? 'read-only file system'
+						: code;
+		throw new CliUsageError(`Cannot create database directory ${directory}: ${reason}`);
+	}
 	const created: string[] = [];
 	for (const file of [path, `${path}-wal`, `${path}-shm`]) {
 		try {
