@@ -25,6 +25,31 @@ Run tools as `ghostpaw-email ...`; use `~/.local/bin/ghostpaw-email` if it is no
 
 Read and search cached email offline. Configure live accounts with email account add before network operations. Inspect messages before replying or changing folders. Confirm recipients and content before sending; trash and folder deletion can remove mail. Credentials use the existing email CLI account configuration or EMAIL_* environment variables.
 
+## Running inside sandboxed agent harnesses
+
+Inside a Codex CLI `--sandbox workspace-write` session, the database and its
+parent directory must be inside a writable root, including SQLite's `-wal` and
+`-shm` side files. A default DB under `~/.ghostpaw` outside those roots can fail
+with `SQLITE_CANTOPEN` or `EPERM` (often exit 70; directory creation failures
+may exit 2), even when normal shell permissions allow access. Put the DB inside the workspace with `--db ./state/email.db`,
+or set `GHOSTPAW_EMAIL_DB="$PWD/state/email.db"` for CLI/MCP use.
+
+To use an external DB directory, add it when starting the OpenAI Codex CLI
+(replace `<dir-with-db>` with its absolute path):
+
+```sh
+codex exec --sandbox workspace-write --add-dir <dir-with-db> "Run the GhostPaw CLI"
+```
+
+Alternatively, set `sandbox_workspace_write.writable_roots` in
+`~/.codex/config.toml` before starting the session:
+
+```toml
+[sandbox_workspace_write]
+writable_roots = ["/absolute/dir-with-db"]
+```
+
+
 For the compact cheat sheet, run `ghostpaw-email skill --short`.
 
 ## Calling tools
