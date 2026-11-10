@@ -4,6 +4,8 @@ All notable changes are documented here using [Keep a Changelog 1.1.0](https://k
 
 ## [Unreleased]
 
+## [0.5.11] - 2026-11-10
+
 ### Added
 
 - `-q` short alias for `--quiet`.
@@ -189,7 +191,8 @@ Same code as 0.5.3. The 0.5.3 release job published to npm but timed out waiting
 - Preserve SQLite built-in imports in bundled output and handle IMAP responses split across TCP chunks.
 - Refine envelope decoding.
 
-[Unreleased]: https://github.com/GhostPawJS/email/compare/v0.5.10...HEAD
+[Unreleased]: https://github.com/GhostPawJS/email/compare/v0.5.11...HEAD
+[0.5.11]: https://github.com/GhostPawJS/email/compare/v0.5.10...v0.5.11
 [0.5.10]: https://github.com/GhostPawJS/email/compare/v0.5.9...v0.5.10
 [0.5.9]: https://github.com/GhostPawJS/email/compare/v0.5.8...v0.5.9
 [0.5.8]: https://github.com/GhostPawJS/email/compare/v0.5.7...v0.5.8
