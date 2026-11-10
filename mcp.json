@@ -6,7 +6,7 @@
       "command": "npx",
       "args": [
         "-y",
-        "@ghostpaw/email@0.5.10",
+        "@ghostpaw/email@0.5.11",
         "mcp"
       ]
     }
