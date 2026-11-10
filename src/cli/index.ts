@@ -60,10 +60,7 @@ export async function runEmailCli(args = process.argv.slice(2)): Promise<void> {
 			continue;
 		}
 		if (
-			token === '--compact' ||
-			token === '--json' ||
-			token === '--quiet' ||
-			token === '--no-color' ||
+			['--compact', '--json', '--quiet', '-q', '--no-color'].includes(token ?? '') ||
 			token?.startsWith('--db=')
 		) {
 			index++;
@@ -74,9 +71,18 @@ export async function runEmailCli(args = process.argv.slice(2)): Promise<void> {
 	const command = args[index];
 	if (
 		command &&
-		(['mcp', 'tools', 'call', 'skill', 'describe', '--version', '-v'].includes(command) ||
-			command.startsWith('mail_') ||
-			['mail', 'help', 'completions', 'version', '-V'].includes(command))
+		([
+			'mcp',
+			'tools',
+			'call',
+			'skill',
+			'describe',
+			'mail',
+			'help',
+			'completions',
+			'version',
+		].includes(command) ||
+			command.startsWith('mail_'))
 	) {
 		const { runToolCli } = await import('../surfaces/cli.ts');
 		const { emailCliOptions } = await import('../surface/email_cli_options.ts');

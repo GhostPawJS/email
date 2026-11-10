@@ -41,8 +41,9 @@ export async function runCliCommand<T>(
 	const stdin = options.stdin ?? process.stdin;
 	const args = [...argv];
 	const tree = cliCommands(options.tools);
+	const isQuiet = (arg: string | undefined) => arg === '--quiet' || arg === '-q';
 	let json = argv.includes('--json'),
-		quiet = argv.includes('--quiet'),
+		quiet = argv.some(isQuiet),
 		compact = false,
 		help = false;
 	let db: string | undefined;
@@ -79,7 +80,7 @@ export async function runCliCommand<T>(
 				db = flag === '--db' ? args.splice(i + 1, 1)[0] : flag.slice(5);
 				if (!db || db.startsWith('--')) throw new CliUsageError('--db requires a path');
 			} else if (flag === '--json') json = true;
-			else if (flag === '--quiet') quiet = true;
+			else if (isQuiet(flag)) quiet = true;
 			else if (flag === '--compact') compact = true;
 			else if (flag === '--help' || flag === '-h') help = true;
 			else if (['--version', '-V', '-v'].includes(flag ?? '')) {
@@ -146,7 +147,7 @@ export async function runCliCommand<T>(
 				stdout.write(
 					entry
 						? renderCliHelp(specFor(entry))
-						: `${options.bin} ${options.version}\n${options.description}\n\nCommands:\n${matches.map((command) => `  ${command.path}`).join('\n')}\n  mcp, skill, tools [--json], describe <tool>, call <tool> [JSON|-], completions <bash|zsh|fish>, version\nVersion output: --version --short or --version --json\nGlobal flags: --db <path>, --json, --quiet, --compact, --help/-h, --version/-V/-v, --no-color\n`,
+						: `${options.bin} ${options.version}\n${options.description}\n\nCommands:\n${matches.map((command) => `  ${command.path}`).join('\n')}\n  mcp, skill, tools [--json], describe <tool>, call <tool> [JSON|-], completions <bash|zsh|fish>, version\nVersion output: --version --short or --version --json\nGlobal flags: --db <path>, --json, -q, --quiet, --compact, --help/-h, --version/-V/-v, --no-color\n`,
 				);
 			return 0;
 		}

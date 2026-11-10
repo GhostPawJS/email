@@ -271,8 +271,8 @@ email read eml --folder INBOX --uid 42 | mail -s "fwd" target@example.com
 # JSON pipeline
 email read queue --json | jq '.entities[] | select(.title | test("invoice"; "i")) | .id'
 
-# Quiet mode — only exit code matters
-email organize archive --folder INBOX --uids 42 --quiet && echo "archived"
+# -q, --quiet: exit code only
+email organize archive --folder INBOX --uids 42 -q && echo "archived"
 ```
 
 ---

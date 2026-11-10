@@ -59,3 +59,55 @@ test('account add help describes negated TLS flags', async () => {
 		assert.ok(output.includes(`Disable TLS for ${protocol.toUpperCase()} (TLS is on by default)`));
 	}
 });
+
+test('quiet aliases suppress stdout and leave default database stderr empty', async () => {
+	const dir = mkdtempSync(join(process.cwd(), '.quiet-test-'));
+	const quietEnv: NodeJS.ProcessEnv = {
+		...env,
+		HOME: dir,
+		USERPROFILE: dir,
+		EMAIL_CONFIG_DIR: join(dir, 'config'),
+	};
+	for (const key of Object.keys(quietEnv)) {
+		if (key.startsWith('EMAIL_') && key !== 'EMAIL_CONFIG_DIR') delete quietEnv[key];
+	}
+	delete quietEnv.GHOSTPAW_EMAIL_DB;
+	try {
+		const run = async (command: string[]) => {
+			const outPath = join(dir, 'stdout');
+			const errPath = join(dir, 'stderr');
+			const outFd = openSync(outPath, 'w');
+			const errFd = openSync(errPath, 'w');
+			try {
+				const child = spawn(process.execPath, [...args, ...command], {
+					env: quietEnv,
+					stdio: ['ignore', outFd, errFd],
+				});
+				const [code] = await once(child, 'close');
+				const stdout = readFileSync(outPath, 'utf8');
+				const stderr = readFileSync(errPath, 'utf8');
+				assert.equal(code, 0, stderr);
+				return { stdout, stderr };
+			} finally {
+				closeSync(outFd);
+				closeSync(errFd);
+			}
+		};
+		assert.notEqual((await run(['mail', 'read', '--view', 'folders'])).stdout, '');
+		for (const first of [true, false]) {
+			const command = ['mail', 'read', '--view', 'folders'];
+			const flags = (flag: string) => (first ? [flag, ...command] : [...command, flag]);
+			const long = await run(flags('--quiet'));
+			assert.deepEqual(long, { stdout: '', stderr: '' });
+			assert.deepEqual(await run(flags('-q')), long);
+		}
+	} finally {
+		rmSync(dir, { recursive: true, force: true });
+	}
+});
+
+test('command help lists both quiet aliases', async () => {
+	for (const command of [['read'], ['search'], ['sync'], ['organize'], ['compose', 'send']]) {
+		assert.match(await help(...command), /-q, --quiet/);
+	}
+});

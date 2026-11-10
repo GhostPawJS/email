@@ -271,3 +271,21 @@ test('describe provides nonempty parameter descriptions', async () => {
 	assert.match(result.out, /config.title \| string \| no \| Configuration title/);
 	assert.match(result.out, /config \| object \| no \| Object: title/);
 });
+
+test('-q matches --quiet before and after commands, including early version and error output', async () => {
+	for (const args of [
+		['tool', 'test', '--some-value=2'],
+		['tool', 'test', '--some-value=bad', '--json'],
+		['--version'],
+		['--help'],
+		['completions', 'bash'],
+	]) {
+		for (const first of [true, false]) {
+			const quietArgs = (flag: string) => (first ? [flag, ...args] : [...args, flag]);
+			const long = await invoke(quietArgs('--quiet'));
+			assert.equal(long.out, '');
+			assert.deepEqual(await invoke(quietArgs('-q')), long);
+		}
+	}
+	assert.match((await invoke(['--help'])).out, /-q, --quiet/);
+});

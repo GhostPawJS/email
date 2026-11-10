@@ -24,6 +24,7 @@ const sharedArgs = {
 	account: { type: 'string' as const, description: 'Account name (overrides default)' },
 	json: { type: 'boolean' as const, description: 'Output full result as JSON', default: false },
 	quiet: {
+		alias: 'q',
 		type: 'boolean' as const,
 		description: 'Suppress all output except errors',
 		default: false,

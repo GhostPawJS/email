@@ -109,9 +109,9 @@ stdin and `@@text` passes `@text`; help marks them `(@file, @- stdin, @@ literal
 empty or unreadable path exits 2. A single `-` reads stdin JSON;
 explicit flags override stdin fields. `--` ends option parsing.
 
-Global flags for the new commands: `--db <path>`, `--json`, `--quiet`,
+Global flags for the new commands: `--db <path>`, `--json`, `-q, --quiet`,
 `--compact`, `--help`/`-h`, `--version`/`-V`/`-v`, `--no-color`.
-Output is JSON when piped or when `--json` is set. `--quiet` suppresses stdout.
+Output is JSON when piped or when `--json` is set. `-q, --quiet` suppresses stdout.
 `completions bash|zsh|fish` prints shell completion setup; `version` prints
 the version and installation variant. The existing `tools [--json]`, `describe <tool>`,
 `call <tool> [JSON|-]`, flat `mail_<tool> --parameter value`, `mcp` and `skill`
